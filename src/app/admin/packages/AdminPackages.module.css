@@ -1,0 +1,207 @@
+.pageContainer {
+  padding: 0;
+  min-height: 100%;
+  background: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.pageSubtitle {
+  color: #6b7280;
+  margin: 0.5rem 0 0;
+}
+
+.primaryBtn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.85rem 1.5rem;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  box-shadow: 0 10px 20px rgba(217, 119, 6, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primaryBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(217, 119, 6, 0.35);
+}
+
+.card {
+  background: #fff;
+  border-radius: 1.25rem;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  padding: 2rem;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.cardHeading {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.countBadge {
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: rgba(245, 158, 11, 0.15);
+  color: #b45309;
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6b7280;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.secondaryBtn {
+  align-self: center;
+  background: #fff7ed;
+  color: #d97706;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  border: 1px solid rgba(217, 119, 6, 0.3);
+  transition: background 0.2s ease;
+}
+
+.secondaryBtn:hover {
+  background: rgba(245, 158, 11, 0.15);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableHeadRow {
+  background: transparent;
+}
+
+.tableHeaderCell {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+}
+
+.tableHeaderCellActions {
+  text-align: right;
+}
+
+.tableRow {
+  transition: background 0.2s ease;
+}
+
+.tableCell {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  color: #1f2937;
+  font-size: 0.95rem;
+}
+
+.tableRow:hover .tableCell {
+  background: #f9fafb;
+}
+
+.actionsCell {
+  text-align: right;
+}
+
+.actionsGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.editBtn,
+.deleteBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.6rem;
+  font-weight: 600;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  text-decoration: none;
+}
+
+.editBtn {
+  background: rgba(59, 130, 246, 0.15);
+  color: #1d4ed8;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.editBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.25);
+}
+
+.deleteBtn {
+  background: rgba(248, 113, 113, 0.18);
+  color: #b91c1c;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+}
+
+.deleteBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(248, 113, 113, 0.25);
+  background: rgba(248, 113, 113, 0.28);
+}
+
+.deleteBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 1.5rem;
+  }
+
+  .tableHeaderCell,
+  .tableCell {
+    padding: 0.75rem;
+  }
+}

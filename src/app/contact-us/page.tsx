@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -103,7 +103,8 @@ export default function ContactPage() {
               Ready to plan your perfect Sri Lankan adventure? Let's start the conversation.
             </p>
           </div>
-          
+          {/* Login / Profile Button */}
+       
           <div className="hero-scroll-indicator">
             <span>Scroll to connect</span>
             <div className="scroll-arrow">↓</div>

@@ -1,19 +1,21 @@
 'use client';
 
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
-export default function Navbar() {
+interface NavbarProps {
+  isAuthenticated: boolean;
+  userRole: string | null;
+}
+
+export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeLink, setActiveLink] = useState('home');
   const [isBookingsDropdownOpen, setIsBookingsDropdownOpen] = useState(false);
-
-  const navigation = [
-  { name: 'Home', href: '/' },
-  { name: 'About Us', href: '/about-us' },
-  { name: 'Contact Us', href: '/contact-us' },
-  { name: 'Categories', href: '/categories' },
-];
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,19 +26,59 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleAuthClick = () => {
+    if (isAuthenticated) {
+      setIsProfileDropdownOpen(!isProfileDropdownOpen);
+    } else {
+      router.push('/login');
+      setIsMenuOpen(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+  await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+    } catch (error) {
+      console.error('Failed to logout user:', error);
+    } finally {
+      setIsProfileDropdownOpen(false);
+      setIsMenuOpen(false);
+      router.push('/');
+      router.refresh();
+    }
+  };
+
+  const handleDashboardClick = () => {
+    setIsProfileDropdownOpen(false);
+    setIsMenuOpen(false);
+    router.push('/admin/dashboard');
+  };
+
+  // Track current pathname to set active link state
+  const pathname = usePathname();
+  useEffect(() => {
+    if (pathname) setActiveLink(pathname);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setIsProfileDropdownOpen(false);
+    }
+  }, [isAuthenticated]);
+
   const navItems = [
-    { id: 'home', label: 'HOME' },
-    { id: 'about', label: 'ABOUT US' },
+    { id: '/', label: 'HOME' },
+    { id: '/about-us', label: 'ABOUT US' },
     { 
       id: 'bookings', 
       label: 'BOOKINGS',
       dropdown: [
-        { id: 'packages', label: 'PACKAGES' },
-        { id: 'create-package', label: 'CREATE PACKAGE' }
+        { id: '/packages', label: 'PACKAGES' },
+        { id: '/create_pkg', label: 'CREATE PACKAGE' }
       ]
     },
-    { id: 'gallery', label: 'GALLERY' },
-    { id: 'contact', label: 'CONTACT US' }
+    { id: '/gallery', label: 'GALLERY' },
+    { id: '/contact-us', label: 'CONTACT US' }
   ];
 
   const handleNavClick = (id: string) => {
@@ -71,37 +113,40 @@ export default function Navbar() {
               onMouseEnter={() => item.dropdown && handleBookingsHover(true)}
               onMouseLeave={() => item.dropdown && handleBookingsHover(false)}
             >
-              <a
-                href={item.dropdown ? '#' : `#${item.id}`}
-                className={`nav-link ${activeLink === item.id ? 'active' : ''} ${item.dropdown ? 'dropdown-toggle' : ''}`}
-                onClick={(e) => {
-                  if (item.dropdown) {
-                    e.preventDefault();
-                    setIsBookingsDropdownOpen(!isBookingsDropdownOpen);
-                  } else {
-                    handleNavClick(item.id);
-                  }
-                }}
-              >
-                <span className="nav-link-text">{item.label}</span>
-                {item.dropdown && (
+              {item.dropdown ? (
+                // Dropdown trigger should be a button (not a navigation link)
+                <button
+                  type="button"
+                  className={`nav-link ${activeLink === item.id ? 'active' : ''} dropdown-toggle`}
+                  onClick={() => setIsBookingsDropdownOpen(!isBookingsDropdownOpen)}
+                >
+                  <span className="nav-link-text">{item.label}</span>
                   <span className="dropdown-arrow">▼</span>
-                )}
-                <span className="nav-link-underline"></span>
-              </a>
+                  <span className="nav-link-underline"></span>
+                </button>
+              ) : (
+                <Link
+                  href={item.id}
+                  className={`nav-link ${activeLink === item.id ? 'active' : ''}`}
+                  onClick={() => handleNavClick(item.id)}
+                >
+                  <span className="nav-link-text">{item.label}</span>
+                  <span className="nav-link-underline"></span>
+                </Link>
+              )}
 
               {/* Dropdown Menu for Bookings */}
               {item.dropdown && (
                 <div className={`dropdown-menu ${isBookingsDropdownOpen ? 'show' : ''}`}>
                   {item.dropdown.map((dropdownItem) => (
-                    <a
+                    <Link
                       key={dropdownItem.id}
-                      href={`#${dropdownItem.id}`}
+                      href={dropdownItem.id}
                       className={`dropdown-link ${activeLink === dropdownItem.id ? 'active' : ''}`}
                       onClick={() => handleNavClick(dropdownItem.id)}
                     >
                       {dropdownItem.label}
-                    </a>
+                    </Link>
                   ))}
                 </div>
               )}
@@ -120,6 +165,33 @@ export default function Navbar() {
           <span>Book Now</span>
           <div className="cta-icon">✈️</div>
         </button>
+
+        {/* Auth Button (Login / Profile / Admin) */}
+        <div className="auth-dropdown-container">
+          <button
+            className="book-now-button auth-button ml-3"
+            onClick={handleAuthClick}
+            aria-label={isAuthenticated ? (userRole === 'ADMIN' ? 'Admin menu' : 'Profile') : 'Login'}
+          >
+            <span>{isAuthenticated ? (userRole === 'ADMIN' ? 'Admin' : 'Profile') : 'Login'}</span>
+            <div className="cta-icon">{userRole === 'ADMIN' ? '👑' : '👤'}</div>
+          </button>
+          
+          {isAuthenticated && isProfileDropdownOpen && (
+            <div className="profile-dropdown">
+              {userRole === 'ADMIN' && (
+                <button onClick={handleDashboardClick} className="dashboard-btn">
+                  <span>Dashboard</span>
+                  <div className="dashboard-icon">📊</div>
+                </button>
+              )}
+              <button onClick={handleLogout} className="logout-btn">
+                <span>Logout</span>
+                <div className="logout-icon">🚪</div>
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Animated Hamburger Menu */}
         <button 
@@ -242,19 +314,25 @@ export default function Navbar() {
           transform: translateY(0);
         }
 
-        .nav-link {
+        /* Reset anchor pseudo-states to avoid browser defaults (blue/underline) */
+        .nav-link,
+        .nav-link:link,
+        .nav-link:visited,
+        .nav-link:active,
+        .nav-link:focus {
           position: relative;
-          text-decoration: none;
+          text-decoration: none !important;
           color: #2E8B57;
           font-weight: 600;
           font-size: 0.9rem;
           letter-spacing: 0.025em;
-          transition: all 0.3s ease;
+          transition: color 0.25s ease, transform 0.25s ease;
           padding: 0.5rem 0.75rem;
-          display: flex;
+          display: inline-flex;
           align-items: center;
           gap: 0.3rem;
           border-radius: 8px;
+          outline: none;
         }
 
         .navbar.scrolled .nav-link {
@@ -323,15 +401,21 @@ export default function Navbar() {
           transform: translateY(0);
         }
 
-        .dropdown-link {
+        /* Dropdown links: reset pseudo-states too */
+        .dropdown-link,
+        .dropdown-link:link,
+        .dropdown-link:visited,
+        .dropdown-link:active,
+        .dropdown-link:focus {
           display: block;
           padding: 0.75rem 1.5rem;
           color: #2E8B57;
-          text-decoration: none;
+          text-decoration: none !important;
           font-weight: 500;
           font-size: 0.9rem;
-          transition: all 0.3s ease;
+          transition: color 0.2s ease, background 0.2s ease;
           border-left: 3px solid transparent;
+          outline: none;
         }
 
         .dropdown-link:hover {
@@ -348,8 +432,8 @@ export default function Navbar() {
 
         /* Book Now Button - Green */
         .book-now-button {
-          background: rgba(245, 158, 11, 0.4); /* Solid green */
-          color: white;
+          background: rgba(245, 158, 11, 0.95);
+          color: white !important;
           border: none;
           padding: 0.75rem 1.5rem;
           border-radius: 50px;
@@ -360,7 +444,7 @@ export default function Navbar() {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          box-shadow: 0 4px 15px #d97706(5, 150, 105, 0.3);
+          box-shadow: 0 6px 18px rgba(217,119,6,0.18);
           position: relative;
           overflow: hidden;
         }
@@ -393,6 +477,115 @@ export default function Navbar() {
 
         .book-now-button:hover .cta-icon {
           transform: translateX(3px) rotate(15deg);
+        }
+
+        .auth-button {
+          background: linear-gradient(90deg,#06b6d4,#3b82f6);
+          box-shadow: 0 6px 18px rgba(59,130,246,0.16);
+          padding: 0.6rem 1.1rem;
+          font-size: 0.9rem;
+        }
+
+        .auth-button .cta-icon {
+          font-size: 1rem;
+        }
+
+        .auth-dropdown-container {
+          position: relative;
+        }
+
+        .profile-dropdown {
+          position: absolute;
+          top: calc(100% + 0.5rem);
+          right: 0;
+          background: rgba(255, 255, 255, 0.98);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(0, 0, 0, 0.1);
+          border-radius: 12px;
+          padding: 0.5rem;
+          min-width: 150px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+          animation: dropdownSlide 0.3s ease;
+          z-index: 1001;
+        }
+
+        @keyframes dropdownSlide {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .logout-btn {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.5rem;
+          padding: 0.75rem 1rem;
+          background: linear-gradient(90deg, #ef4444, #dc2626);
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 0.9rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        .logout-btn:hover {
+          background: linear-gradient(90deg, #dc2626, #b91c1c);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .logout-icon {
+          font-size: 1rem;
+          transition: transform 0.3s ease;
+        }
+
+        .logout-btn:hover .logout-icon {
+          transform: translateX(3px);
+        }
+
+        .dashboard-btn {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.5rem;
+          padding: 0.75rem 1rem;
+          background: linear-gradient(90deg, #3b82f6, #2563eb);
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 0.9rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+          margin-bottom: 0.5rem;
+        }
+
+        .dashboard-btn:hover {
+          background: linear-gradient(90deg, #2563eb, #1d4ed8);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .dashboard-icon {
+          font-size: 1rem;
+          transition: transform 0.3s ease;
+        }
+
+        .dashboard-btn:hover .dashboard-icon {
+          transform: scale(1.1);
         }
 
         .mobile-cta {
@@ -466,6 +659,10 @@ export default function Navbar() {
           }
 
           .desktop-cta {
+            display: none;
+          }
+
+          .auth-button {
             display: none;
           }
 

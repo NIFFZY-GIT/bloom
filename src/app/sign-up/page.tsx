@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-const backgroundImages = [
-  '/images/signup-bg-1.jpg',
-];
+const backgroundImages = ['/images/signup-bg-1.jpg'];
 
 export default function SignupPage() {
+  const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [formData, setFormData] = useState({
     username: '',
@@ -14,6 +14,8 @@ export default function SignupPage() {
     password: '',
     confirmPassword: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -22,10 +24,39 @@ export default function SignupPage() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle signup logic here
-    console.log('Signup attempted with:', formData);
+    setError(null);
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          role: 'USER'
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Signup failed');
+      const destination = data.role === 'ADMIN' ? '/admin/dashboard' : '/';
+      router.push(destination);
+      router.refresh();
+    } catch (err: any) {
+      setError(err.message || 'Signup failed');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -156,10 +187,18 @@ export default function SignupPage() {
               </label>
             </div>
 
+            {error && <p className="error-message">{error}</p>}
+
             {/* Yellow Signup Button */}
-            <button type="submit" className="modern-signup-btn-yellow">
-              <span className="btn-text">CREATE ACCOUNT</span>
-              <div className="btn-arrow">→</div>
+            <button type="submit" className="modern-signup-btn-yellow" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <span className="btn-text">CREATING...</span>
+              ) : (
+                <>
+                  <span className="btn-text">CREATE ACCOUNT</span>
+                  <div className="btn-arrow">→</div>
+                </>
+              )}
             </button>
           </form>
 
@@ -562,6 +601,24 @@ export default function SignupPage() {
 
         .modern-signup-btn-yellow:hover .btn-arrow {
           transform: translateX(4px);
+        }
+
+        .modern-signup-btn-yellow:disabled {
+          background: #9ca3af;
+          cursor: not-allowed;
+          box-shadow: none;
+          transform: none;
+        }
+
+        .modern-signup-btn-yellow:disabled::before {
+          display: none;
+        }
+
+        .error-message {
+          color: #ef4444;
+          font-size: 0.9rem;
+          text-align: center;
+          margin-bottom: 1rem;
         }
 
         /* Google Signup Section with Yellow */

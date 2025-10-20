@@ -1,0 +1,45 @@
+.adminLayout {
+  display: flex;
+  min-height: calc(100vh - 5.5rem);
+  margin-top: 5.5rem;
+  background: #f1f5f9;
+}
+
+.sidebarWrapper {
+  flex-shrink: 0;
+  width: 260px;
+  position: sticky;
+  top: 5.5rem;
+  align-self: flex-start;
+  height: calc(100vh - 5.5rem);
+  overflow-y: auto;
+  z-index: 20;
+}
+
+.contentArea {
+  flex: 1;
+  padding: 2.5rem;
+  min-height: calc(100vh - 5.5rem);
+  overflow-y: auto;
+}
+
+@media (max-width: 1024px) {
+  .adminLayout {
+    flex-direction: column;
+    margin-top: 5rem;
+    min-height: auto;
+  }
+
+  .sidebarWrapper {
+    width: 100%;
+    position: relative;
+    height: auto;
+    top: 0;
+    box-shadow: none;
+  }
+
+  .contentArea {
+    padding: 2rem 1.5rem;
+    min-height: auto;
+  }
+}

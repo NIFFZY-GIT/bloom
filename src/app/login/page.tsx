@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 const backgroundImages = [
   '/images/hero-bg-1.jpg',
@@ -8,8 +9,15 @@ const backgroundImages = [
   '/images/hero-bg-3.jpg'
 ];
 
-export default function HeroSection() {
+export default function LoginPage() {
+  const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -18,6 +26,40 @@ export default function HeroSection() {
 
     return () => clearInterval(timer);
   }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Login failed');
+      const destination = data.role === 'ADMIN' ? '/admin/dashboard' : '/';
+      router.push(destination);
+      router.refresh();
+    } catch (err: any) {
+      setError(err.message || 'Login failed');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="hero-container">
@@ -90,13 +132,17 @@ export default function HeroSection() {
           </div>
 
           {/* Modern Form */}
-          <form className="modern-login-form">
+          <form className="modern-login-form" onSubmit={handleSubmit}>
             <div className="input-group-modern">
               <div className="input-container">
                 <input
                   type="email"
+                  name="email"
                   placeholder=" "
                   className="modern-input"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
                 />
                 <label className="modern-label">Email Address</label>
                 <div className="input-underline"></div>
@@ -107,8 +153,12 @@ export default function HeroSection() {
               <div className="input-container">
                 <input
                   type="password"
+                  name="password"
                   placeholder=" "
                   className="modern-input"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
                 />
                 <label className="modern-label">Password</label>
                 <div className="input-underline"></div>
@@ -127,16 +177,24 @@ export default function HeroSection() {
               </a>
             </div>
 
+            {error && <p className="error-message">{error}</p>}
+
             {/* Yellow Login Button */}
-            <button type="submit" className="modern-login-btn-yellow">
-              <span className="btn-text">LOG IN</span>
-              <div className="btn-arrow">→</div>
+            <button type="submit" className="modern-login-btn-yellow" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <span className="btn-text">LOGGING IN...</span>
+              ) : (
+                <>
+                  <span className="btn-text">LOG IN</span>
+                  <div className="btn-arrow">→</div>
+                </>
+              )}
             </button>
           </form>
 
           {/* Signup Link */}
           <div className="modern-signup-section">
-            <p>Don't have an account? <a href="#" className="modern-signup-link">Sign Up</a></p>
+            <p>Don't have an account? <a href="/sign-up" className="modern-signup-link">Sign Up</a></p>
           </div>
         </div>
       </div>
@@ -642,6 +700,24 @@ export default function HeroSection() {
 
         .modern-login-btn-yellow:hover .btn-arrow {
           transform: translateX(4px);
+        }
+
+        .modern-login-btn-yellow:disabled {
+          background: #9ca3af;
+          cursor: not-allowed;
+          box-shadow: none;
+          transform: none;
+        }
+
+        .modern-login-btn-yellow:disabled::before {
+          display: none;
+        }
+
+        .error-message {
+          color: #ef4444;
+          font-size: 0.9rem;
+          text-align: center;
+          margin-top: -0.5rem;
         }
 
         .modern-signup-section {
