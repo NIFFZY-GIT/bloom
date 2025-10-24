@@ -1,0 +1,376 @@
+.page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f9fafb 0%, #eef2ff 45%, #f8fafc 100%);
+  padding: 3.5rem 1.5rem 4rem;
+}
+
+.wrapper {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.headerTitle {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.headerSubtitle {
+  margin: 0 auto;
+  max-width: 580px;
+  color: #6b7280;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 2rem;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 1.25rem;
+  box-shadow: 0 30px 60px rgba(79, 70, 229, 0.12);
+  padding: 2.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.cardTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.stepBadge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #4338ca;
+  background: rgba(99, 102, 241, 0.12);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.1rem;
+}
+
+.detailItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 1rem;
+  background: #f8fafc;
+}
+
+.detailLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6b7280;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.detailValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.summaryList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  border-radius: 0.85rem;
+  background: rgba(99, 102, 241, 0.08);
+  color: #312e81;
+}
+
+.summaryRow strong {
+  font-size: 1.05rem;
+}
+
+.note {
+  background: rgba(16, 185, 129, 0.12);
+  border-radius: 0.85rem;
+  padding: 1rem 1.25rem;
+  color: #047857;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.bankList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.bankRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  background: #f9fafb;
+  border: 1px solid rgba(229, 231, 235, 0.85);
+}
+
+.bankLabel {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.bankValue {
+  font-family: 'JetBrains Mono', monospace;
+  color: #4338ca;
+}
+
+.receiptSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.receiptDropzone {
+  border: 2px dashed rgba(99, 102, 241, 0.35);
+  border-radius: 1rem;
+  padding: 1.75rem;
+  background: rgba(238, 242, 255, 0.6);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: #4c51bf;
+}
+
+.receiptDropzone strong {
+  font-size: 1rem;
+}
+
+.fileInput {
+  display: none;
+}
+
+.receiptActions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.uploadBtn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.75rem 1.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.uploadPrimary {
+  background: linear-gradient(135deg, #6366f1, #4338ca);
+  color: #ffffff;
+  box-shadow: 0 18px 32px rgba(99, 102, 241, 0.25);
+}
+
+.uploadPrimary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 22px 40px rgba(99, 102, 241, 0.35);
+}
+
+.uploadSecondary {
+  background: #f1f5f9;
+  color: #1f2937;
+}
+
+.uploadSecondary:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.uploadBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.statusMessage {
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.statusSuccess {
+  color: #0f766e;
+}
+
+.statusError {
+  color: #b91c1c;
+}
+
+.statusLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 0.6rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 999px;
+  background: rgba(79, 70, 229, 0.12);
+  color: #4338ca;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.statusLink:hover {
+  background: rgba(79, 70, 229, 0.2);
+  color: #312e81;
+}
+
+.previewWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.previewImage {
+  max-width: 260px;
+  border-radius: 1rem;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  box-shadow: 0 16px 30px rgba(99, 102, 241, 0.2);
+}
+
+.pdfBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  background: rgba(220, 38, 38, 0.12);
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.backLink {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #4c51bf;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.backLink:hover {
+  color: #312e81;
+}
+
+.emptyState {
+  max-width: 520px;
+  margin: 4rem auto;
+  text-align: center;
+  background: #ffffff;
+  border-radius: 1.5rem;
+  padding: 3rem 2rem;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.emptyState h2 {
+  margin: 0;
+  font-size: 1.9rem;
+  color: #1f2937;
+}
+
+.emptyState p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.emptyState a {
+  align-self: center;
+  background: #111827;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.75rem 1.75rem;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.emptyState a:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(17, 24, 39, 0.25);
+}
+
+@media (max-width: 1024px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 2.5rem 1rem 3rem;
+  }
+
+  .card {
+    padding: 1.75rem;
+  }
+
+  .detailsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .bankRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .receiptActions {
+    flex-direction: column;
+  }
+
+  .uploadBtn {
+    width: 100%;
+    text-align: center;
+  }
+}
