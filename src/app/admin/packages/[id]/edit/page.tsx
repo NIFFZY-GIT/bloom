@@ -16,9 +16,27 @@ export default async function EditPackagePage({ params }: Params) {
   }
 
   const result = await query(
-    `SELECT id, title, description, price, duration, image_path, category, highlights, includes, difficulty
-     FROM tour_packages
-     WHERE id = $1`,
+    `SELECT
+        tp.id,
+        tp.title,
+        tp.description,
+        tp.price,
+        tp.duration,
+        tp.image_path,
+        tp.category,
+        tp.highlights,
+        tp.includes,
+        tp.difficulty,
+        COALESCE(
+          (
+            SELECT json_agg(tpi.image_path ORDER BY tpi.sort_order, tpi.id)
+            FROM tour_package_images tpi
+            WHERE tpi.package_id = tp.id
+          ),
+          '[]'::json
+        ) AS gallery_images
+     FROM tour_packages tp
+     WHERE tp.id = $1`,
     [numericId],
   );
 
@@ -30,12 +48,13 @@ export default async function EditPackagePage({ params }: Params) {
     title: string;
     description: string;
     price: number;
-    duration: string;
+    duration: number;
     image_path: string | null;
     category: string;
     highlights: string[] | null;
     includes: string[] | null;
     difficulty: 'Easy' | 'Moderate' | 'Challenging';
+    gallery_images: string[];
   };
 
   return (
@@ -52,6 +71,7 @@ export default async function EditPackagePage({ params }: Params) {
         highlights: pkg.highlights,
         includes: pkg.includes,
         difficulty: pkg.difficulty,
+        galleryImages: pkg.gallery_images ?? [],
       }}
     />
   );

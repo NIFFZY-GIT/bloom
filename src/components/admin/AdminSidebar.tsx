@@ -16,6 +16,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: '📊' },
   { href: '/admin/packages', label: 'Packages', icon: '📦' },
   { href: '/admin/bookings', label: 'Bookings', icon: '📅' },
+  { href: '/admin/custompackages', label: 'Custom Packages', icon: '�' },
   { href: '/admin/users', label: 'Users', icon: '👥' },
 ];
 

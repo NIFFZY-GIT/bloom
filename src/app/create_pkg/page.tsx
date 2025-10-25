@@ -57,8 +57,11 @@ const CreatePackagePage: React.FC = () => {
     contactPhone: '',
     preferredDate: '',
     guests: 2,
-    specialRequests: ''
+    specialRequests: '',
   });
+  const [isSubmittingPackage, setIsSubmittingPackage] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   const availablePlaces: Place[] = [
@@ -232,15 +235,30 @@ const CreatePackagePage: React.FC = () => {
     }));
   };
 
+  const parseDurationToHours = (duration: string) => {
+    const [rawValue = '0', unit = 'hours'] = duration.trim().split(/\s+/);
+    const numeric = Number.parseFloat(rawValue);
+    if (!Number.isFinite(numeric)) {
+      return 0;
+    }
+    const lowered = unit.toLowerCase();
+    if (lowered.startsWith('min')) {
+      return numeric / 60;
+    }
+    return numeric;
+  };
 
-  
+  const getTotalDurationHours = () =>
+    selectedPlaces.reduce((total, place) => total + parseDurationToHours(place.duration), 0);
+
+  const getTotalDurationMinutes = () => Math.max(0, Math.round(getTotalDurationHours() * 60));
+
   const calculateTotalDuration = () => {
-    // Simple calculation - you might want to make this more sophisticated
-    const totalHours = selectedPlaces.reduce((total, place) => {
-      const hours = parseFloat(place.duration.split(' ')[0]);
-      return total + hours;
-    }, 0);
-    return `${totalHours} hours`;
+    const totalHours = getTotalDurationHours();
+    if (totalHours <= 0) {
+      return '0 hours';
+    }
+    return Number.isInteger(totalHours) ? `${totalHours} hours` : `${totalHours.toFixed(1)} hours`;
   };
 
   const calculateTotalPrice = () => {
@@ -249,110 +267,115 @@ const CreatePackagePage: React.FC = () => {
 
   const handleNextStep = () => {
     if (currentStep < 3) {
+      setSubmitError(null);
+      setSubmitSuccess(null);
       setCurrentStep(currentStep + 1);
     }
   };
 
   const handlePrevStep = () => {
     if (currentStep > 1) {
+      setSubmitError(null);
+      setSubmitSuccess(null);
       setCurrentStep(currentStep - 1);
     }
   };
 
-  // In the CreatePackagePage component, replace the places-grid section with this:
-
-<div className="places-grid">
-  {filteredPlaces.map((place, index) => (
-    <div 
-      key={place.id}
-      className={`place-card fade-in ${isVisible ? 'appear' : ''}`}
-      style={{ animationDelay: `${index * 0.1}s` }}
-    >
-      <div className="place-image">
-        <img src={place.imagePath} alt={place.name} />
-        <button 
-          className="add-place-btn"
-          onClick={() => handleAddPlace(place)}
-          disabled={selectedPlaces.find(p => p.id === place.id) !== undefined}
-          title="Add to itinerary"
-        >
-          <i className="fas fa-plus"></i>
-        </button>
-        {place.price > 0 && (
-          <div className="price-badge">${place.price}</div>
-        )}
-      </div>
-      
-      <div className="place-content">
-        <div className="place-header">
-          <h4>{place.name}</h4>
-          <span className="duration">{place.duration}</span>
-        </div>
-        
-        <p className="place-description">{place.description}</p>
-        
-        <div className="place-location">
-          <i className="fas fa-map-marker-alt"></i>
-          <span>{place.location}</span>
-        </div>
-        
-        <div className="place-highlights">
-          {place.highlights.map((highlight, idx) => (
-            <span key={idx} className="highlight-tag">#{highlight}</span>
-          ))}
-        </div>
-      </div>
-    </div>
-  ))}
-</div>
-
-  const handleSubmitPackage = (e: React.FormEvent) => {
+  const handleSubmitPackage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Here you would typically send the package data to your backend/admin
-    const customPackage: CustomPackage = {
-      id: `custom-${Date.now()}`,
-      name: packageForm.name,
-      description: packageForm.description,
-      places: selectedPlaces,
-      totalDuration: calculateTotalDuration(),
-      totalPrice: calculateTotalPrice(),
+    setSubmitError(null);
+    setSubmitSuccess(null);
+
+    if (selectedPlaces.length === 0) {
+      setSubmitError('Please select at least one place before submitting.');
+      setCurrentStep(1);
+      return;
+    }
+
+    const placesPayload = selectedPlaces.map((place, index) => ({
+      id: place.id,
+      name: place.name,
+      description: place.description,
+      imagePath: place.imagePath,
+      category: place.category,
+      duration: place.duration,
+      price: place.price,
+      location: place.location,
+      highlights: place.highlights,
+      order: index + 1,
+    }));
+
+    const totalDurationMinutes = getTotalDurationMinutes();
+    const totalPrice = calculateTotalPrice();
+
+    const payload = {
+      name: packageForm.name.trim(),
+      description: packageForm.description.trim(),
+      places: placesPayload,
+      totals: {
+        durationLabel: calculateTotalDuration(),
+        durationMinutes: totalDurationMinutes,
+        price: totalPrice,
+      },
       preferences: {
         pace: packageForm.pace,
         transport: packageForm.transport,
         guide: packageForm.guide,
         meals: packageForm.meals,
-        photography: packageForm.photography
+        photography: packageForm.photography,
       },
-      contactInfo: {
-        name: packageForm.contactName,
-        email: packageForm.contactEmail,
-        phone: packageForm.contactPhone,
-        date: packageForm.preferredDate,
+      contact: {
+        name: packageForm.contactName.trim(),
+        email: packageForm.contactEmail.trim(),
+        phone: packageForm.contactPhone.trim(),
+        date: packageForm.preferredDate || null,
         guests: packageForm.guests,
-        specialRequests: packageForm.specialRequests
-      }
+        specialRequests: packageForm.specialRequests.trim() || null,
+      },
     };
 
-    alert(`Thank you ${packageForm.contactName}! Your custom package "${packageForm.name}" has been submitted to our team. We'll contact you within 24 hours to finalize your tour!`);
-    
-    // Reset form
-    setSelectedPlaces([]);
-    setCurrentStep(1);
-    setPackageForm({
-      name: '',
-      description: '',
-      pace: 'moderate',
-      transport: 'walking',
-      guide: true,
-      meals: false,
-      photography: false,
-      contactName: '',
-      contactEmail: '',
-      contactPhone: '',
-      preferredDate: '',
-      guests: 2,
-      specialRequests: ''
-    });
+    setIsSubmittingPackage(true);
+
+    try {
+      const response = await fetch('/api/custom-packages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok || !data?.success) {
+        const message = data?.message || 'Failed to submit custom package';
+        throw new Error(message);
+      }
+
+      setSubmitSuccess('Thanks! Your custom package request was sent to our team. We will contact you soon.');
+      setSelectedPlaces([]);
+      setCurrentStep(1);
+      setPackageForm({
+        name: '',
+        description: '',
+        pace: 'moderate',
+        transport: 'walking',
+        guide: true,
+        meals: false,
+        photography: false,
+        contactName: '',
+        contactEmail: '',
+        contactPhone: '',
+        preferredDate: '',
+        guests: 2,
+        specialRequests: '',
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to submit custom package';
+      setSubmitError(message);
+    } finally {
+      setIsSubmittingPackage(false);
+    }
   };
 
   useEffect(() => {
@@ -408,6 +431,14 @@ const CreatePackagePage: React.FC = () => {
             <span>Submit</span>
           </div>
         </div>
+
+        {submitSuccess && (
+          <div className="form-feedback success-message">{submitSuccess}</div>
+        )}
+
+        {submitError && (
+          <div className="form-feedback error-message">{submitError}</div>
+        )}
 
         {/* Step 1: Choose Places */}
         {currentStep === 1 && (
@@ -864,11 +895,20 @@ const CreatePackagePage: React.FC = () => {
                 </div>
 
                 <div className="form-actions">
-                  <button type="button" className="prev-step-btn" onClick={handlePrevStep}>
+                  <button
+                    type="button"
+                    className="prev-step-btn"
+                    onClick={handlePrevStep}
+                    disabled={isSubmittingPackage}
+                  >
                     Back to Customize
                   </button>
-                  <button type="submit" className="submit-package-btn">
-                    Submit Package to Admin
+                  <button
+                    type="submit"
+                    className="submit-package-btn"
+                    disabled={isSubmittingPackage}
+                  >
+                    {isSubmittingPackage ? 'Submitting...' : 'Submit Package to Admin'}
                   </button>
                 </div>
               </form>

@@ -12,6 +12,7 @@ export async function POST(request: Request) {
       date,
       guests,
       message,
+      countryCode,
     } = body;
 
     if (!packageId || !name || !email || !date || !guests) {
@@ -23,7 +24,26 @@ export async function POST(request: Request) {
       VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *;
     `;
-    const values = [packageId, name, email, phone, date, guests, message || null];
+
+    const trimmedPhone = typeof phone === 'string' ? phone.trim() : null;
+    const trimmedCountryCode = typeof countryCode === 'string' ? countryCode.trim() : '';
+    const normalizedCountryCode = trimmedCountryCode
+      ? (trimmedCountryCode.startsWith('+') ? trimmedCountryCode : `+${trimmedCountryCode.replace(/^\+/, '')}`)
+      : '';
+
+    let phoneWithCountry = trimmedPhone;
+
+    if (phoneWithCountry) {
+      if (normalizedCountryCode && !phoneWithCountry.startsWith('+')) {
+        phoneWithCountry = `${normalizedCountryCode} ${phoneWithCountry}`;
+      }
+    } else if (normalizedCountryCode) {
+      phoneWithCountry = normalizedCountryCode;
+    }
+
+    const sanitizedPhone = phoneWithCountry ? phoneWithCountry.replace(/\s+/g, ' ').trim() : null;
+
+    const values = [packageId, name, email, sanitizedPhone, date, guests, message || null];
 
     const result = await query(insertQuery, values);
 

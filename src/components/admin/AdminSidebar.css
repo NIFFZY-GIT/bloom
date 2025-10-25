@@ -2,12 +2,13 @@
   display: flex;
   flex-direction: column;
   width: 260px;
-  min-height: 100vh;
+  height: 100vh; /* takes full viewport height */
   background: linear-gradient(180deg, #022c43 0%, #053f5e 100%);
   color: #f1f5f9;
   padding: 24px 20px;
   box-shadow: 0 10px 30px rgba(3, 7, 18, 0.25);
 }
+
 
 .sidebar-header {
   margin-bottom: 32px;

@@ -341,37 +341,7 @@ export default async function AdminDashboard() {
           </article>
         </section>
 
-        <section className={`${styles.card} ${styles.cardFullWidth}`}>
-          <div className={styles.cardHeader}>
-            <h2 className={styles.cardTitle}>Current Packages</h2>
-            <Link href="/admin/packages/new" className={styles.viewAllBtn}>+ Add New Package</Link>
-          </div>
-          <div className={styles.cardContent}>
-            {packages.length === 0 ? (
-              <div className={styles.emptyState}>
-                <p>No tour packages available yet. Create your first package to showcase it here.</p>
-              </div>
-            ) : (
-              <div className={styles.packagesGrid}>
-                {packages.map((pkg) => (
-                  <div className={styles.packageCard} key={pkg.id}>
-                    <div
-                      className={styles.packageImage}
-                      style={{ backgroundImage: `url(${pkg.imagePath || '/images/packages/default.jpg'})` }}
-                    >
-                      {pkg.category && <span className={styles.packageBadge}>{pkg.category}</span>}
-                    </div>
-                    <div className={styles.packageInfo}>
-                      <h3 className={styles.packageName}>{pkg.title}</h3>
-                      <p className={styles.packageBookings}>{pkg.reviews ?? 0} reviews</p>
-                      <p className={styles.packagePrice}>{pkg.price != null ? formatCurrency(pkg.price) : '—'}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
+      
       </main>
     </div>
   );

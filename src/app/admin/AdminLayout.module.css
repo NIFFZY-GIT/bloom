@@ -1,6 +1,7 @@
 .adminLayout {
   display: flex;
-  min-height: calc(100vh - 5.5rem);
+  align-items: stretch;
+  min-height: 100vh;
   margin-top: 5.5rem;
   background: #f1f5f9;
 }
@@ -8,10 +9,13 @@
 .sidebarWrapper {
   flex-shrink: 0;
   width: 260px;
-  position: sticky;
-  top: 5.5rem;
-  align-self: flex-start;
-  height: calc(100vh - 5.5rem);
+  position: relative;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-height: calc(100vh - 5.5rem);
+  max-height: none;
   overflow-y: auto;
   z-index: 20;
 }
@@ -20,7 +24,7 @@
   flex: 1;
   padding: 2.5rem;
   min-height: calc(100vh - 5.5rem);
-  overflow-y: auto;
+  overflow: visible;
 }
 
 @media (max-width: 1024px) {
@@ -33,7 +37,8 @@
   .sidebarWrapper {
     width: 100%;
     position: relative;
-    height: auto;
+    min-height: auto;
+    max-height: none;
     top: 0;
     box-shadow: none;
   }

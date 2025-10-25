@@ -42,8 +42,14 @@ export default function AddPackageForm({ isOpen, onClose, onPackageAdded }: AddP
         body: JSON.stringify({
           ...formData,
           price: parseFloat(formData.price),
-          highlights: formData.highlights.split(',').map(s => s.trim()),
-          includes: formData.includes.split(',').map(s => s.trim()),
+          highlights: formData.highlights
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean),
+          includes: formData.includes
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean),
         }),
       });
 
@@ -87,8 +93,17 @@ export default function AddPackageForm({ isOpen, onClose, onPackageAdded }: AddP
               <input type="number" id="price" name="price" value={formData.price} onChange={handleChange} required />
             </div>
             <div className="form-group">
-              <label htmlFor="duration">Duration (e.g., '5 days')</label>
-              <input type="text" id="duration" name="duration" value={formData.duration} onChange={handleChange} required />
+              <label htmlFor="duration">Duration (days)</label>
+              <input
+                type="number"
+                min="1"
+                step="1"
+                id="duration"
+                name="duration"
+                value={formData.duration}
+                onChange={handleChange}
+                required
+              />
             </div>
           </div>
 

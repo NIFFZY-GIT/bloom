@@ -1,4 +1,4 @@
-import { Category, Place } from '../types';
+import { Category, Place } from '../Types';
 import PlaceCard from './PlaceCard';
 
 interface CategoryDetailsProps {

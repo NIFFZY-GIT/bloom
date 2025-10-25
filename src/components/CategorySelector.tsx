@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import { Category } from '../types';
+import { Category } from '../Types';
 
 interface CategorySelectorProps {
   categories: Category[];

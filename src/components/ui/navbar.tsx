@@ -2,7 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, CSSProperties } from 'react';
+
+// --- Helper function to combine styles ---
+const combineStyles = (...styleObjects: CSSProperties[]): CSSProperties => {
+  return Object.assign({}, ...styleObjects);
+};
 
 interface NavbarProps {
   isAuthenticated: boolean;
@@ -10,803 +15,387 @@ interface NavbarProps {
 }
 
 export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
+  // --- State Management ---
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [activeLink, setActiveLink] = useState('home');
   const [isBookingsDropdownOpen, setIsBookingsDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  
+  // State for hover effects
+  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
+  
+  // State for responsive design
+  const [isMobile, setIsMobile] = useState(false);
+
+  // --- Refs ---
+  const bookingsDropdownRef = useRef<HTMLDivElement | null>(null);
+  const profileDropdownRef = useRef<HTMLDivElement | null>(null);
+  // MODIFICATION: Add a ref to manage the dropdown close timer
+  const bookingsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+
   const router = useRouter();
+  const pathname = usePathname();
 
+  // --- Effects ---
+
+  // Effect for scroll detection
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+  
+  // Effect for responsive breakpoint
+  useEffect(() => {
+    const checkIsMobile = () => setIsMobile(window.innerWidth < 768);
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
 
+  // Effect to close menu on route change
+  useEffect(() => {
+    if (isMenuOpen) {
+      setIsMenuOpen(false);
+    }
+    setIsBookingsDropdownOpen(false);
+    setIsProfileDropdownOpen(false);
+  }, [pathname]);
+
+  // Effect to disable body scroll when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = isMenuOpen ? 'hidden' : 'auto';
+  }, [isMenuOpen]);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node;
+      if (isBookingsDropdownOpen && bookingsDropdownRef.current && !bookingsDropdownRef.current.contains(target)) {
+        setIsBookingsDropdownOpen(false);
+      }
+      if (isProfileDropdownOpen && profileDropdownRef.current && !profileDropdownRef.current.contains(target)) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handlePointerDown);
+    return () => document.removeEventListener('mousedown', handlePointerDown);
+  }, [isBookingsDropdownOpen, isProfileDropdownOpen]);
+
+  // --- Handlers ---
   const handleAuthClick = () => {
     if (isAuthenticated) {
       setIsProfileDropdownOpen(!isProfileDropdownOpen);
     } else {
-      router.push('/login');
       setIsMenuOpen(false);
+      router.push('/login');
     }
   };
 
   const handleLogout = async () => {
     try {
-  await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+      const response = await fetch('/api/logout', { method: 'POST' });
+      if (!response.ok) {
+        throw new Error(`Logout failed with status ${response.status}`);
+      }
     } catch (error) {
-      console.error('Failed to logout user:', error);
+      console.error('Logout failed:', error);
     } finally {
       setIsProfileDropdownOpen(false);
       setIsMenuOpen(false);
+      setHoveredItemId(null);
       router.push('/');
       router.refresh();
     }
   };
 
-  const handleDashboardClick = () => {
-    setIsProfileDropdownOpen(false);
+  const handleBookNow = () => {
     setIsMenuOpen(false);
-    router.push('/admin/dashboard');
+    router.push('/create_pkg');
   };
 
-  // Track current pathname to set active link state
-  const pathname = usePathname();
-  useEffect(() => {
-    if (pathname) setActiveLink(pathname);
-  }, [pathname]);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setIsProfileDropdownOpen(false);
+  // MODIFICATION START: Handlers for the bookings dropdown with delay
+  const handleBookingsMouseEnter = () => {
+    if (bookingsTimeoutRef.current) {
+      clearTimeout(bookingsTimeoutRef.current);
     }
-  }, [isAuthenticated]);
+    setIsBookingsDropdownOpen(true);
+  };
 
+  const handleBookingsMouseLeave = () => {
+    bookingsTimeoutRef.current = setTimeout(() => {
+      setIsBookingsDropdownOpen(false);
+    }, 200); // 200ms delay before closing
+  };
+  // MODIFICATION END
+
+  // --- Navigation Data ---
   const navItems = [
-    { id: '/', label: 'HOME' },
-    { id: '/about-us', label: 'ABOUT US' },
-    { 
-      id: 'bookings', 
-      label: 'BOOKINGS',
+    { id: '/', label: 'Home' },
+    { id: '/about-us', label: 'About Us' },
+    {
+      id: 'bookings',
+      label: 'Bookings',
       dropdown: [
-        { id: '/packages', label: 'PACKAGES' },
-        { id: '/create_pkg', label: 'CREATE PACKAGE' }
+        { id: '/packages', label: 'Packages' },
+        { id: '/create_pkg', label: 'Create Package' }
       ]
     },
-    { id: '/gallery', label: 'GALLERY' },
-    { id: '/contact-us', label: 'CONTACT US' }
+    { id: '/gallery', label: 'Gallery' },
+    { id: '/contact-us', label: 'Contact Us' }
   ];
-
-  const handleNavClick = (id: string) => {
-    setActiveLink(id);
-    setIsMenuOpen(false);
-    setIsBookingsDropdownOpen(false);
-  };
-
-  const handleBookingsHover = (show: boolean) => {
-    setIsBookingsDropdownOpen(show);
+  
+  // --- Inline Styles Object ---
+  const styles: { [key: string]: CSSProperties } = {
+    nav: {
+      position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 1000,
+      transition: 'background-color 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease',
+      backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.85)' : '#ffffff',
+      backdropFilter: isScrolled ? 'blur(10px)' : 'none',
+      WebkitBackdropFilter: isScrolled ? 'blur(10px)' : 'none',
+      boxShadow: isScrolled ? '0 2px 20px rgba(0, 0, 0, 0.07)' : 'none',
+      borderBottom: isScrolled ? '1px solid transparent' : '1px solid #e2e8f0',
+    },
+    container: { maxWidth: '1280px', margin: '0 auto', padding: '0 2rem' },
+    flexBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '5.5rem' },
+    logoContainer: { display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' },
+    logoTextPrimary: { fontSize: '1.25rem', fontWeight: 700, color: '#1a202c' },
+    logoTextSecondary: { fontSize: '0.7rem', fontWeight: 400, color: '#718096', letterSpacing: '0.05em', textTransform: 'uppercase' },
+    desktopNavContainer: { display: isMobile ? 'none' : 'flex', alignItems: 'center', gap: '0.5rem' },
+    navLink: {
+      position: 'relative', padding: '0.5rem 1rem', borderRadius: '0.5rem', fontSize: '0.9rem',
+      fontWeight: 500, textDecoration: 'none', color: '#4a5568', backgroundColor: 'transparent',
+      border: 'none', cursor: 'pointer', transition: 'color 0.3s ease, background-color 0.3s ease',
+    },
+    navLinkActive: { color: '#00796B' },
+    dropdownContainer: {
+      position: 'absolute', left: 0, top: '100%', marginTop: '1rem', width: '12rem',
+      borderRadius: '0.75rem', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)',
+      backgroundColor: '#ffffff', border: '1px solid #edf2f7', padding: '0.5rem',
+      opacity: isBookingsDropdownOpen ? 1 : 0, visibility: isBookingsDropdownOpen ? 'visible' : 'hidden',
+      transform: isBookingsDropdownOpen ? 'translateY(0)' : 'translateY(10px)',
+      transition: 'opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease',
+      zIndex: 1001, pointerEvents: isBookingsDropdownOpen ? 'auto' : 'none',
+    },
+    dropdownLink: { display: 'block', padding: '0.6rem 1rem', fontSize: '0.9rem', borderRadius: '0.5rem', textDecoration: 'none', color: '#4a5568' },
+    authContainer: { display: isMobile ? 'none' : 'flex', alignItems: 'center', gap: '0.75rem' },
+    ctaButton: {
+      padding: '0.75rem 1.5rem', fontSize: '0.9rem', fontWeight: 600, color: '#ffffff',
+      backgroundColor: '#00796B', border: 'none', borderRadius: '9999px', cursor: 'pointer',
+      transition: 'transform 0.3s ease, box-shadow 0.3s ease', boxShadow: '0 4px 15px -5px rgba(0, 121, 107, 0.5)',
+    },
+    authButton: {
+      padding: '0.75rem 1.5rem', fontSize: '0.9rem', fontWeight: 600, color: '#2d3748',
+      backgroundColor: '#edf2f7', border: 'none', borderRadius: '9999px', cursor: 'pointer',
+      transition: 'background-color 0.3s ease, transform 0.3s ease',
+    },
+    profileDropdown: {
+      position: 'absolute', right: 0, top: 'calc(100% + 0.75rem)', width: '12rem',
+      borderRadius: '0.75rem', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)',
+      backgroundColor: '#ffffff', border: '1px solid #edf2f7', padding: '0.5rem',
+      display: 'flex', flexDirection: 'column', gap: '0.25rem',
+      opacity: isProfileDropdownOpen ? 1 : 0, visibility: isProfileDropdownOpen ? 'visible' : 'hidden',
+      transform: isProfileDropdownOpen ? 'translateY(0)' : 'translateY(10px)',
+      transition: 'opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease',
+      zIndex: 1002, pointerEvents: isProfileDropdownOpen ? 'auto' : 'none',
+    },
+    profileDropdownItem: {
+      display: 'block', width: '100%', padding: '0.65rem 0.75rem', borderRadius: '0.5rem',
+      fontSize: '0.9rem', textDecoration: 'none', backgroundColor: 'transparent',
+      color: '#2d3748', border: 'none', textAlign: 'left', cursor: 'pointer',
+      transition: 'background-color 0.2s ease, color 0.2s ease',
+    },
+    profileDropdownDivider: { height: '1px', backgroundColor: '#e2e8f0', margin: '0.35rem 0' },
+    hamburgerButton: {
+      display: isMobile ? 'flex' : 'none', flexDirection: 'column', justifyContent: 'space-around',
+      width: '2rem', height: '2rem', background: 'transparent', border: 'none',
+      cursor: 'pointer', padding: 0, zIndex: 1001,
+    },
+    hamburgerLine: { width: '2rem', height: '2px', borderRadius: '10px', backgroundColor: '#2d3748', transition: 'all 0.3s linear', position: 'relative', transformOrigin: '1px' },
+    mobileMenuOverlay: {
+      position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+      backgroundColor: '#ffffff', zIndex: 999, display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', transition: 'opacity 0.3s ease-in-out',
+      opacity: isMenuOpen ? 1 : 0, visibility: isMenuOpen ? 'visible' : 'hidden',
+    },
+    mobileNavLinksContainer: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem', textAlign: 'center' },
+    mobileNavLink: { fontSize: '1.5rem', fontWeight: 600, color: '#2d3748', textDecoration: 'none' },
+    mobileActionsContainer: { width: '100%', marginTop: '3rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', padding: '0 2rem' },
+    mobilePrimaryButton: {
+      width: '100%', padding: '0.9rem 1.5rem', fontSize: '1rem', fontWeight: 600, color: '#ffffff',
+      backgroundColor: '#00796B', border: 'none', borderRadius: '9999px', cursor: 'pointer',
+      transition: 'transform 0.3s ease, box-shadow 0.3s ease', boxShadow: '0 4px 15px -5px rgba(0, 121, 107, 0.5)',
+    },
+    mobileSecondaryButton: {
+      width: '100%', padding: '0.9rem 1.5rem', fontSize: '1rem', fontWeight: 600, color: '#2d3748',
+      backgroundColor: '#edf2f7', border: 'none', borderRadius: '9999px', cursor: 'pointer',
+      transition: 'background-color 0.3s ease',
+    },
   };
 
   return (
-    <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
-      <div className="nav-container">
-        {/* Tropical Bloom Logo */}
-        <div className="logo">
-          <div className="logo-icon">🌺</div>
-          <div className="logo-text">
-            <span className="logo-line-1">TROPICAL</span>
-            <span className="logo-line-2">BLOOM</span>
-            <span className="logo-line-3">TOURISM</span>
+    <>
+      <nav style={styles.nav}>
+        <div style={styles.container}>
+          <div style={styles.flexBetween}>
+            {/* Logo */}
+            <Link href="/" style={styles.logoContainer}>
+              <span style={{ fontSize: '2.25rem' }}>🌺</span>
+              <div>
+                <div style={styles.logoTextPrimary}>Tropical Bloom</div>
+                <div style={styles.logoTextSecondary}>Tourism</div>
+              </div>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <div style={styles.desktopNavContainer}>
+              {navItems.map((item) => (
+                <div
+                  key={item.id}
+                  style={{ position: 'relative' }}
+                  // MODIFICATION: Use the new delayed handlers
+                  onMouseEnter={item.dropdown ? handleBookingsMouseEnter : undefined}
+                  onMouseLeave={item.dropdown ? handleBookingsMouseLeave : undefined}
+                  ref={item.dropdown ? bookingsDropdownRef : null}
+                >
+                  {item.dropdown ? (
+                    <button
+                      type="button"
+                      style={combineStyles(
+                        styles.navLink,
+                        pathname.startsWith('/packages') || pathname.startsWith('/create_pkg') ? styles.navLinkActive : {},
+                        (hoveredItemId === item.id || isBookingsDropdownOpen) ? { backgroundColor: '#f7fafc' } : {}
+                      )}
+                      onMouseEnter={() => setHoveredItemId(item.id)}
+                      onMouseLeave={() => setHoveredItemId(null)}
+                      aria-haspopup="true"
+                      aria-expanded={isBookingsDropdownOpen}
+                    >
+                      {item.label}
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.id}
+                      style={combineStyles(
+                        styles.navLink,
+                        pathname === item.id ? styles.navLinkActive : {},
+                        hoveredItemId === item.id ? { backgroundColor: '#f7fafc' } : {}
+                      )}
+                      onMouseEnter={() => setHoveredItemId(item.id)}
+                      onMouseLeave={() => setHoveredItemId(null)}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
+                  {item.dropdown && (
+                    <div style={styles.dropdownContainer}>
+                      {item.dropdown.map((subItem) => (
+                        <Link
+                          key={subItem.id}
+                          href={subItem.id}
+                          style={combineStyles(
+                            styles.dropdownLink,
+                            pathname === subItem.id ? { color: '#00796B' } : {},
+                            hoveredItemId === subItem.id ? { backgroundColor: '#f7fafc', color: '#00796B'} : {}
+                          )}
+                          onMouseEnter={() => setHoveredItemId(subItem.id)}
+                          onMouseLeave={() => setHoveredItemId(null)}
+                          onClick={() => setIsBookingsDropdownOpen(false)}
+                        >
+                          {subItem.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Auth and CTA (No changes here) */}
+            <div style={styles.authContainer}>
+              <button type="button" style={combineStyles(styles.ctaButton, hoveredItemId === 'cta' ? { transform: 'translateY(-2px)', boxShadow: '0 8px 20px -5px rgba(0, 121, 107, 0.6)' } : {})} onClick={handleBookNow} onMouseEnter={() => setHoveredItemId('cta')} onMouseLeave={() => setHoveredItemId(null)}>
+                Book Now
+              </button>
+              <div style={{ position: 'relative' }} ref={profileDropdownRef}>
+                <button type="button" onClick={handleAuthClick} style={combineStyles(styles.authButton, hoveredItemId === 'auth' ? { backgroundColor: '#e2e8f0', transform: 'translateY(-2px)' } : {}, isProfileDropdownOpen ? { backgroundColor: '#e2e8f0' } : {})} onMouseEnter={() => setHoveredItemId('auth')} onMouseLeave={() => setHoveredItemId(null)} aria-haspopup="true" aria-expanded={isProfileDropdownOpen}>
+                  {isAuthenticated ? (userRole === 'ADMIN' ? 'Admin' : 'Profile') : 'Login'}
+                </button>
+                {isAuthenticated && (
+                  <div style={styles.profileDropdown} role="menu">
+                    <Link href={userRole === 'ADMIN' ? '/admin/dashboard' : '/user_dashboard'} style={combineStyles(styles.profileDropdownItem, hoveredItemId === 'profile-dashboard' ? { backgroundColor: '#f7fafc', color: '#00796B' } : {})} onClick={() => setIsProfileDropdownOpen(false)} onMouseEnter={() => setHoveredItemId('profile-dashboard')} onMouseLeave={() => setHoveredItemId(null)} role="menuitem">
+                      {userRole === 'ADMIN' ? 'Admin Dashboard' : 'My Trips'}
+                    </Link>
+                    {userRole === 'ADMIN' && (
+                      <Link href="/admin/packages" style={combineStyles(styles.profileDropdownItem, hoveredItemId === 'profile-packages' ? { backgroundColor: '#f7fafc', color: '#00796B' } : {})} onClick={() => setIsProfileDropdownOpen(false)} onMouseEnter={() => setHoveredItemId('profile-packages')} onMouseLeave={() => setHoveredItemId(null)} role="menuitem">
+                        Manage Packages
+                      </Link>
+                    )}
+                    <div style={styles.profileDropdownDivider} />
+                    <button type="button" style={combineStyles(styles.profileDropdownItem, hoveredItemId === 'profile-logout' ? { backgroundColor: '#fff5f5', color: '#c53030' } : {})} onClick={handleLogout} onMouseEnter={() => setHoveredItemId('profile-logout')} onMouseLeave={() => setHoveredItemId(null)} role="menuitem">
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Mobile menu button (No changes here) */}
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)} style={styles.hamburgerButton}>
+                <div style={combineStyles(styles.hamburgerLine, isMenuOpen ? { transform: 'rotate(45deg)', backgroundColor: '#4a5568' } : { transform: 'rotate(0)' })} />
+                <div style={combineStyles(styles.hamburgerLine, isMenuOpen ? { opacity: 0, transform: 'translateX(20px)' } : { opacity: 1, transform: 'translateX(0)' })} />
+                <div style={combineStyles(styles.hamburgerLine, isMenuOpen ? { transform: 'rotate(-45deg)', backgroundColor: '#4a5568' } : { transform: 'rotate(0)' })} />
+            </button>
           </div>
         </div>
-        
-        {/* Navigation Links */}
-        <div className={`nav-links ${isMenuOpen ? 'nav-links-active' : ''}`}>
-          {navItems.map((item) => (
-            <div 
-              key={item.id}
-              className={`nav-item ${item.dropdown ? 'has-dropdown' : ''}`}
-              onMouseEnter={() => item.dropdown && handleBookingsHover(true)}
-              onMouseLeave={() => item.dropdown && handleBookingsHover(false)}
-            >
-              {item.dropdown ? (
-                // Dropdown trigger should be a button (not a navigation link)
-                <button
-                  type="button"
-                  className={`nav-link ${activeLink === item.id ? 'active' : ''} dropdown-toggle`}
-                  onClick={() => setIsBookingsDropdownOpen(!isBookingsDropdownOpen)}
-                >
-                  <span className="nav-link-text">{item.label}</span>
-                  <span className="dropdown-arrow">▼</span>
-                  <span className="nav-link-underline"></span>
-                </button>
-              ) : (
-                <Link
-                  href={item.id}
-                  className={`nav-link ${activeLink === item.id ? 'active' : ''}`}
-                  onClick={() => handleNavClick(item.id)}
-                >
-                  <span className="nav-link-text">{item.label}</span>
-                  <span className="nav-link-underline"></span>
-                </Link>
-              )}
+      </nav>
 
-              {/* Dropdown Menu for Bookings */}
-              {item.dropdown && (
-                <div className={`dropdown-menu ${isBookingsDropdownOpen ? 'show' : ''}`}>
-                  {item.dropdown.map((dropdownItem) => (
-                    <Link
-                      key={dropdownItem.id}
-                      href={dropdownItem.id}
-                      className={`dropdown-link ${activeLink === dropdownItem.id ? 'active' : ''}`}
-                      onClick={() => handleNavClick(dropdownItem.id)}
-                    >
-                      {dropdownItem.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
+      {/* Full-Screen Mobile Menu (No changes here) */}
+      {isMobile && (
+        <div style={styles.mobileMenuOverlay}>
+            <div style={styles.mobileNavLinksContainer}>
+                {navItems.map((item) => (
+                     <div key={item.id} style={{textAlign: 'center'}}>
+                     {item.dropdown ? (
+                       <>
+                         <span style={combineStyles(styles.mobileNavLink, {color: '#a0aec0', fontSize: '1rem', textTransform: 'uppercase'})}>{item.label}</span>
+                         <div style={{marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem'}}>
+                           {item.dropdown.map(subItem => (
+                             <Link key={subItem.id} href={subItem.id} style={styles.mobileNavLink} onClick={() => setIsMenuOpen(false)}>
+                               {subItem.label}
+                             </Link>
+                           ))}
+                         </div>
+                       </>
+                     ) : (
+                       <Link href={item.id} style={styles.mobileNavLink} onClick={() => setIsMenuOpen(false)}>
+                         {item.label}
+                       </Link>
+                     )}
+                   </div>
+                ))}
             </div>
-          ))}
-          
-          {/* CTA Button in mobile menu */}
-          <button className="book-now-button mobile-cta">
-            <span>Book Now</span>
-            <div className="cta-icon">✈️</div>
-          </button>
-        </div>
-
-        {/* Desktop CTA Button */}
-        <button className="book-now-button desktop-cta">
-          <span>Book Now</span>
-          <div className="cta-icon">✈️</div>
-        </button>
-
-        {/* Auth Button (Login / Profile / Admin) */}
-        <div className="auth-dropdown-container">
-          <button
-            className="book-now-button auth-button ml-3"
-            onClick={handleAuthClick}
-            aria-label={isAuthenticated ? (userRole === 'ADMIN' ? 'Admin menu' : 'Profile') : 'Login'}
-          >
-            <span>{isAuthenticated ? (userRole === 'ADMIN' ? 'Admin' : 'Profile') : 'Login'}</span>
-            <div className="cta-icon">{userRole === 'ADMIN' ? '👑' : '👤'}</div>
-          </button>
-          
-          {isAuthenticated && isProfileDropdownOpen && (
-            <div className="profile-dropdown">
-              {userRole === 'ADMIN' && (
-                <button onClick={handleDashboardClick} className="dashboard-btn">
-                  <span>Dashboard</span>
-                  <div className="dashboard-icon">📊</div>
-                </button>
-              )}
-              <button onClick={handleLogout} className="logout-btn">
-                <span>Logout</span>
-                <div className="logout-icon">🚪</div>
+            <div style={styles.mobileActionsContainer}>
+              <button type="button" style={styles.mobilePrimaryButton} onClick={() => { setIsMenuOpen(false); router.push('/create_pkg'); }}>
+                Book Now
               </button>
+              {isAuthenticated ? (
+                <>
+                  <button type="button" style={styles.mobileSecondaryButton} onClick={() => { setIsMenuOpen(false); router.push(userRole === 'ADMIN' ? '/admin/dashboard' : '/user_dashboard'); }}>
+                    {userRole === 'ADMIN' ? 'Admin Dashboard' : 'My Trips'}
+                  </button>
+                  <button type="button" style={combineStyles(styles.mobileSecondaryButton, { backgroundColor: '#fff5f5', color: '#c53030' })} onClick={handleLogout}>
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <button type="button" style={styles.mobileSecondaryButton} onClick={() => { setIsMenuOpen(false); router.push('/login'); }}>
+                  Login
+                </button>
+              )}
             </div>
-          )}
         </div>
-
-        {/* Animated Hamburger Menu */}
-        <button 
-          className={`menu-toggle ${isMenuOpen ? 'active' : ''}`}
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          <span className="menu-line line-1"></span>
-          <span className="menu-line line-2"></span>
-          <span className="menu-line line-3"></span>
-        </button>
-      </div>
-
-      <style jsx>{`
-        .navbar {
-          background: rgba(254, 254, 254, 0); /* Solid white background */
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* Darker border for contrast */
-          padding: 1rem 0;
-          position: fixed;
-          width: 100%;
-          top: 0;
-          z-index: 1000;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .navbar.scrolled {
-          background: rgba(255, 255, 255, 0.98); /* More solid white when scrolled */
-          backdrop-filter: blur(30px);
-          -webkit-backdrop-filter: blur(30px);
-          border-bottom: 1px solid rgba(0, 0, 0, 0.15);
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-          padding: 0.75rem 0;
-        }
-
-        .nav-container {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          max-width: 1400px;
-          margin: 0 auto;
-          padding: 0 2rem;
-        }
-
-        /* Tropical Bloom Logo Styles */
-        .logo {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          cursor: pointer;
-          transition: transform 0.3s ease;
-        }
-
-        .logo:hover {
-          transform: translateY(-2px);
-        }
-
-        .logo-icon {
-          font-size: 2.5rem;
-          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-          animation: bloom 4s ease-in-out infinite;
-        }
-
-        .logo-text {
-          display: flex;
-          flex-direction: column;
-          line-height: 1;
-        }
-
-        .logo-line-1 {
-          font-size: 1.1rem;
-          font-weight: 800;
-          color: #2E8B57;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-        }
-
-        .logo-line-2 {
-          font-size: 1.4rem;
-          font-weight: 900;
-          color: #00f646ff;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-          margin: -2px 0;
-        }
-
-        .logo-line-3 {
-          font-size: 0.9rem;
-          font-weight: 600;
-          color: #4169E1;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-        }
-
-        /* Navigation Links */
-        .nav-links {
-          display: flex;
-          align-items: center;
-          gap: 1.5rem;
-          background: rgba(255, 255, 255, 0.9); /* White background for nav links */
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border-radius: 50px;
-          padding: 0.5rem 1.5rem;
-          border: 1px solid rgba(0, 0, 0, 0.1); /* Darker border */
-        }
-
-        .navbar.scrolled .nav-links {
-          background: rgba(255, 255, 255, 0.95);
-          border: 1px solid rgba(0, 0, 0, 0.15);
-        }
-
-        .nav-item {
-          position: relative;
-        }
-
-        .nav-item.has-dropdown:hover .dropdown-menu {
-          opacity: 1;
-          visibility: visible;
-          transform: translateY(0);
-        }
-
-        /* Reset anchor pseudo-states to avoid browser defaults (blue/underline) */
-        .nav-link,
-        .nav-link:link,
-        .nav-link:visited,
-        .nav-link:active,
-        .nav-link:focus {
-          position: relative;
-          text-decoration: none !important;
-          color: #2E8B57;
-          font-weight: 600;
-          font-size: 0.9rem;
-          letter-spacing: 0.025em;
-          transition: color 0.25s ease, transform 0.25s ease;
-          padding: 0.5rem 0.75rem;
-          display: inline-flex;
-          align-items: center;
-          gap: 0.3rem;
-          border-radius: 8px;
-          outline: none;
-        }
-
-        .navbar.scrolled .nav-link {
-          color: #f59e0b;
-        }
-
-        .nav-link:hover {
-          color: #f59e0b;
-          transform: translateY(-1px);
-          background: rgba(255, 182, 193, 0.1);
-        }
-
-        .nav-link.active {
-          color: #f59e0b;
-        }
-
-        .nav-link-underline {
-          position: absolute;
-          bottom: 0;
-          left: 50%;
-          width: 0;
-          height: 2px;
-          background: linear-gradient(90deg, #f59e0b, #f59e0b);
-          border-radius: 2px;
-          transition: all 0.3s ease;
-          transform: translateX(-50%);
-        }
-
-        .nav-link:hover .nav-link-underline,
-        .nav-link.active .nav-link-underline {
-          width: 100%;
-        }
-
-        .dropdown-arrow {
-          font-size: 0.7rem;
-          transition: transform 0.3s ease;
-        }
-
-        .nav-item.has-dropdown:hover .dropdown-arrow {
-          transform: rotate(180deg);
-        }
-
-        /* Dropdown Menu */
-        .dropdown-menu {
-          position: absolute;
-          top: 100%;
-          left: 0;
-          background: rgba(255, 255, 255, 0.98); /* White dropdown */
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(0, 0, 0, 0.1);
-          border-radius: 12px;
-          padding: 0.5rem 0;
-          min-width: 180px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-          opacity: 0;
-          visibility: hidden;
-          transform: translateY(-10px);
-          transition: all 0.3s ease;
-          z-index: 1000;
-        }
-
-        .dropdown-menu.show {
-          opacity: 1;
-          visibility: visible;
-          transform: translateY(0);
-        }
-
-        /* Dropdown links: reset pseudo-states too */
-        .dropdown-link,
-        .dropdown-link:link,
-        .dropdown-link:visited,
-        .dropdown-link:active,
-        .dropdown-link:focus {
-          display: block;
-          padding: 0.75rem 1.5rem;
-          color: #2E8B57;
-          text-decoration: none !important;
-          font-weight: 500;
-          font-size: 0.9rem;
-          transition: color 0.2s ease, background 0.2s ease;
-          border-left: 3px solid transparent;
-          outline: none;
-        }
-
-        .dropdown-link:hover {
-          background: rgba(255, 182, 193, 0.1);
-          color: #f59e0b;
-          border-left-color: #f59e0b;
-        }
-
-        .dropdown-link.active {
-          background: rgba(255, 182, 193, 0.15);
-          color: #FF69B4;
-          border-left-color: #FF69B4;
-        }
-
-        /* Book Now Button - Green */
-        .book-now-button {
-          background: rgba(245, 158, 11, 0.95);
-          color: white !important;
-          border: none;
-          padding: 0.75rem 1.5rem;
-          border-radius: 50px;
-          font-weight: 600;
-          font-size: 0.9rem;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          box-shadow: 0 6px 18px rgba(217,119,6,0.18);
-          position: relative;
-          overflow: hidden;
-        }
-
-        .book-now-button::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-          transition: left 0.5s ease;
-        }
-
-        .book-now-button:hover::before {
-          left: 100%;
-        }
-
-        .book-now-button:hover {
-             background: #d97706; /* Darker yellow on hover */
-          transform: translateY(-3px);
-          box-shadow: 0 12px 35px #d97706;
-        }
-
-        .cta-icon {
-          transition: transform 0.3s ease;
-          font-size: 1.1rem;
-        }
-
-        .book-now-button:hover .cta-icon {
-          transform: translateX(3px) rotate(15deg);
-        }
-
-        .auth-button {
-          background: linear-gradient(90deg,#06b6d4,#3b82f6);
-          box-shadow: 0 6px 18px rgba(59,130,246,0.16);
-          padding: 0.6rem 1.1rem;
-          font-size: 0.9rem;
-        }
-
-        .auth-button .cta-icon {
-          font-size: 1rem;
-        }
-
-        .auth-dropdown-container {
-          position: relative;
-        }
-
-        .profile-dropdown {
-          position: absolute;
-          top: calc(100% + 0.5rem);
-          right: 0;
-          background: rgba(255, 255, 255, 0.98);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(0, 0, 0, 0.1);
-          border-radius: 12px;
-          padding: 0.5rem;
-          min-width: 150px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-          animation: dropdownSlide 0.3s ease;
-          z-index: 1001;
-        }
-
-        @keyframes dropdownSlide {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .logout-btn {
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 0.5rem;
-          padding: 0.75rem 1rem;
-          background: linear-gradient(90deg, #ef4444, #dc2626);
-          color: white;
-          border: none;
-          border-radius: 8px;
-          font-weight: 600;
-          font-size: 0.9rem;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
-        }
-
-        .logout-btn:hover {
-          background: linear-gradient(90deg, #dc2626, #b91c1c);
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
-        }
-
-        .logout-icon {
-          font-size: 1rem;
-          transition: transform 0.3s ease;
-        }
-
-        .logout-btn:hover .logout-icon {
-          transform: translateX(3px);
-        }
-
-        .dashboard-btn {
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 0.5rem;
-          padding: 0.75rem 1rem;
-          background: linear-gradient(90deg, #3b82f6, #2563eb);
-          color: white;
-          border: none;
-          border-radius: 8px;
-          font-weight: 600;
-          font-size: 0.9rem;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-          margin-bottom: 0.5rem;
-        }
-
-        .dashboard-btn:hover {
-          background: linear-gradient(90deg, #2563eb, #1d4ed8);
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
-        }
-
-        .dashboard-icon {
-          font-size: 1rem;
-          transition: transform 0.3s ease;
-        }
-
-        .dashboard-btn:hover .dashboard-icon {
-          transform: scale(1.1);
-        }
-
-        .mobile-cta {
-          display: none;
-          width: 100%;
-          justify-content: center;
-          margin-top: 1rem;
-        }
-
-        /* Animated Hamburger Menu */
-        .menu-toggle {
-          display: none;
-          flex-direction: column;
-          background: none;
-          border: none;
-          cursor: pointer;
-          gap: 4px;
-          padding: 0.5rem;
-          border-radius: 8px;
-          transition: all 0.3s ease;
-        }
-
-        .menu-toggle:hover {
-          background: rgba(255, 182, 193, 0.1);
-        }
-
-        .menu-line {
-          width: 25px;
-          height: 2px;
-          background: #2E8B57;
-          border-radius: 2px;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          transform-origin: center;
-        }
-
-        .navbar.scrolled .menu-line {
-          background: #2E8B57;
-        }
-
-        .menu-toggle.active .line-1 {
-          transform: rotate(45deg) translate(6px, 6px);
-          background: #FF69B4;
-        }
-
-        .menu-toggle.active .line-2 {
-          opacity: 0;
-          transform: scale(0);
-        }
-
-        .menu-toggle.active .line-3 {
-          transform: rotate(-45deg) translate(6px, -6px);
-          background: #FF69B4;
-        }
-
-        /* Mobile Styles */
-        @media (max-width: 1024px) {
-          .nav-links {
-            gap: 1rem;
-            padding: 0.5rem 1rem;
-          }
-          
-          .nav-link {
-            font-size: 0.85rem;
-            padding: 0.5rem;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .nav-container {
-            padding: 0 1.5rem;
-          }
-
-          .desktop-cta {
-            display: none;
-          }
-
-          .auth-button {
-            display: none;
-          }
-
-          .nav-links {
-            position: fixed;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.98); /* White mobile menu */
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-top: none;
-            flex-direction: column;
-            padding: 2rem;
-            gap: 1rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            transform: translateY(-20px);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 0 0 20px 20px;
-          }
-
-          .nav-links-active {
-            transform: translateY(0);
-            opacity: 1;
-            visibility: visible;
-          }
-
-          .nav-item {
-            width: 100%;
-          }
-
-          .nav-link {
-            font-size: 1.1rem;
-            padding: 0.75rem 0;
-            text-align: center;
-            width: 100%;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            justify-content: center;
-          }
-
-          .nav-link:last-child {
-            border-bottom: none;
-          }
-
-          .nav-link-underline {
-            display: none;
-          }
-
-          .dropdown-menu {
-            position: static;
-            background: transparent;
-            box-shadow: none;
-            border: none;
-            opacity: 1;
-            visibility: visible;
-            transform: none;
-            padding: 0.5rem 0 0 1rem;
-            min-width: auto;
-          }
-
-          .dropdown-link {
-            padding: 0.5rem 1rem;
-            border-left: 2px solid rgba(255, 182, 193, 0.3);
-            font-size: 1rem;
-          }
-
-          .dropdown-arrow {
-            display: none;
-          }
-
-          .mobile-cta {
-            display: flex;
-          }
-
-          .menu-toggle {
-            display: flex;
-          }
-
-          /* Adjust logo for mobile */
-          .logo-line-1 {
-            font-size: 0.95rem;
-          }
-
-          .logo-line-2 {
-            font-size: 1.2rem;
-          }
-
-          .logo-line-3 {
-            font-size: 0.8rem;
-          }
-
-          .logo-icon {
-            font-size: 2rem;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .nav-container {
-            padding: 0 1rem;
-          }
-
-          /* Hide full logo text on very small screens, show icon only */
-          .logo-text {
-            display: none;
-          }
-
-          .nav-links {
-            padding: 1.5rem 1rem;
-          }
-        }
-
-        /* Animations */
-        @keyframes bloom {
-          0%, 100% {
-            transform: scale(1) rotate(0deg);
-          }
-          25% {
-            transform: scale(1.1) rotate(5deg);
-          }
-          50% {
-            transform: scale(1.05) rotate(-5deg);
-          }
-          75% {
-            transform: scale(1.1) rotate(3deg);
-          }
-        }
-
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-5px);
-          }
-        }
-
-        /* Smooth scroll behavior */
-        html {
-          scroll-behavior: smooth;
-        }
-      `}</style>
-    </nav>
+      )}
+    </>
   );
 }

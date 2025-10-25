@@ -8,6 +8,25 @@
   padding: 0 2rem;
 }
 
+.form-feedback {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.form-feedback.success-message {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.form-feedback.error-message {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
 /* Hero Section */
 .create-package-hero {
   position: relative;
