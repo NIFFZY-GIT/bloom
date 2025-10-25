@@ -1,103 +1,261 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+
+import footer from '../components/ui/footer';
+import HeroCarousel from '../components/HeroCarousel';
+import CategorySelector from '../components/CategorySelector';
+import CategoryDetails from '../components/CategoryDetails';
+import BackgroundAnimation from '../components/BackgroundAnimation';
+import { Category, Place } from '../Types';
+
+const categories: Category[] = [
+  {
+    id: 1,
+    name: 'Beaches & Coastal',
+    image: '/images/categories/beaches.png',
+    color: '#1e40af',
+    bgColor: 'linear-gradient(135deg, #1e40af, #3b82f6)',
+    description: 'Pristine beaches and coastal destinations with golden sands and turquoise waters',
+    animation: 'waves'
+  },
+  {
+    id: 2,
+    name: 'Rainforests & Natural',
+    image: '/images/categories/rainforests.png',
+    color: '#059669',
+    bgColor: 'linear-gradient(135deg, #059669, #10b981)',
+    description: 'Lush rainforests and natural reserves teeming with biodiversity',
+    animation: 'forest'
+  },
+  {
+    id: 3,
+    name: 'National Parks & Wildlife',
+    image: '/images/categories/wildlife.png',
+    color: '#92400e',
+    bgColor: 'linear-gradient(135deg, #92400e, #b45309)',
+    description: 'Wildlife sanctuaries and national parks for incredible animal encounters',
+    animation: 'wildlife'
+  },
+  {
+    id: 4,
+    name: 'Cultural Heritage',
+    image: '/images/categories/cultural.png',
+    color: '#7c3aed',
+    bgColor: 'linear-gradient(135deg, #7c3aed, #8b5cf6)',
+    description: 'Ancient cities and UNESCO World Heritage sites',
+    animation: 'heritage'
+  },
+  {
+    id: 5,
+    name: 'Hill Country',
+    image: '/images/categories/hill-country.png',
+    color: '#0d9488',
+    bgColor: 'linear-gradient(135deg, #0d9488, #14b8a6)',
+    description: 'Scenic highlands with tea plantations and cool climates',
+    animation: 'mountains'
+  },
+  {
+    id: 6,
+    name: 'Religious & Spiritual',
+    image: '/images/categories/temples.png',
+    color: '#dc2626',
+    bgColor: 'linear-gradient(135deg, #dc2626, #ef4444)',
+    description: 'Sacred temples, churches, and spiritual sites',
+    animation: 'spiritual'
+  },
+  {
+    id: 7,
+    name: 'Urban & Modern',
+    image: '/images/categories/urban.png',
+    color: '#4f46e5',
+    bgColor: 'linear-gradient(135deg, #4f46e5, #6366f1)',
+    description: 'Modern cities with contemporary attractions',
+    animation: 'urban'
+  },
+  {
+    id: 8,
+    name: 'Waterfalls & Lakes',
+    image: '/images/categories/waterfalls.png',
+    color: '#0891b2',
+    bgColor: 'linear-gradient(135deg, #0891b2, #06b6d4)',
+    description: 'Majestic waterfalls and serene lakes',
+    animation: 'waterfalls'
+  },
+  {
+    id: 9,
+    name: 'Adventure & Eco',
+    image: '/images/categories/adventure.png',
+    color: '#65a30d',
+    bgColor: 'linear-gradient(135deg, #65a30d, #84cc16)',
+    description: 'Thrilling adventures and eco-tourism experiences',
+    animation: 'adventure'
+  },
+  {
+    id: 10,
+    name: 'Village & Cultural',
+    image: '/images/categories/village.png',
+    color: '#db2777',
+    bgColor: 'linear-gradient(135deg, #db2777, #ec4899)',
+    description: 'Traditional village life and cultural experiences',
+    animation: 'village'
+  },
+  {
+    id: 11,
+    name: 'Fortresses & Colonial',
+    image: '/images/categories/fortresses.png',
+    color: '#d97706',
+    bgColor: 'linear-gradient(135deg, #d97706, #f59e0b)',
+    description: 'Historic fortresses and colonial architecture',
+    animation: 'fortresses'
+  }
+];
+
+const places: Place[] = [
+  // Beaches & Coastal
+  {
+    id: 1,
+    name: 'Mirissa',
+    description: 'A beautiful crescent-shaped beach known for whale watching and vibrant beach cafes. Perfect for surfing and sunset views.',
+    image: '/images/places/mirissa.png',
+    category: 'Beaches & Coastal'
+  },
+  {
+    id: 2,
+    name: 'Hikkaduwa',
+    description: 'Famous for its coral reefs, surfing spots, and lively nightlife. A paradise for snorkeling and diving enthusiasts.',
+    image: '/images/places/hikkaduwa.png',
+    category: 'Beaches & Coastal'
+  },
+    {
+    id: 3,
+    name: 'Arugam Bay',
+    description: 'World-class surfing destination on the east coast',
+    image: '/images/places/Arugam.jpg',
+    category: 'Beaches & Coastal'
+  },
+   {
+    id: 4,
+    name: 'Arugam Bay',
+    description: 'World-class surfing destination on the east coast',
+    image: '/images/places/Pasikudah.jpg',
+    category: 'Beaches & Coastal'
+  },
+    {
+    id: 5,
+    name: 'Arugam Bay',
+    description: 'World-class surfing destination on the east coast',
+    image: '/images/places/Sinharaja.jpg',
+    category: 'Rainforests & Natural'
+  },
+    {
+    id: 6,
+    name: 'Arugam Bay',
+    description: 'World-class surfing destination on the east coast',
+    image: '/images/places/Kanneliya.jpg',
+    category: 'Rainforests & Natural'
+  },
+    {
+    id: 7,
+    name: 'Mirissa',
+    description: 'A beautiful crescent-shaped beach known for whale watching and vibrant beach cafes. Perfect for surfing and sunset views.',
+    image: '/images/places/mirissa.png',
+    category: 'National Parks & Wildlife'
+  },
+  {
+    id: 8,
+    name: 'Hikkaduwa',
+    description: 'Famous for its coral reefs, surfing spots, and lively nightlife. A paradise for snorkeling and diving enthusiasts.',
+    image: '/images/places/hikkaduwa.png',
+    category: 'National Parks & Wildlife'
+  },
+    {
+    id: 9,
+    name: 'Arugam Bay',
+    description: 'World-class surfing destination on the east coast',
+    image: '/images/places/Arugam.jpg',
+    category: 'National Parks & Wildlife'
+  },
+   {
+    id: 10,
+    name: 'Arugam Bay',
+    description: 'World-class surfing destination on the east coast',
+    image: '/images/places/Pasikudah.jpg',
+    category: 'National Parks & Wildlife'
+  },
+  // ... other places (same as before)
+];
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [selectedCategory, setSelectedCategory] = useState<Category>(categories[0]);
+  const [filteredPlaces, setFilteredPlaces] = useState<Place[]>([]);
+  const [bgColor, setBgColor] = useState<string>(categories[0].bgColor);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+  useEffect(() => {
+    const categoryPlaces = places.filter(place => 
+      place.category === selectedCategory.name
+    );
+    setFilteredPlaces(categoryPlaces);
+    setBgColor(selectedCategory.bgColor);
+  }, [selectedCategory]);
+
+  return (
+    <div className="min-h-screen relative overflow-hidden">
+      <BackgroundAnimation category={selectedCategory} />
+      
+      <div className="relative z-10">
+      
+        <HeroCarousel />
+        
+        <main>
+          <section className="journey-section">
+            <div className="container mx-auto px-4">
+              <h1 className="journey-title">What&apos;s your journey?</h1>
+              <CategorySelector 
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onCategorySelect={setSelectedCategory}
+              />
+            </div>
+          </section>
+
+          <CategoryDetails 
+            category={selectedCategory}
+            places={filteredPlaces}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        </main>
+      </div>
+
+      <style jsx global>{`
+        .journey-section {
+          padding: 4rem 0;
+          text-align: center;
+          position: relative;
+          z-index: 2;
+        }
+
+        .journey-title {
+          font-size: 3.5rem;
+          font-weight: 800;
+          color: white;
+          margin-bottom: 3rem;
+          letter-spacing: -0.025em;
+          text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+          .journey-title {
+            font-size: 2.5rem;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .journey-title {
+            font-size: 2rem;
+          }
+        }
+          
+      `}</style>
     </div>
   );
 }
