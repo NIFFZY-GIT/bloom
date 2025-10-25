@@ -1,0 +1,50 @@
+.adminLayout {
+  display: flex;
+  align-items: stretch;
+  min-height: 100vh;
+  margin-top: 5.5rem;
+  background: #f1f5f9;
+}
+
+.sidebarWrapper {
+  flex-shrink: 0;
+  width: 260px;
+  position: relative;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-height: calc(100vh - 5.5rem);
+  max-height: none;
+  overflow-y: auto;
+  z-index: 20;
+}
+
+.contentArea {
+  flex: 1;
+  padding: 2.5rem;
+  min-height: calc(100vh - 5.5rem);
+  overflow: visible;
+}
+
+@media (max-width: 1024px) {
+  .adminLayout {
+    flex-direction: column;
+    margin-top: 5rem;
+    min-height: auto;
+  }
+
+  .sidebarWrapper {
+    width: 100%;
+    position: relative;
+    min-height: auto;
+    max-height: none;
+    top: 0;
+    box-shadow: none;
+  }
+
+  .contentArea {
+    padding: 2rem 1.5rem;
+    min-height: auto;
+  }
+}
