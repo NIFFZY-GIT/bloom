@@ -112,6 +112,22 @@ CREATE INDEX IF NOT EXISTS idx_tour_package_images_package
     ON tour_package_images(package_id, sort_order);
 
 
+CREATE TABLE gallery_items (
+    id SERIAL PRIMARY KEY,
+    category VARCHAR(255) NOT NULL,
+    image_path VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT
+);
+
+CREATE TABLE reviews (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    position VARCHAR(255),
+    avatar VARCHAR(255),
+    rating NUMERIC(2, 1) CHECK (rating >= 0 AND rating <= 5),
+    text TEXT NOT NULL
+);
 
 
 

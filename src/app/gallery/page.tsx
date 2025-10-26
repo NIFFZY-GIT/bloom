@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import './GalleryPage.css';
 
 interface GalleryItem {
@@ -23,100 +23,95 @@ interface Review {
 const GalleryPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const galleryItems: GalleryItem[] = [
-    {
-      id: 1,
-      category: 'web',
-      imagePath: '/images/gallery/web1.jpg',
-      title: 'E-commerce Platform',
-      description: 'Modern web design with seamless user experience'
-    },
-    {
-      id: 2,
-      category: 'branding',
-      imagePath: '/images/gallery/branding1.png',
-      title: 'Corporate Identity',
-      description: 'Complete brand identity for a tech startup'
-    },
-    {
-      id: 3,
-      category: 'ui',
-      imagePath: '/images/gallery/branding1.png',
-      title: 'Dashboard Design',
-      description: 'Intuitive user interface for a data analytics platform'
-    },
-    {
-      id: 4,
-      category: 'mobile',
-      imagePath: '/images/gallery/branding1.png',
-      title: 'Fitness App',
-      description: 'Mobile application for tracking workouts and nutrition'
-    },
-    {
-      id: 5,
-      category: 'web',
-      imagePath: '/images/gallery/branding1.png',
-      title: 'Portfolio Website',
-      description: 'Creative portfolio for a photographer'
-    },
-    {
-      id: 6,
-      category: 'branding',
-      imagePath: '/images/gallery/branding1.png',
-      title: 'Product Packaging',
-      description: 'Eco-friendly packaging design for a skincare line'
-    },
-    {
-      id: 7,
-      category: 'ui',
-      imagePath: '/images/gallery/branding1.png',
-      title: 'Booking System',
-      description: 'User-friendly interface for a hotel reservation system'
-    },
-    {
-      id: 8,
-      category: 'mobile',
-      imagePath: '/images/gallery/branding1.png',
-      title: 'Travel Companion',
-      description: 'Mobile app for planning and tracking travel itineraries'
+  const handleScrollToGallery = () => {
+    if (sectionRef.current) {
+      sectionRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  ];
+  };
 
-  const reviews: Review[] = [
-    {
-      id: 1,
-      name: 'Sarah Johnson',
-      position: 'Marketing Director',
-      avatar: '/images/avatars/avatar1.jpg',
-      rating: 5,
-      text: '"Working with HoloCM was a game-changer for our brand. Their attention to detail and creative approach transformed our online presence completely. We\'ve seen a 40% increase in engagement since launching our new website."'
-    },
-    {
-      id: 2,
-      name: 'Michael Chen',
-      position: 'Startup Founder',
-      avatar: '/images/avatars/avatar2.jpg',
-      rating: 4.5,
-      text: '"The team at HoloCM understood our vision from day one. They delivered a stunning mobile app that exceeded our expectations. Their professionalism and technical expertise made the entire process smooth and efficient."'
-    },
-    {
-      id: 3,
-      name: 'Emma Rodriguez',
-      position: 'Creative Director',
-      avatar: '/images/avatars/avatar3.jpg',
-      rating: 5,
-      text: '"I\'m blown away by the branding work HoloCM did for our agency. They captured our essence perfectly and delivered a cohesive identity system that has elevated our brand across all touchpoints. Highly recommended!"'
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadGalleryData = async () => {
+      setIsLoadingData(true);
+      try {
+        const response = await fetch('/api/gallery', {
+          method: 'GET',
+          cache: 'no-store',
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (!controller.signal.aborted) {
+          setGalleryItems(Array.isArray(data.items) ? data.items : []);
+          setReviews(Array.isArray(data.reviews) ? data.reviews : []);
+          setLoadError(null);
+        }
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+  console.error('Failed to load gallery data:', error);
+  setLoadError('Unable to load tour highlights right now. Please try again later.');
+        setGalleryItems([]);
+        setReviews([]);
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoadingData(false);
+        }
+      }
+    };
+
+    loadGalleryData();
+
+    return () => controller.abort();
+  }, []);
+
+  const availableFilters = useMemo(() => {
+    const categories = new Set<string>();
+    galleryItems.forEach(item => {
+      if (item.category) {
+        categories.add(item.category);
+      }
+    });
+    return ['all', ...Array.from(categories).sort((a, b) => a.localeCompare(b))];
+  }, [galleryItems]);
+
+  useEffect(() => {
+    if (activeFilter !== 'all' && !availableFilters.includes(activeFilter)) {
+      setActiveFilter('all');
     }
-  ];
+  }, [activeFilter, availableFilters]);
 
-  const filteredItems = activeFilter === 'all' 
-    ? galleryItems 
-    : galleryItems.filter(item => item.category === activeFilter);
+  const filteredItems = useMemo(() => {
+    if (activeFilter === 'all') {
+      return galleryItems;
+    }
+    return galleryItems.filter(item => item.category === activeFilter);
+  }, [activeFilter, galleryItems]);
 
   const handleFilterClick = (filter: string) => {
     setActiveFilter(filter);
+  };
+
+  const formatFilterLabel = (value: string) => {
+    if (value === 'all') {
+      return 'All Experiences';
+    }
+    return value
+      .replace(/[-_]/g, ' ')
+      .replace(/\b\w/g, char => char.toUpperCase());
   };
 
   useEffect(() => {
@@ -141,24 +136,44 @@ const GalleryPage: React.FC = () => {
   }, []);
 
   const renderStars = (rating: number) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
+    const safeRating = Number.isFinite(rating) ? Math.max(0, Math.min(5, rating)) : 0;
+    const stars: React.ReactNode[] = [];
+    const fullStars = Math.floor(safeRating);
+    const hasHalfStar = safeRating % 1 >= 0.5 && fullStars < 5;
+    const totalStars = 5;
+    const starGlyph = '\u2605';
 
     for (let i = 0; i < fullStars; i++) {
-      stars.push(<i key={i} className="fas fa-star"></i>);
+      stars.push(
+        <span key={`full-${i}`} className="star star-full" aria-hidden="true">
+          {starGlyph}
+        </span>,
+      );
     }
 
     if (hasHalfStar) {
-      stars.push(<i key="half" className="fas fa-star-half-alt"></i>);
+      stars.push(
+        <span key="half" className="star star-half" aria-hidden="true">
+          {starGlyph}
+        </span>,
+      );
     }
 
-    const emptyStars = 5 - stars.length;
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(<i key={`empty-${i}`} className="far fa-star"></i>);
+    while (stars.length < totalStars) {
+      const index = stars.length;
+      stars.push(
+        <span key={`empty-${index}`} className="star star-empty" aria-hidden="true">
+          {starGlyph}
+        </span>,
+      );
     }
 
-    return stars;
+    return (
+      <>
+        <span className="sr-only">Rated {safeRating.toFixed(1)} out of 5</span>
+        {stars}
+      </>
+    );
   };
 
   return (
@@ -167,9 +182,9 @@ const GalleryPage: React.FC = () => {
       <section className="gallery-hero">
         <div className="hero-overlay"></div>
         <div className="hero-content">
-          <h1>Our Creative Gallery</h1>
-          <p>Explore our portfolio of stunning projects and see what our clients have to say about their experiences with us.</p>
-          <button className="cta-button">View Our Work</button>
+          <h1>Discover Brooklyn Moments</h1>
+          <p>Step into the sights, flavours, and stories our guests experience on tour. From street art walks to waterfront sunsets, this gallery celebrates the joy of exploring Brooklyn.</p>
+          <button className="cta-button" onClick={handleScrollToGallery}>Plan Your Adventure</button>
         </div>
         <div className="scroll-indicator">
           <span>Scroll Down</span>
@@ -180,92 +195,95 @@ const GalleryPage: React.FC = () => {
       <div className="container">
         <section className="gallery-section" ref={sectionRef}>
           <div className="section-header">
-            <h2>Featured Projects</h2>
-            <p>Browse through our collection of creative work across different domains</p>
+            <h2>Signature Experiences</h2>
+            <p>Browse curated highlights from recent tours and bespoke itineraries that delighted our guests</p>
           </div>
 
           <div className="gallery-filters">
-            <button 
-              className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
-              onClick={() => handleFilterClick('all')}
-            >
-              All Projects
-            </button>
-            <button 
-              className={`filter-btn ${activeFilter === 'web' ? 'active' : ''}`}
-              onClick={() => handleFilterClick('web')}
-            >
-              Web Design
-            </button>
-            <button 
-              className={`filter-btn ${activeFilter === 'branding' ? 'active' : ''}`}
-              onClick={() => handleFilterClick('branding')}
-            >
-              Branding
-            </button>
-            <button 
-              className={`filter-btn ${activeFilter === 'ui' ? 'active' : ''}`}
-              onClick={() => handleFilterClick('ui')}
-            >
-              UI/UX
-            </button>
-            <button 
-              className={`filter-btn ${activeFilter === 'mobile' ? 'active' : ''}`}
-              onClick={() => handleFilterClick('mobile')}
-            >
-              Mobile Apps
-            </button>
-          </div>
-
-          <div className="gallery-grid">
-            {filteredItems.map((item, index) => (
-              <div 
-                key={item.id}
-                className={`gallery-item fade-in ${isVisible ? 'appear' : ''}`}
-                style={{ animationDelay: `${index * 0.1}s` }}
-                data-category={item.category}
+            {availableFilters.map(filter => (
+              <button
+                key={filter}
+                className={`filter-btn ${activeFilter === filter ? 'active' : ''}`}
+                onClick={() => handleFilterClick(filter)}
               >
-                <div className="gallery-image">
-                  <img src={item.imagePath} alt={item.title} />
-                </div>
-                <div className="gallery-overlay">
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-                  <button className="view-project-btn">View Project</button>
-                </div>
-              </div>
+                {formatFilterLabel(filter)}
+              </button>
             ))}
           </div>
+
+          {isLoadingData ? (
+            <div className="gallery-state">Loading experiences&hellip;</div>
+          ) : loadError ? (
+            <div className="gallery-state gallery-state-error" role="alert">{loadError}</div>
+          ) : filteredItems.length > 0 ? (
+            <div className="gallery-grid">
+              {filteredItems.map((item, index) => (
+                <div
+                  key={item.id}
+                  className={`gallery-item fade-in ${isVisible ? 'appear' : ''}`}
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                  data-category={item.category}
+                >
+                  <div className="gallery-image">
+                    <img src={item.imagePath} alt={item.title} />
+                  </div>
+                  <div className="gallery-overlay">
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                    <button className="view-project-btn">View Experience</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="gallery-state gallery-state-empty">
+              <h3>No experiences to show yet</h3>
+              <p>We&apos;re busy crafting more adventures. Check back soon for fresh tour highlights.</p>
+            </div>
+          )}
         </section>
 
         <section className="reviews-section">
           <div className="section-header">
-            <h2>What Our Clients Say</h2>
-            <p>Hear from our satisfied customers about their experience working with us</p>
+            <h2>Traveler Stories</h2>
+            <p>Hear how fellow explorers felt after spending the day uncovering Brooklyn with our guides</p>
           </div>
-          <div className="reviews-container">
-            {reviews.map((review, index) => (
-              <div 
-                key={review.id}
-                className={`review-card fade-in ${isVisible ? 'appear' : ''}`}
-                style={{ animationDelay: `${index * 0.2}s` }}
-              >
-                <div className="review-header">
-                  <div className="review-avatar">
-                    <img src={review.avatar} alt={review.name} />
-                  </div>
-                  <div className="review-info">
-                    <h3>{review.name}</h3>
-                    <div className="review-stars">
-                      {renderStars(review.rating)}
+          {isLoadingData ? (
+            <div className="gallery-state">Gathering traveler stories&hellip;</div>
+          ) : loadError ? (
+            <div className="gallery-state gallery-state-error" role="status">
+              Unable to load traveler stories right now.
+            </div>
+          ) : reviews.length > 0 ? (
+            <div className="reviews-container">
+              {reviews.map((review, index) => (
+                <div
+                  key={review.id}
+                  className={`review-card fade-in ${isVisible ? 'appear' : ''}`}
+                  style={{ animationDelay: `${index * 0.2}s` }}
+                >
+                  <div className="review-header">
+                    <div className="review-avatar">
+                      <img src={review.avatar} alt={review.name} />
                     </div>
-                    <p>{review.position}</p>
+                    <div className="review-info">
+                      <h3>{review.name}</h3>
+                      <div className="review-stars">
+                        {renderStars(review.rating)}
+                      </div>
+                      <p>{review.position}</p>
+                    </div>
                   </div>
+                  <p className="review-text">{review.text}</p>
                 </div>
-                <p className="review-text">{review.text}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="gallery-state gallery-state-empty">
+              <h3>No traveler stories yet</h3>
+              <p>Invite recent guests to share their favourite Brooklyn moments so we can feature them here.</p>
+            </div>
+          )}
         </section>
       </div>
     </div>

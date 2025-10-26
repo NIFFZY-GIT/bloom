@@ -18,6 +18,8 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/bookings', label: 'Bookings', icon: '📅' },
   { href: '/admin/custompackages', label: 'Custom Packages', icon: '�' },
   { href: '/admin/users', label: 'Users', icon: '👥' },
+  { href: '/admin/admingallery', label: 'Gallery', icon: '📸' },
+  { href: '/admin/reviews', label: 'Reviews', icon: '⭐' },
 ];
 
 export default function AdminSidebar() {

@@ -27,6 +27,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Unsupported file type' }, { status: 400 });
     }
 
+    const folderInput = formData.get('folder');
+    let folderSegments: string[] = [];
+    if (typeof folderInput === 'string') {
+      const trimmed = folderInput.trim();
+      if (trimmed.length > 0) {
+        const candidates = trimmed.split(/[\\/]+/);
+        folderSegments = candidates.filter(segment => /^[a-zA-Z0-9_-]+$/.test(segment));
+      }
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
@@ -34,8 +44,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'File too large. Max size is 4MB.' }, { status: 400 });
     }
 
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    await mkdir(uploadsDir, { recursive: true });
+  const uploadsDir = path.join(process.cwd(), 'public', 'uploads', ...folderSegments);
+  await mkdir(uploadsDir, { recursive: true });
 
     const extensionByType: Record<string, string> = {
       'image/jpeg': '.jpg',
@@ -48,11 +58,12 @@ export async function POST(request: Request) {
     const inferredExtension = extensionByType[file.type];
     const fileExtension = inferredExtension || path.extname(file.name) || '.bin';
     const uniqueName = `${crypto.randomUUID()}${fileExtension}`;
-    const filePath = path.join(uploadsDir, uniqueName);
+  const filePath = path.join(uploadsDir, uniqueName);
 
     await writeFile(filePath, buffer);
 
-    const publicUrl = `/uploads/${uniqueName}`;
+  const publicPathSegments = ['uploads', ...folderSegments, uniqueName];
+  const publicUrl = `/${publicPathSegments.join('/')}`;
 
     return NextResponse.json({ success: true, url: publicUrl }, { status: 201 });
   } catch (error) {
