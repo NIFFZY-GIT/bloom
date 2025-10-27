@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { sendWelcomeEmail } from '@/lib/email';
 
 export async function POST(req: Request) {
   try {
@@ -27,22 +27,26 @@ export async function POST(req: Request) {
 
     const user = insert.rows[0];
 
-    const secret = process.env.JWT_SECRET || 'dev-secret';
-    const token = jwt.sign({ sub: user.user_id, email: user.email, role: user.role }, secret, { expiresIn: '7d' });
+    // Send welcome email (don't fail signup if email fails)
+    try {
+      await sendWelcomeEmail({
+        email: user.email,
+        username: user.username,
+      });
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError);
+      // Continue with successful signup even if email fails
+    }
 
-    const response = NextResponse.json(
-      { role: user.role, user: { id: user.user_id, username: user.username, email: user.email } },
+    // Return success without logging in the user
+    return NextResponse.json(
+      { 
+        success: true,
+        message: 'Registration successful! Please log in.',
+        user: { id: user.user_id, username: user.username, email: user.email } 
+      },
       { status: 201 }
     );
-
-    response.cookies.set('auth_token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV !== 'development',
-      maxAge: 60 * 60 * 24 * 7,
-      path: '/',
-    });
-
-    return response;
   } catch (err: any) {
     console.error('Signup error', err);
     // unique violation (duplicate email/username)

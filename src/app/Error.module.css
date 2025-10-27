@@ -1,0 +1,251 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fef3c7 0%, #ffffff 50%, #fee2e2 100%);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.05) 0%, transparent 70%);
+  animation: rotate 30s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.content {
+  text-align: center;
+  max-width: 600px;
+  position: relative;
+  z-index: 1;
+  background: white;
+  padding: 60px 40px;
+  border-radius: 24px;
+  box-shadow: 0 10px 40px rgba(239, 68, 68, 0.1);
+}
+
+.errorIcon {
+  font-size: 100px;
+  margin-bottom: 20px;
+  animation: shake 0.5s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  75% {
+    transform: translateX(10px);
+  }
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #1f2937;
+  margin-bottom: 20px;
+  font-weight: 800;
+}
+
+.description {
+  font-size: 1.1rem;
+  color: #6b7280;
+  line-height: 1.8;
+  margin-bottom: 30px;
+}
+
+.errorDetails {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 30px 0;
+  text-align: left;
+}
+
+.errorDetails summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #374151;
+  padding: 10px;
+  user-select: none;
+}
+
+.errorDetails summary:hover {
+  color: #ff6b35;
+}
+
+.errorDetails code {
+  display: block;
+  background: #1f2937;
+  color: #fbbf24;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.digest {
+  color: #6b7280;
+  font-size: 12px;
+  margin-top: 10px;
+  font-family: monospace;
+}
+
+.illustration {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  margin: 40px 0;
+  font-size: 80px;
+}
+
+.toolbox {
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.wrench {
+  animation: rotate-wrench 4s ease-in-out infinite;
+}
+
+@keyframes rotate-wrench {
+  0%, 100% {
+    transform: rotate(-15deg);
+  }
+  50% {
+    transform: rotate(15deg);
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
+  color: white;
+  padding: 14px 32px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+.primaryBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+.secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  color: #ff6b35;
+  padding: 14px 32px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 16px;
+  border: 2px solid #ff6b35;
+  transition: all 0.3s ease;
+}
+
+.secondaryBtn:hover {
+  background: #fff9f6;
+  transform: translateY(-2px);
+}
+
+.helpText {
+  color: #6b7280;
+  font-size: 14px;
+  margin-top: 20px;
+}
+
+.helpText a {
+  color: #ff6b35;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.helpText a:hover {
+  color: #ff8c5a;
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content {
+    padding: 40px 30px;
+  }
+
+  .errorIcon {
+    font-size: 80px;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .description {
+    font-size: 1rem;
+  }
+
+  .illustration {
+    font-size: 60px;
+    gap: 20px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .primaryBtn,
+  .secondaryBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}

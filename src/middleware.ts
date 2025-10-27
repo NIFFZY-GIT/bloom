@@ -19,7 +19,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Protected routes that require authentication
-  const protectedRoutes = ['/profile', '/bookings', '/create_pkg'];
+  const protectedRoutes = ['/profile', '/bookings'];
   
   // Admin routes that require admin role
   const adminRoutes = ['/admin'];

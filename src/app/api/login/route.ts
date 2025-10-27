@@ -27,14 +27,21 @@ export async function POST(req: Request) {
     const secret = process.env.JWT_SECRET || 'dev-secret';
     const token = jwt.sign({ sub: user.user_id, email: user.email, role: user.role }, secret, { expiresIn: '7d' });
 
+    console.log('[Login API] JWT token created for user:', user.email);
+    console.log('[Login API] Token length:', token.length);
+    console.log('[Login API] NODE_ENV:', process.env.NODE_ENV);
+
     const response = NextResponse.json({ role: user.role }, { status: 200 });
 
     response.cookies.set('auth_token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV !== 'development',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 1 week
       path: '/',
     });
+
+    console.log('[Login API] Cookie set successfully');
 
     return response;
   } catch (err: any) {

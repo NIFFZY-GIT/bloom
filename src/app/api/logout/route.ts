@@ -11,10 +11,13 @@ export async function POST() {
     // Clear the authentication cookie by setting an expired one
     response.cookies.set('auth_token', '', {
       httpOnly: true,
-      secure: process.env.NODE_ENV !== 'development',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
       expires: new Date(0),
       path: '/',
     });
+
+    console.log('[Logout API] Cookie cleared successfully');
 
     return response;
   } catch (error) {

@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { isAuthenticated } from '@/lib/auth-client';
 
 import 'react-phone-number-input/style.css';
 import PhoneInput from 'react-phone-number-input';
@@ -34,6 +35,8 @@ interface PackagesClientProps {
   initialTourPackages: TourPackage[];
 }
 
+const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/400x250?text=Tour+Image';
+
 const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
   const [tourPackages, setTourPackages] = useState<TourPackage[]>(initialTourPackages);
   const [activeFilter, setActiveFilter] = useState<string>('all');
@@ -43,14 +46,20 @@ const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
     name: '',
     email: '',
     phone: '',
-    date: '',
+    startDate: '',
+    endDate: '',
     guests: 1,
-    message: ''
+    message: '',
+    foodAndSpecialRequests: ''
   });
+  const [packageImageIndex, setPackageImageIndex] = useState<Record<number, number>>({});
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOption, setSortOption] = useState<'recommended' | 'price-asc' | 'price-desc' | 'duration'>('recommended');
   const sectionRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const datePickerRef = useRef<HTMLDivElement | null>(null);
+  const dateTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   const availableFilters = useMemo(() => {
     const categorySet = new Set<string>();
@@ -106,6 +115,8 @@ const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
   };
 
   const handleViewPackage = (pkg: TourPackage) => {
+    // Allow viewing package details without authentication
+    // Authentication check happens when submitting booking
     setSelectedPackage(pkg);
     document.body.style.overflow = 'hidden'; // Prevent background scrolling
   };
@@ -142,17 +153,31 @@ const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
       name: '',
       email: '',
       phone: '',
-      date: '',
+      startDate: '',
+      endDate: '',
       guests: 1,
       message: '',
+      foodAndSpecialRequests: ''
     });
+    setIsDatePickerOpen(false);
   };
 
   const handleBookingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setBookingForm(prev => ({
       ...prev,
-      [name]: name === 'guests' ? Number(value) : value,
+      ...(name === 'guests'
+        ? { guests: Number(value) }
+        : name === 'startDate'
+          ? {
+              startDate: value,
+              endDate: prev.endDate && prev.endDate >= value ? prev.endDate : value,
+            }
+          : name === 'endDate'
+            ? {
+                endDate: !prev.startDate || value >= prev.startDate ? value : prev.startDate,
+              }
+            : { [name]: value }),
     }));
   };
 
@@ -163,9 +188,53 @@ const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
     });
   };
 
+  const handleToggleDatePicker = () => {
+    setIsDatePickerOpen(prev => !prev);
+  };
+
+  const closeDatePicker = useCallback(() => {
+    setIsDatePickerOpen(false);
+  }, []);
+
   const handleBookNow = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedPackage) return;
+
+    console.log('[PackagesClient] Starting booking process...');
+    console.log('[PackagesClient] Document cookies:', document.cookie);
+
+    // Check if user is authenticated before proceeding
+    console.log('[PackagesClient] Checking authentication...');
+    
+    let authenticated = false;
+    try {
+      authenticated = await isAuthenticated();
+      console.log('[PackagesClient] Authentication result:', authenticated);
+    } catch (error) {
+      console.error('[PackagesClient] Error during auth check:', error);
+      authenticated = false;
+    }
+    
+    if (!authenticated) {
+      console.log('[PackagesClient] User not authenticated, showing alert and redirecting');
+      alert('Please log in to complete your booking. You will be redirected to the login page.');
+      setTimeout(() => {
+        router.push(`/login?redirect=/packages`);
+      }, 1500);
+      return;
+    }
+
+    console.log('[PackagesClient] User authenticated, proceeding with booking...');
+
+    const startDate = bookingForm.startDate;
+    if (!startDate) {
+      alert('Please select your preferred start date.');
+      return;
+    }
+
+    const normalizedEndDate = bookingForm.endDate && bookingForm.endDate >= startDate
+      ? bookingForm.endDate
+      : startDate;
 
     try {
       const response = await fetch('/api/bookings', {
@@ -173,7 +242,15 @@ const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           packageId: selectedPackage.id,
-          ...bookingForm,
+          name: bookingForm.name,
+          email: bookingForm.email,
+          phone: bookingForm.phone,
+          startDate,
+          endDate: normalizedEndDate,
+          date: startDate,
+          guests: bookingForm.guests,
+          message: bookingForm.message,
+          foodAndSpecialRequests: bookingForm.foodAndSpecialRequests,
         }),
       });
 
@@ -195,12 +272,26 @@ const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
         name: bookingForm.name,
         email: bookingForm.email,
         phone: bookingForm.phone,
-        date: bookingForm.date,
+        startDate,
+        endDate: normalizedEndDate,
         guests: guestsCount.toString(),
       });
 
+      const dateLabelStart = formatDateLabel(startDate);
+      const dateLabelEnd = formatDateLabel(normalizedEndDate);
+      const dateRangeLabel = startDate === normalizedEndDate
+        ? dateLabelStart
+        : `${dateLabelStart} – ${dateLabelEnd}`;
+
+      params.append('date', dateRangeLabel);
+      params.append('dateRange', `${startDate}:${normalizedEndDate}`);
+
       if (bookingForm.message.trim()) {
         params.append('message', bookingForm.message.trim());
+      }
+
+      if (bookingForm.foodAndSpecialRequests.trim()) {
+        params.append('foodAndSpecialRequests', bookingForm.foodAndSpecialRequests.trim());
       }
 
       const bookingRecord = data?.booking;
@@ -236,7 +327,66 @@ const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
     };
   }, []);
 
-  const getPrimaryImage = (pkg: TourPackage) => pkg.image_path || pkg.gallery_images?.[0]?.image_path || 'https://via.placeholder.com/400x250?text=Tour+Image';
+  useEffect(() => {
+    if (!isDatePickerOpen) {
+      return;
+    }
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (
+        datePickerRef.current &&
+        !datePickerRef.current.contains(target) &&
+        dateTriggerRef.current &&
+        !dateTriggerRef.current.contains(target)
+      ) {
+        closeDatePicker();
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeDatePicker();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isDatePickerOpen, closeDatePicker]);
+
+  const getPackageImages = useCallback((pkg: TourPackage) => {
+    const images: string[] = [];
+
+    const pushUnique = (src: string | null | undefined) => {
+      if (src && !images.includes(src)) {
+        images.push(src);
+      }
+    };
+
+    pushUnique(pkg.image_path);
+
+    if (Array.isArray(pkg.gallery_images)) {
+      pkg.gallery_images.forEach((image) => {
+        pushUnique(image?.image_path);
+      });
+    }
+
+    if (!images.length) {
+      images.push(PLACEHOLDER_IMAGE);
+    }
+
+    return images;
+  }, []);
+
+  const getPrimaryImage = useCallback((pkg: TourPackage) => {
+    const images = getPackageImages(pkg);
+    return images[0] ?? PLACEHOLDER_IMAGE;
+  }, [getPackageImages]);
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -259,6 +409,67 @@ const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
   };
 
   const today = new Date().toISOString().split('T')[0];
+  const endDateMin = bookingForm.startDate || today;
+
+  const formatDateLabel = useCallback((isoDate: string) => {
+    if (!isoDate) {
+      return '';
+    }
+    const parsed = new Date(isoDate);
+    if (Number.isNaN(parsed.valueOf())) {
+      return isoDate;
+    }
+    return parsed.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }, []);
+
+  const selectedDateLabel = useMemo(() => {
+    if (!bookingForm.startDate) {
+      return 'Select dates';
+    }
+
+    const normalizedEnd = bookingForm.endDate && bookingForm.endDate >= bookingForm.startDate
+      ? bookingForm.endDate
+      : bookingForm.startDate;
+
+    const startLabel = formatDateLabel(bookingForm.startDate);
+    const endLabel = formatDateLabel(normalizedEnd);
+
+    return bookingForm.startDate === normalizedEnd ? startLabel : `${startLabel} – ${endLabel}`;
+  }, [bookingForm.startDate, bookingForm.endDate, formatDateLabel]);
+
+  useEffect(() => {
+    if (!filteredPackages.length) {
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setPackageImageIndex((prev) => {
+        let updated = false;
+        const nextState: Record<number, number> = { ...prev };
+
+        filteredPackages.forEach((pkg) => {
+          const images = getPackageImages(pkg);
+          const totalImages = images.length;
+          if (totalImages > 1) {
+            const currentIndex = prev[pkg.id] ?? 0;
+            const nextIndex = (currentIndex + 1) % totalImages;
+            if (nextState[pkg.id] !== nextIndex) {
+              nextState[pkg.id] = nextIndex;
+              updated = true;
+            }
+          }
+        });
+
+        return updated ? nextState : prev;
+      });
+    }, 6000);
+
+    return () => window.clearInterval(interval);
+  }, [filteredPackages, getPackageImages]);
 
   return (
     <div className="packages-page">
@@ -328,42 +539,138 @@ const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
 
           {filteredPackages.length > 0 ? (
             <div className="packages-grid">
-              {filteredPackages.map((pkg, index) => (
-                <div key={pkg.id} className={`package-card fade-in ${isVisible ? 'appear' : ''}`} style={{ animationDelay: `${index * 0.1}s` }}>
-                  <div className="package-image">
-                    <img src={getPrimaryImage(pkg)} alt={pkg.title} />
-                    <div className="package-badge">
-                      <span className="duration">{pkg.duration}</span>
-                      <span className="difficulty" style={{ backgroundColor: getDifficultyColor(pkg.difficulty) }}>{pkg.difficulty}</span>
-                    </div>
-                    <div className="package-overlay">
-                      <button className="view-package-btn" onClick={() => handleViewPackage(pkg)}>View Details</button>
-                    </div>
-                  </div>
-                  <div className="package-content">
-                    <div className="package-header">
-                      <h3>{pkg.title}</h3>
-                      <div className="package-rating">
-                        <div className="stars">{renderStars(pkg.rating)}</div>
-                        <span>({pkg.reviews})</span>
+              {filteredPackages.map((pkg, index) => {
+                const packageImages = getPackageImages(pkg);
+                const totalImages = packageImages.length;
+                const storedIndex = packageImageIndex[pkg.id] ?? 0;
+                const activeIndex = totalImages > 0 ? ((storedIndex % totalImages) + totalImages) % totalImages : 0;
+                const showControls = totalImages > 1;
+
+                const handlePrevImage = (event: React.MouseEvent<HTMLButtonElement>) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setPackageImageIndex((prev) => {
+                    if (totalImages <= 1) {
+                      return prev;
+                    }
+                    const current = prev[pkg.id] ?? activeIndex;
+                    const nextIndex = (current - 1 + totalImages) % totalImages;
+                    return { ...prev, [pkg.id]: nextIndex };
+                  });
+                };
+
+                const handleNextImage = (event: React.MouseEvent<HTMLButtonElement>) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setPackageImageIndex((prev) => {
+                    if (totalImages <= 1) {
+                      return prev;
+                    }
+                    const current = prev[pkg.id] ?? activeIndex;
+                    const nextIndex = (current + 1) % totalImages;
+                    return { ...prev, [pkg.id]: nextIndex };
+                  });
+                };
+
+                const handleSelectImage = (event: React.MouseEvent<HTMLButtonElement>, imageIndex: number) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setPackageImageIndex((prev) => ({ ...prev, [pkg.id]: imageIndex }));
+                };
+
+                return (
+                  <div
+                    key={pkg.id}
+                    className={`package-card fade-in ${isVisible ? 'appear' : ''}`}
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <div className="package-image">
+                      <div className="package-slider">
+                        {packageImages.map((imageSrc, imageIndex) => (
+                          <img
+                            key={`${pkg.id}-image-${imageIndex}`}
+                            src={imageSrc}
+                            alt={`${pkg.title} image ${imageIndex + 1}`}
+                            className={`package-slider-image ${imageIndex === activeIndex ? 'active' : ''}`}
+                            loading={imageIndex === 0 ? 'eager' : 'lazy'}
+                          />
+                        ))}
+                      </div>
+
+                      {showControls && (
+                        <>
+                          <button
+                            type="button"
+                            className="slider-control slider-control-prev"
+                            onClick={handlePrevImage}
+                            aria-label={`Show previous photo for ${pkg.title}`}
+                          >
+                            <span className="slider-icon" aria-hidden="true">
+                              <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+                                <path d="M15.41 7.41 14 6 8 12l6 6 1.41-1.41L10.83 12z" />
+                              </svg>
+                            </span>
+                          </button>
+                          <button
+                            type="button"
+                            className="slider-control slider-control-next"
+                            onClick={handleNextImage}
+                            aria-label={`Show next photo for ${pkg.title}`}
+                          >
+                            <span className="slider-icon" aria-hidden="true">
+                              <svg viewBox="0 0 24 24" focusable="false" role="presentation">
+                                <path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L12.17 12z" />
+                              </svg>
+                            </span>
+                          </button>
+                          <div className="slider-dots" role="tablist" aria-label={`${pkg.title} gallery`}>
+                            {packageImages.map((_, dotIndex) => (
+                              <button
+                                key={`dot-${pkg.id}-${dotIndex}`}
+                                type="button"
+                                className={`slider-dot ${dotIndex === activeIndex ? 'active' : ''}`}
+                                onClick={(event) => handleSelectImage(event, dotIndex)}
+                                aria-label={`View photo ${dotIndex + 1}`}
+                                aria-pressed={dotIndex === activeIndex}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
+
+                      <div className="package-badge">
+                        <span className="duration">{pkg.duration}</span>
+                        <span className="difficulty" style={{ backgroundColor: getDifficultyColor(pkg.difficulty) }}>{pkg.difficulty}</span>
+                      </div>
+                      <div className="package-overlay">
+                        <button className="view-package-btn" onClick={() => handleViewPackage(pkg)}>View Details</button>
                       </div>
                     </div>
-                    <p className="package-description">{pkg.description}</p>
-                    <div className="package-highlights">
-                      {pkg.highlights.slice(0, 3).map((highlight, idx) => (
-                        <span key={idx} className="highlight-tag">#{highlight}</span>
-                      ))}
-                    </div>
-                    <div className="package-footer">
-                      <div className="package-price">
-                        <span className="price">${pkg.price}</span>
-                        <span className="per-person">per person</span>
+                    <div className="package-content">
+                      <div className="package-header">
+                        <h3>{pkg.title}</h3>
+                        <div className="package-rating">
+                          <div className="stars">{renderStars(pkg.rating)}</div>
+                          <span>({pkg.reviews})</span>
+                        </div>
                       </div>
-                      <button className="book-now-btn" onClick={() => handleViewPackage(pkg)}>Book Now</button>
+                      <p className="package-description">{pkg.description}</p>
+                      <div className="package-highlights">
+                        {pkg.highlights.slice(0, 3).map((highlight, idx) => (
+                          <span key={idx} className="highlight-tag">#{highlight}</span>
+                        ))}
+                      </div>
+                      <div className="package-footer">
+                        <div className="package-price">
+                          <span className="price">${pkg.price}</span>
+                          <span className="per-person">per person</span>
+                        </div>
+                        <button className="book-now-btn" onClick={() => handleViewPackage(pkg)}>Book Now</button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="packages-empty-state">
@@ -474,23 +781,96 @@ const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
 
                 <div className="form-group-section">
                   <h4>Tour Preferences</h4>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="date">Preferred Date <span className="required-asterisk">*</span></label>
-                      <input type="date" id="date" name="date" value={bookingForm.date} onChange={handleBookingChange} min={today} required />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="guests">Number of Guests <span className="required-asterisk">*</span></label>
-                      <select id="guests" name="guests" value={bookingForm.guests} onChange={handleBookingChange} required>
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
-                          <option key={num} value={num}>{num} {num === 1 ? 'Guest' : 'Guests'}</option>
-                        ))}
-                      </select>
-                    </div>
+                  <div className="form-group date-range-field">
+                    <label htmlFor="preferred-dates">Preferred Dates <span className="required-asterisk">*</span></label>
+                    <button
+                      type="button"
+                      id="preferred-dates"
+                      className={`date-range-trigger ${bookingForm.startDate ? 'has-value' : ''}`}
+                      onClick={handleToggleDatePicker}
+                      ref={dateTriggerRef}
+                      aria-expanded={isDatePickerOpen}
+                      aria-controls="preferred-dates-panel"
+                    >
+                      <span>{selectedDateLabel}</span>
+                      <i className="fas fa-calendar-alt" aria-hidden="true"></i>
+                    </button>
+                    {isDatePickerOpen && (
+                      <div className="date-range-panel" id="preferred-dates-panel" ref={datePickerRef}>
+                        <div className="date-range-inputs">
+                          <div className="date-input-group">
+                            <span>Start</span>
+                            <input
+                              type="date"
+                              name="startDate"
+                              value={bookingForm.startDate}
+                              onChange={handleBookingChange}
+                              min={today}
+                              required
+                            />
+                          </div>
+                          <div className="date-input-group">
+                            <span>End</span>
+                            <input
+                              type="date"
+                              name="endDate"
+                              value={bookingForm.endDate}
+                              onChange={handleBookingChange}
+                              min={endDateMin}
+                            />
+                          </div>
+                        </div>
+                        <div className="date-range-actions">
+                          <button type="button" className="date-range-clear" onClick={() => {
+                            setBookingForm(prev => ({
+                              ...prev,
+                              startDate: '',
+                              endDate: '',
+                            }));
+                          }}>
+                            Clear
+                          </button>
+                          <button type="button" className="date-range-apply" onClick={closeDatePicker}>
+                            Done
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div className="form-group">
-                    <label htmlFor="message">Special Requests / Notes</label>
-                    <textarea id="message" name="message" value={bookingForm.message} onChange={handleBookingChange} placeholder="e.g., dietary restrictions, accessibility needs..." rows={4}></textarea>
+                    <label htmlFor="guests">Number of Guests <span className="required-asterisk">*</span></label>
+                    <select id="guests" name="guests" value={bookingForm.guests} onChange={handleBookingChange} required>
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+                        <option key={num} value={num}>{num} {num === 1 ? 'Guest' : 'Guests'}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <h4 style={{ marginTop: '1.5rem', marginBottom: '0.75rem', color: '#1f2937', fontSize: '1rem', fontWeight: 600 }}>
+                    <i className="fas fa-utensils" style={{ marginRight: '0.5rem', color: '#f59e0b' }}></i>
+                    Food & Special Requirements (for all guests)
+                  </h4>
+                  
+                  <div className="form-group">
+                    <label htmlFor="foodAndSpecialRequests">
+                      Food Preferences, Allergies & Additional Information
+                    </label>
+                    <textarea 
+                      id="foodAndSpecialRequests" 
+                      name="foodAndSpecialRequests" 
+                      value={bookingForm.foodAndSpecialRequests} 
+                      onChange={handleBookingChange} 
+                      placeholder="Example: 2 guests are vegetarian, 1 guest is non-vegan, 1 guest has nut allergy, 1 guest has dairy allergy. Please also mention any other special requests or celebrations..." 
+                      rows={5}
+                    ></textarea>
+                    <small style={{ display: 'block', marginTop: '0.5rem', color: '#6b7280', fontSize: '0.875rem' }}>
+                      💡 Tip: Mention the count for each requirement (e.g., "2 vegetarian, 1 has shellfish allergy")
+                    </small>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="message">Additional Notes</label>
+                    <textarea id="message" name="message" value={bookingForm.message} onChange={handleBookingChange} placeholder="Any other information you'd like to share..." rows={3}></textarea>
                   </div>
                 </div>
 

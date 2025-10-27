@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import db, { query } from '@/lib/db';
+import { notifyAdminCustomPackage, sendCustomPackageAcknowledgment } from '@/lib/email';
 
 interface PlacePayload {
   id: number | null;
@@ -104,27 +105,22 @@ export async function POST(request: Request) {
     };
   });
 
-  const totalDurationMinutes = places.reduce((total, place) => total + place.durationMinutes, 0);
-  const totalPrice = places.reduce((total, place) => total + place.price, 0);
-
-  const preferences = body?.preferences ?? {};
-  const pace = normalizeString(preferences?.pace) || 'moderate';
-  const transport = normalizeString(preferences?.transport) || 'walking';
-  const includeGuide = coerceBoolean(preferences?.guide, true);
-  const includeMeals = coerceBoolean(preferences?.meals, false);
-  const includePhotography = coerceBoolean(preferences?.photography, false);
+  const totals = body?.totals ?? {};
+  const totalDurationMinutes = coerceNumber(totals?.durationMinutes, 0);
+  const totalDurationLabel = normalizeOptionalString(totals?.durationLabel) || '0 hours';
 
   const contact = body?.contact ?? {};
-  const contactName = normalizeString(contact?.name);
   const contactEmail = normalizeString(contact?.email);
-  const contactPhone = normalizeString(contact?.phone);
-  const preferredDate = normalizeOptionalString(contact?.date);
+  const contactPhone = normalizeOptionalString(contact?.phone);
+  const startDate = normalizeOptionalString(contact?.startDate);
+  const endDate = normalizeOptionalString(contact?.endDate);
   const guestsRaw = coerceNumber(contact?.guests, 1);
   const guests = Number.isInteger(guestsRaw) && guestsRaw > 0 ? Math.min(guestsRaw, 100) : 1;
-  const specialRequests = normalizeOptionalString(contact?.specialRequests);
+  const foodAndSpecialRequests = normalizeOptionalString(contact?.foodAndSpecialRequests);
+  const additionalInfo = normalizeOptionalString(contact?.additionalInfo);
 
-  if (!contactName || !contactEmail || !contactPhone) {
-    return NextResponse.json({ message: 'Contact name, email, and phone are required' }, { status: 400 });
+  if (!contactEmail) {
+    return NextResponse.json({ message: 'Contact email is required' }, { status: 400 });
   }
 
   const client = await db.pool.connect();
@@ -132,85 +128,168 @@ export async function POST(request: Request) {
   try {
     await client.query('BEGIN');
 
+    // Insert or get places from the places table
+    const placeIds: number[] = [];
+    
+    for (const place of places) {
+      // Check if place exists in places table
+      let placeId: number;
+      
+      if (place.id) {
+        // Check if this ID exists
+        const existingPlace = await client.query(
+          'SELECT id FROM places WHERE id = $1',
+          [place.id]
+        );
+        
+        if (existingPlace.rows.length > 0) {
+          placeId = place.id;
+        } else {
+          // Insert new place
+          const insertResult = await client.query(
+            `INSERT INTO places (name, description, image_path, category, duration, location, highlights, price)
+             VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8)
+             RETURNING id`,
+            [
+              place.name,
+              place.description,
+              place.imagePath,
+              place.category,
+              place.duration,
+              place.location,
+              JSON.stringify(place.highlights),
+              place.price,
+            ]
+          );
+          placeId = insertResult.rows[0].id;
+        }
+      } else {
+        // Insert new place
+        const insertResult = await client.query(
+          `INSERT INTO places (name, description, image_path, category, duration, location, highlights, price)
+           VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8)
+           RETURNING id`,
+          [
+            place.name,
+            place.description,
+            place.imagePath,
+            place.category,
+            place.duration,
+            place.location,
+            JSON.stringify(place.highlights),
+            place.price,
+          ]
+        );
+        placeId = insertResult.rows[0].id;
+      }
+      
+      placeIds.push(placeId);
+    }
+
+    // Insert custom package
     const packageResult = await client.query(
-      `INSERT INTO custom_package_requests (
-         package_name,
-         package_description,
+      `INSERT INTO custom_packages (
+         name,
+         description,
          total_duration_minutes,
-         total_price,
-         pace,
-         transport,
-         include_guide,
-         include_meals,
-         include_photography,
-         contact_name,
+         total_duration_label,
+         guests,
          contact_email,
          contact_phone,
-         preferred_date,
-         guests,
-         special_requests
+         start_date,
+         end_date,
+         food_and_special_requests,
+         additional_info,
+         status
        )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
        RETURNING id`,
       [
         name,
         description,
         totalDurationMinutes,
-        Number(totalPrice.toFixed(2)),
-        pace,
-        transport,
-        includeGuide,
-        includeMeals,
-        includePhotography,
-        contactName,
+        totalDurationLabel,
+        guests,
         contactEmail,
         contactPhone,
-        preferredDate,
-        guests,
-        specialRequests,
+        startDate,
+        endDate,
+        foodAndSpecialRequests,
+        additionalInfo,
+        'pending',
       ],
     );
 
-    const requestId = packageResult.rows[0].id as number;
+    const packageId = packageResult.rows[0].id;
 
-    for (const place of places) {
+    // Link places to custom package
+    for (let i = 0; i < placeIds.length; i++) {
       await client.query(
-        `INSERT INTO custom_package_request_places (
-           custom_package_id,
-           place_external_id,
-           place_name,
-           place_description,
-           image_path,
-           category,
-           duration_minutes,
-           price,
-           location,
-           highlights,
-           sequence
-         )
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::text[], $11)`,
-        [
-          requestId,
-          place.id,
-          place.name,
-          place.description,
-          place.imagePath,
-          place.category,
-          place.durationMinutes,
-          place.price,
-          place.location,
-          place.highlights,
-          place.order,
-        ],
+        `INSERT INTO custom_package_places (custom_package_id, place_id, display_order)
+         VALUES ($1, $2, $3)`,
+        [packageId, placeIds[i], i + 1]
       );
     }
 
     await client.query('COMMIT');
 
-    return NextResponse.json({ success: true, requestId }, { status: 201 });
+    // Send email notifications to customer and all admins
+    try {
+      const placeNames = places.map((p) => p.name);
+      const dateRange = startDate && endDate 
+        ? `${startDate} to ${endDate}`
+        : startDate 
+          ? `From ${startDate}` 
+          : endDate 
+            ? `Until ${endDate}` 
+            : 'Not specified';
+
+      // Send acknowledgment to customer
+      console.log(`Sending custom package acknowledgment to customer: ${contactEmail}`);
+      await sendCustomPackageAcknowledgment({
+        customerName: name, // Using package name as customer name (could be improved)
+        customerEmail: contactEmail,
+        packageName: name,
+        packageId: String(packageId),
+        places: placeNames,
+        guests,
+        dateRange,
+      });
+
+      // Get all admin users from database (role = 'ADMIN' in uppercase per schema)
+      const adminResult = await client.query(
+        `SELECT email FROM users WHERE role = $1`,
+        ['ADMIN']
+      );
+
+      console.log(`Found ${adminResult.rows.length} admin(s) to notify about custom package`);
+
+      // Send notification to each admin user in database
+      for (const admin of adminResult.rows) {
+        console.log(`Sending custom package notification to admin: ${admin.email}`);
+        await notifyAdminCustomPackage({
+          packageId: String(packageId),
+          packageName: name,
+          customerEmail: contactEmail,
+          customerPhone: contactPhone,
+          guests,
+          duration: totalDurationLabel,
+          places: placeNames,
+          dateRange,
+          toEmail: admin.email, // Send to this specific admin
+        });
+      }
+
+      console.log('All custom package notification emails sent successfully');
+    } catch (emailError) {
+      // Log email error but don't fail the request
+      console.error('Failed to send custom package notification emails:', emailError);
+    }
+
+    return NextResponse.json({ success: true, packageId }, { status: 201 });
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('Failed to save custom package request:', error);
+    console.error('Failed to save custom package:', error);
     return NextResponse.json({ message: 'Failed to submit custom package' }, { status: 500 });
   } finally {
     client.release();
@@ -221,52 +300,50 @@ export async function GET() {
   try {
     const result = await query(
       `SELECT
-         r.id,
-         r.package_name,
-         r.package_description,
-         r.total_duration_minutes,
-         r.total_price,
-         r.pace,
-         r.transport,
-         r.include_guide,
-         r.include_meals,
-         r.include_photography,
-         r.contact_name,
-         r.contact_email,
-         r.contact_phone,
-         r.preferred_date,
-         r.guests,
-         r.special_requests,
-         r.created_at,
+         cp.id,
+         cp.name,
+         cp.description,
+         cp.total_duration_minutes,
+         cp.total_duration_label,
+         cp.guests,
+         cp.contact_email,
+         cp.contact_phone,
+         cp.start_date,
+         cp.end_date,
+         cp.food_and_special_requests,
+         cp.additional_info,
+         cp.status,
+         cp.created_at,
+         cp.updated_at,
          COALESCE(
            json_agg(
              json_build_object(
                'id', p.id,
-               'externalId', p.place_external_id,
-               'name', p.place_name,
-               'description', p.place_description,
+               'name', p.name,
+               'description', p.description,
                'imagePath', p.image_path,
                'category', p.category,
-               'durationMinutes', p.duration_minutes,
-               'price', p.price,
+               'duration', p.duration,
                'location', p.location,
                'highlights', p.highlights,
-               'sequence', p.sequence
+               'price', p.price,
+               'displayOrder', cpp.display_order
              )
-             ORDER BY p.sequence, p.id
+             ORDER BY cpp.display_order
            )
            FILTER (WHERE p.id IS NOT NULL),
            '[]'
          ) AS places
-       FROM custom_package_requests r
-       LEFT JOIN custom_package_request_places p ON p.custom_package_id = r.id
-       GROUP BY r.id
-       ORDER BY r.created_at DESC`
+       FROM custom_packages cp
+       LEFT JOIN custom_package_places cpp ON cpp.custom_package_id = cp.id
+       LEFT JOIN places p ON p.id = cpp.place_id
+       GROUP BY cp.id
+       ORDER BY cp.created_at DESC`
     );
 
-    return NextResponse.json({ success: true, requests: result.rows }, { status: 200 });
+    return NextResponse.json({ success: true, packages: result.rows }, { status: 200 });
   } catch (error) {
-    console.error('Failed to load custom package requests:', error);
+    console.error('Failed to load custom packages:', error);
     return NextResponse.json({ message: 'Failed to load custom packages' }, { status: 500 });
   }
 }

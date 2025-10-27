@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { query } from '@/lib/db';
+import { sendBookingConfirmationToUser, notifyAdminNewBooking } from '@/lib/email';
 
 type RouteParams = {
   bookingId: string;
@@ -111,6 +112,80 @@ export async function POST(request: Request, context: { params: Promise<RoutePar
     if (!isUndefinedColumnError(error)) {
       console.error('Failed to insert booking receipt audit record:', error);
     }
+  }
+
+  // Send email notifications after successful receipt upload
+  try {
+    // Get booking details with package information
+    const bookingResult = await query(
+      `SELECT 
+        b.id,
+        b.customer_name,
+        b.customer_email,
+        b.customer_phone,
+        b.preferred_date,
+        b.number_of_guests,
+        b.special_requests,
+        tp.title as package_title,
+        tp.price as price_per_person
+      FROM bookings b
+      LEFT JOIN tour_packages tp ON b.package_id = tp.id
+      WHERE b.id = $1`,
+      [bookingId]
+    );
+
+    if (bookingResult.rows.length > 0) {
+      const booking = bookingResult.rows[0];
+      
+      // Convert database values to numbers (PostgreSQL returns NUMERIC as string)
+      const pricePerPerson = Number(booking.price_per_person) || 0;
+      const numberOfGuests = Number(booking.number_of_guests) || 1;
+      const totalAmount = pricePerPerson * numberOfGuests;
+
+      const emailData = {
+        bookingId: String(bookingId),
+        customerName: booking.customer_name,
+        customerEmail: booking.customer_email,
+        customerPhone: booking.customer_phone,
+        packageName: booking.package_title || 'Tour Package',
+        preferredDate: booking.preferred_date,
+        preferredStartDate: booking.preferred_date,
+        preferredEndDate: booking.preferred_date, // Same as start date since column doesn't exist
+        numberOfGuests: numberOfGuests,
+        totalAmount: totalAmount,
+        pricePerPerson: pricePerPerson,
+        specialRequests: booking.special_requests,
+      };
+
+      // Send confirmation email to customer
+      console.log(`Sending booking confirmation to customer: ${booking.customer_email}`);
+      console.log(`Email data:`, { totalAmount, pricePerPerson, numberOfGuests });
+      await sendBookingConfirmationToUser(emailData);
+
+      // Get all admin users from database (role = 'ADMIN' in uppercase per schema)
+      const adminResult = await query(
+        `SELECT email FROM users WHERE role = $1`,
+        ['ADMIN']
+      );
+
+      console.log(`Found ${adminResult.rows.length} admin(s) to notify`);
+
+      // Send notification to each admin user in database
+      for (const admin of adminResult.rows) {
+        console.log(`Sending booking notification to admin: ${admin.email}`);
+        await notifyAdminNewBooking({
+          ...emailData,
+          toEmail: admin.email, // Send to this specific admin
+        });
+      }
+
+      console.log('All booking confirmation emails sent successfully');
+    } else {
+      console.warn(`Booking #${bookingId} not found for email notification`);
+    }
+  } catch (emailError) {
+    console.error('Failed to send booking confirmation emails:', emailError);
+    // Don't fail the request if emails fail - receipt was already saved
   }
 
   return NextResponse.json({ success: true });

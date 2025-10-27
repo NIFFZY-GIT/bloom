@@ -1,6 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { isAuthenticated } from '@/lib/auth-client';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 import './CreatePackagePage.css';
 
 interface Place {
@@ -40,164 +44,67 @@ interface CustomPackage {
 }
 
 const CreatePackagePage: React.FC = () => {
+  const router = useRouter();
   const [selectedPlaces, setSelectedPlaces] = useState<Place[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const [availablePlaces, setAvailablePlaces] = useState<Place[]>([]);
+  const [isLoadingPlaces, setIsLoadingPlaces] = useState<boolean>(true);
+  const [isUserAuthenticated, setIsUserAuthenticated] = useState<boolean>(false);
   const [packageForm, setPackageForm] = useState({
     name: '',
     description: '',
-    pace: 'moderate',
-    transport: 'walking',
-    guide: true,
-    meals: false,
-    photography: false,
-    contactName: '',
+    guests: 2,
     contactEmail: '',
     contactPhone: '',
-    preferredDate: '',
-    guests: 2,
-    specialRequests: '',
+    startDate: '',
+    endDate: '',
+    foodAndSpecialRequests: '',
+    additionalInfo: '',
   });
   const [isSubmittingPackage, setIsSubmittingPackage] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const datePickerRef = useRef<HTMLDivElement | null>(null);
+  const dateTriggerRef = useRef<HTMLButtonElement | null>(null);
 
-  const availablePlaces: Place[] = [
-    {
-      id: 1,
-      name: 'Brooklyn Bridge',
-      description: 'Iconic suspension bridge connecting Manhattan and Brooklyn with breathtaking skyline views.',
-      imagePath: '/images/places/Arugam.jpg',
-      category: 'landmark',
-      duration: '2 hours',
-      price: 0,
-      location: 'DUMBO, Brooklyn',
-      highlights: ['Skyline Views', 'Photo Opportunities', 'Historical Significance']
-    },
-    {
-      id: 2,
-      name: 'Brooklyn Heights Promenade',
-      description: 'Famous elevated walkway offering stunning views of Manhattan skyline and Brooklyn Bridge.',
-      imagePath: '/images/places/Sinharaja.jpg',
-      category: 'scenic',
-      duration: '1.5 hours',
-      price: 0,
-      location: 'Brooklyn Heights',
-      highlights: ['Manhattan Views', 'Peaceful Walk', 'Architecture']
-    },
-    {
-      id: 3,
-      name: 'DUMBO Waterfront',
-      description: 'Trendy neighborhood known for its cobblestone streets, art galleries, and Manhattan Bridge views.',
-      imagePath: '/images/places/Kanneliya.jpg',
-      category: 'cultural',
-      duration: '2 hours',
-      price: 0,
-      location: 'DUMBO',
-      highlights: ['Art Galleries', 'Cobblestone Streets', 'Bridge Views']
-    },
-    {
-      id: 4,
-      name: 'Brooklyn Botanic Garden',
-      description: '52-acre garden featuring cherry esplanade, Japanese garden, and rose garden.',
-      imagePath: '/images/places/Pasikudah.jpg',
-      category: 'nature',
-      duration: '3 hours',
-      price: 18,
-      location: 'Prospect Heights',
-      highlights: ['Japanese Garden', 'Cherry Blossoms', 'Rose Garden']
-    },
-    {
-      id: 5,
-      name: 'Williamsburg',
-      description: 'Hip neighborhood with vibrant street art, boutique shops, and diverse food scene.',
-      imagePath: '/images/places/Sinharaja.jpg',
-      category: 'cultural',
-      duration: '3 hours',
-      price: 0,
-      location: 'Williamsburg',
-      highlights: ['Street Art', 'Boutique Shopping', 'Food Scene']
-    },
-    {
-      id: 6,
-      name: 'Coney Island',
-      description: 'Classic amusement area with boardwalk, amusement park, and beach activities.',
-      imagePath: '/images/places/Pasikudah.jpg',
-      category: 'entertainment',
-      duration: '4 hours',
-      price: 45,
-      location: 'Coney Island',
-      highlights: ['Amusement Park', 'Beach', 'Boardwalk']
-    },
-    {
-      id: 7,
-      name: 'Prospect Park',
-      description: '526-acre urban park designed by the same architects as Central Park.',
-      imagePath: '/images/places/Pasikudah.jpg',
-      category: 'nature',
-      duration: '2.5 hours',
-      price: 0,
-      location: 'Prospect Park',
-      highlights: ['Long Meadow', 'Lake', 'Boat House']
-    },
-    {
-      id: 8,
-      name: 'Brooklyn Museum',
-      description: 'World-class museum with extensive collections of art and historical artifacts.',
-      imagePath: '/images/places/Pasikudah.jpg',
-      category: 'cultural',
-      duration: '2 hours',
-      price: 16,
-      location: 'Prospect Heights',
-      highlights: ['Art Collections', 'Egyptian Art', 'Contemporary Exhibits']
-    },
-    {
-      id: 9,
-      name: 'Industry City',
-      description: 'Revitalized industrial complex with food halls, shops, and creative studios.',
-      imagePath: '/images/places/Pasikudah.jpg',
-      category: 'shopping',
-      duration: '2 hours',
-      price: 0,
-      location: 'Sunset Park',
-      highlights: ['Food Halls', 'Local Shops', 'Creative Spaces']
-    },
-    {
-      id: 10,
-      name: 'Green-Wood Cemetery',
-      description: 'Historic cemetery and arboretum with beautiful landscapes and notable graves.',
-      imagePath: '/images/places/Pasikudah.jpg',
-      category: 'historical',
-      duration: '2 hours',
-      price: 0,
-      location: 'Sunset Park',
-      highlights: ['Historical Graves', 'Beautiful Landscapes', 'Architecture']
-    },
-    {
-      id: 11,
-      name: 'Barclays Center',
-      description: 'Multi-purpose arena hosting concerts, sports events, and entertainment shows.',
-      imagePath: '/images/places/Pasikudah.jpg',
-      category: 'entertainment',
-      duration: '3 hours',
-      price: 75,
-      location: 'Prospect Heights',
-      highlights: ['Concerts', 'Sports Events', 'Entertainment']
-    },
-    {
-      id: 12,
-      name: 'Smorgasburg',
-      description: 'Open-air food market featuring dozens of local food vendors and artisans.',
-      imagePath: '/images/places/Pasikudah.jpg',
-      category: 'food',
-      duration: '2 hours',
-      price: 0,
-      location: 'Williamsburg',
-      highlights: ['Food Vendors', 'Local Artisans', 'Outdoor Market']
-    }
-  ];
+  // Fetch places from database
+  useEffect(() => {
+    const fetchPlaces = async () => {
+      try {
+        setIsLoadingPlaces(true);
+        const response = await fetch('/api/places');
+        const data = await response.json();
+        
+        if (data.success && Array.isArray(data.places)) {
+          setAvailablePlaces(data.places);
+        } else {
+          console.error('Failed to load places:', data.message);
+          setAvailablePlaces([]);
+        }
+      } catch (error) {
+        console.error('Error fetching places:', error);
+        setAvailablePlaces([]);
+      } finally {
+        setIsLoadingPlaces(false);
+      }
+    };
+
+    fetchPlaces();
+  }, []);
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      const authenticated = await isAuthenticated();
+      setIsUserAuthenticated(authenticated);
+    };
+
+    checkAuth();
+  }, []);
 
   const filteredPlaces = activeCategory === 'all' 
     ? availablePlaces 
@@ -229,10 +136,32 @@ const CreatePackagePage: React.FC = () => {
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setPackageForm(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-    }));
+    
+    if (name === 'startDate') {
+      setPackageForm(prev => ({
+        ...prev,
+        startDate: value,
+        endDate: prev.endDate && prev.endDate >= value ? prev.endDate : value,
+      }));
+    } else if (name === 'endDate') {
+      setPackageForm(prev => ({
+        ...prev,
+        endDate: !prev.startDate || value >= prev.startDate ? value : prev.startDate,
+      }));
+    } else {
+      setPackageForm(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+      }));
+    }
+  };
+
+  const handleToggleDatePicker = () => {
+    setIsDatePickerOpen(prev => !prev);
+  };
+
+  const closeDatePicker = () => {
+    setIsDatePickerOpen(false);
   };
 
   const parseDurationToHours = (duration: string) => {
@@ -265,10 +194,23 @@ const CreatePackagePage: React.FC = () => {
     return selectedPlaces.reduce((total, place) => total + place.price, 0);
   };
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     if (currentStep < 3) {
       setSubmitError(null);
       setSubmitSuccess(null);
+      
+      // Check authentication when trying to move from step 1 to step 2
+      if (currentStep === 1) {
+        const authenticated = await isAuthenticated();
+        if (!authenticated) {
+          setSubmitError('Please log in to continue customizing your package. You will be redirected to the login page.');
+          setTimeout(() => {
+            router.push('/login?redirect=/create_pkg');
+          }, 2000);
+          return;
+        }
+      }
+      
       setCurrentStep(currentStep + 1);
     }
   };
@@ -286,6 +228,16 @@ const CreatePackagePage: React.FC = () => {
     setSubmitError(null);
     setSubmitSuccess(null);
 
+    // Check if user is authenticated
+    const authenticated = await isAuthenticated();
+    if (!authenticated) {
+      setSubmitError('Please log in to create a custom package. You will be redirected to the login page.');
+      setTimeout(() => {
+        router.push('/login?redirect=/create_pkg');
+      }, 2000);
+      return;
+    }
+
     if (selectedPlaces.length === 0) {
       setSubmitError('Please select at least one place before submitting.');
       setCurrentStep(1);
@@ -299,14 +251,12 @@ const CreatePackagePage: React.FC = () => {
       imagePath: place.imagePath,
       category: place.category,
       duration: place.duration,
-      price: place.price,
       location: place.location,
       highlights: place.highlights,
       order: index + 1,
     }));
 
     const totalDurationMinutes = getTotalDurationMinutes();
-    const totalPrice = calculateTotalPrice();
 
     const payload = {
       name: packageForm.name.trim(),
@@ -315,22 +265,15 @@ const CreatePackagePage: React.FC = () => {
       totals: {
         durationLabel: calculateTotalDuration(),
         durationMinutes: totalDurationMinutes,
-        price: totalPrice,
-      },
-      preferences: {
-        pace: packageForm.pace,
-        transport: packageForm.transport,
-        guide: packageForm.guide,
-        meals: packageForm.meals,
-        photography: packageForm.photography,
       },
       contact: {
-        name: packageForm.contactName.trim(),
         email: packageForm.contactEmail.trim(),
         phone: packageForm.contactPhone.trim(),
-        date: packageForm.preferredDate || null,
         guests: packageForm.guests,
-        specialRequests: packageForm.specialRequests.trim() || null,
+        startDate: packageForm.startDate || null,
+        endDate: packageForm.endDate || null,
+        foodAndSpecialRequests: packageForm.foodAndSpecialRequests.trim() || null,
+        additionalInfo: packageForm.additionalInfo.trim() || null,
       },
     };
 
@@ -352,23 +295,19 @@ const CreatePackagePage: React.FC = () => {
         throw new Error(message);
       }
 
-      setSubmitSuccess('Thanks! Your custom package request was sent to our team. We will contact you soon.');
+      setSubmitSuccess('🎉 Thank you! Your custom tour request has been submitted successfully. Our team will review your itinerary and send you a detailed quotation within 24 hours. Check your email and "My Trips" in your profile for updates!');
       setSelectedPlaces([]);
       setCurrentStep(1);
       setPackageForm({
         name: '',
         description: '',
-        pace: 'moderate',
-        transport: 'walking',
-        guide: true,
-        meals: false,
-        photography: false,
-        contactName: '',
+        guests: 2,
         contactEmail: '',
         contactPhone: '',
-        preferredDate: '',
-        guests: 2,
-        specialRequests: '',
+        startDate: '',
+        endDate: '',
+        foodAndSpecialRequests: '',
+        additionalInfo: '',
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to submit custom package';
@@ -399,8 +338,51 @@ const CreatePackagePage: React.FC = () => {
     };
   }, []);
 
+  // Close date picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isDatePickerOpen &&
+        datePickerRef.current &&
+        dateTriggerRef.current &&
+        !datePickerRef.current.contains(event.target as Node) &&
+        !dateTriggerRef.current.contains(event.target as Node)
+      ) {
+        closeDatePicker();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDatePickerOpen]);
+
+  // Helper variables for date picker
+  const today = new Date().toISOString().split('T')[0];
+  const endDateMin = packageForm.startDate || today;
+  const selectedDateLabel = packageForm.startDate
+    ? packageForm.endDate && packageForm.endDate !== packageForm.startDate
+      ? `${packageForm.startDate} to ${packageForm.endDate}`
+      : packageForm.startDate
+    : 'Select dates';
+
   return (
     <div className="create-package-page">
+      {/* Authentication Notice Banner */}
+      {!isUserAuthenticated && (
+        <div className="auth-notice-banner">
+          <div className="auth-notice-content">
+            <i className="fas fa-info-circle"></i>
+            <span>
+              <strong>Browsing Mode:</strong> You can explore places, but you'll need to{' '}
+              <a href="/login?redirect=/create_pkg" className="login-link">log in</a> or{' '}
+              <a href="/sign-up?redirect=/create_pkg" className="login-link">sign up</a> to customize and submit your package.
+            </span>
+          </div>
+        </div>
+      )}
+      
       {/* Hero Section */}
       <section className="create-package-hero">
         <div className="hero-overlay"></div>
@@ -490,49 +472,59 @@ const CreatePackagePage: React.FC = () => {
             <div className="selection-area">
               <div className="available-places">
                 <h3>Available Places ({filteredPlaces.length})</h3>
-                <div className="places-grid">
-                  {filteredPlaces.map((place, index) => (
-                    <div 
-                      key={place.id}
-                      className={`place-card fade-in ${isVisible ? 'appear' : ''}`}
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                    >
-                      <div className="place-image">
-                        <img src={place.imagePath} alt={place.name} />
-                        <button 
-                          className="add-place-btn"
-                          onClick={() => handleAddPlace(place)}
-                          disabled={selectedPlaces.find(p => p.id === place.id) !== undefined}
-                        >
-                          <i className="fas fa-plus"></i>
-                        </button>
-                        {place.price > 0 && (
-                          <div className="price-badge">${place.price}</div>
-                        )}
+                {isLoadingPlaces ? (
+                  <div style={{ textAlign: 'center', padding: '60px 20px', color: '#6b7280' }}>
+                    <i className="fas fa-spinner fa-spin" style={{ fontSize: '2rem', marginBottom: '16px' }}></i>
+                    <p>Loading places...</p>
+                  </div>
+                ) : filteredPlaces.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '60px 20px', color: '#6b7280' }}>
+                    <i className="fas fa-map-marked-alt" style={{ fontSize: '2rem', marginBottom: '16px' }}></i>
+                    <p>No places available</p>
+                    <span style={{ fontSize: '0.9rem' }}>Please check back later or contact us for custom options</span>
+                  </div>
+                ) : (
+                  <div className="places-grid">
+                    {filteredPlaces.map((place, index) => (
+                      <div 
+                        key={place.id}
+                        className={`place-card fade-in ${isVisible ? 'appear' : ''}`}
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      >
+                        <div className="place-image">
+                          <img src={place.imagePath} alt={place.name} />
+                          <button 
+                            className="add-place-btn"
+                            onClick={() => handleAddPlace(place)}
+                            disabled={selectedPlaces.find(p => p.id === place.id) !== undefined}
+                          >
+                            <i className="fas fa-plus"></i>
+                          </button>
+                        </div>
+                        
+                        <div className="place-content">
+                          <div className="place-header">
+                            <h4>{place.name}</h4>
+                            <span className="duration">{place.duration}</span>
+                          </div>
+                          
+                          <p className="place-description">{place.description}</p>
+                          
+                          <div className="place-location">
+                            <i className="fas fa-map-marker-alt"></i>
+                            <span>{place.location}</span>
+                          </div>
+                          
+                          <div className="place-highlights">
+                            {place.highlights.map((highlight, idx) => (
+                              <span key={idx} className="highlight-tag">#{highlight}</span>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                      
-                      <div className="place-content">
-                        <div className="place-header">
-                          <h4>{place.name}</h4>
-                          <span className="duration">{place.duration}</span>
-                        </div>
-                        
-                        <p className="place-description">{place.description}</p>
-                        
-                        <div className="place-location">
-                          <i className="fas fa-map-marker-alt"></i>
-                          <span>{place.location}</span>
-                        </div>
-                        
-                        <div className="place-highlights">
-                          {place.highlights.map((highlight, idx) => (
-                            <span key={idx} className="highlight-tag">#{highlight}</span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="selected-places">
@@ -551,7 +543,6 @@ const CreatePackagePage: React.FC = () => {
                         <div className="item-content">
                           <h4>{place.name}</h4>
                           <span className="item-duration">{place.duration}</span>
-                          {place.price > 0 && <span className="item-price">${place.price}</span>}
                         </div>
                         <div className="item-actions">
                           <button 
@@ -584,10 +575,6 @@ const CreatePackagePage: React.FC = () => {
                         <span>{calculateTotalDuration()}</span>
                       </div>
                       <div className="summary-item">
-                        <span>Total Cost:</span>
-                        <span>${calculateTotalPrice()}</span>
-                      </div>
-                      <div className="summary-item">
                         <span>Places:</span>
                         <span>{selectedPlaces.length}</span>
                       </div>
@@ -612,143 +599,162 @@ const CreatePackagePage: React.FC = () => {
           <section className="customize-section">
             <div className="section-header">
               <h2>Customize Your Experience</h2>
-              <p>Tell us about your preferences to make your tour perfect</p>
+              <p>Tell us about your tour preferences and requirements</p>
             </div>
 
             <div className="customize-content">
               <div className="package-details">
                 <h3>Package Details</h3>
                 <div className="form-group">
-                  <label htmlFor="packageName">Tour Name</label>
+                  <label htmlFor="packageName">Tour Name *</label>
                   <input
                     type="text"
                     id="packageName"
                     name="name"
                     value={packageForm.name}
                     onChange={handleFormChange}
-                    placeholder="Give your tour a name"
+                    placeholder="Give your dream tour a name"
                     required
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="packageDescription">Description</label>
+                  <label htmlFor="packageDescription">What do you expect from this tour? *</label>
                   <textarea
                     id="packageDescription"
                     name="description"
                     value={packageForm.description}
                     onChange={handleFormChange}
-                    placeholder="Describe what you want from this tour"
-                    rows={4}
+                    placeholder="Tell us what you expect from this tour so we can make it better and happen..."
+                    rows={5}
+                    required
                   />
                 </div>
               </div>
 
               <div className="preferences">
-                <h3>Tour Preferences</h3>
+                <h3>Tour Information</h3>
                 <div className="preferences-grid">
-                  <div className="preference-group">
-                    <label>Pace</label>
-                    <div className="radio-group">
-                      <label className="radio-option">
-                        <input
-                          type="radio"
-                          name="pace"
-                          value="relaxed"
-                          checked={packageForm.pace === 'relaxed'}
-                          onChange={handleFormChange}
-                        />
-                        <span>Relaxed</span>
-                      </label>
-                      <label className="radio-option">
-                        <input
-                          type="radio"
-                          name="pace"
-                          value="moderate"
-                          checked={packageForm.pace === 'moderate'}
-                          onChange={handleFormChange}
-                        />
-                        <span>Moderate</span>
-                      </label>
-                      <label className="radio-option">
-                        <input
-                          type="radio"
-                          name="pace"
-                          value="fast"
-                          checked={packageForm.pace === 'fast'}
-                          onChange={handleFormChange}
-                        />
-                        <span>Fast-paced</span>
-                      </label>
-                    </div>
+                  <div className="form-group">
+                    <label htmlFor="guests">Number of Guests *</label>
+                    <select
+                      id="guests"
+                      name="guests"
+                      value={packageForm.guests}
+                      onChange={handleFormChange}
+                      required
+                    >
+                      {[1,2,3,4,5,6,7,8,9,10,15,20].map(num => (
+                        <option key={num} value={num}>{num} {num === 1 ? 'Guest' : 'Guests'}</option>
+                      ))}
+                    </select>
                   </div>
 
-                  <div className="preference-group">
-                    <label>Transport</label>
-                    <div className="radio-group">
-                      <label className="radio-option">
-                        <input
-                          type="radio"
-                          name="transport"
-                          value="walking"
-                          checked={packageForm.transport === 'walking'}
-                          onChange={handleFormChange}
-                        />
-                        <span>Walking</span>
-                      </label>
-                      <label className="radio-option">
-                        <input
-                          type="radio"
-                          name="transport"
-                          value="public"
-                          checked={packageForm.transport === 'public'}
-                          onChange={handleFormChange}
-                        />
-                        <span>Public Transport</span>
-                      </label>
-                      <label className="radio-option">
-                        <input
-                          type="radio"
-                          name="transport"
-                          value="private"
-                          checked={packageForm.transport === 'private'}
-                          onChange={handleFormChange}
-                        />
-                        <span>Private Vehicle</span>
-                      </label>
-                    </div>
+                  <div className="form-group">
+                    <label htmlFor="contactEmail">Email Address *</label>
+                    <input
+                      type="email"
+                      id="contactEmail"
+                      name="contactEmail"
+                      value={packageForm.contactEmail}
+                      onChange={handleFormChange}
+                      placeholder="your.email@example.com"
+                      required
+                    />
                   </div>
 
-                  <div className="preference-group">
-                    <label>Add-ons</label>
-                    <div className="checkbox-group">
-                      <label className="checkbox-option">
-                        <input
-                          type="checkbox"
-                          name="guide"
-                          checked={packageForm.guide}
-                          onChange={handleFormChange}
-                        />
-                        <span>Professional Guide (+$50)</span>
-                      </label>
-                      <label className="checkbox-option">
-                        <input
-                          type="checkbox"
-                          name="meals"
-                          checked={packageForm.meals}
-                          onChange={handleFormChange}
-                        />
-                        <span>Include Meals (+$30/person)</span>
-                      </label>
-                      <label className="checkbox-option">
-                        <input
-                          type="checkbox"
-                          name="photography"
-                          checked={packageForm.photography}
-                          onChange={handleFormChange}
-                        />
-                        <span>Professional Photography (+$75)</span>
-                      </label>
-                    </div>
+                  <div className="form-group">
+                    <label htmlFor="contactPhone">Phone Number (with country code) *</label>
+                    <PhoneInput
+                      international
+                      defaultCountry="US"
+                      value={packageForm.contactPhone}
+                      onChange={(value) => setPackageForm(prev => ({...prev, contactPhone: value || ''}))}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group date-range-field">
+                    <label htmlFor="preferred-dates">Preferred Travel Dates *</label>
+                    <button
+                      type="button"
+                      id="preferred-dates"
+                      className={`date-range-trigger ${packageForm.startDate ? 'has-value' : ''}`}
+                      onClick={handleToggleDatePicker}
+                      ref={dateTriggerRef}
+                      aria-expanded={isDatePickerOpen}
+                      aria-controls="preferred-dates-panel"
+                    >
+                      <span>{selectedDateLabel}</span>
+                      <i className="fas fa-calendar-alt" aria-hidden="true"></i>
+                    </button>
+                    {isDatePickerOpen && (
+                      <div className="date-range-panel" id="preferred-dates-panel" ref={datePickerRef}>
+                        <div className="date-range-inputs">
+                          <div className="date-input-group">
+                            <span>Start</span>
+                            <input
+                              type="date"
+                              name="startDate"
+                              value={packageForm.startDate}
+                              onChange={handleFormChange}
+                              min={today}
+                              required
+                            />
+                          </div>
+                          <div className="date-input-group">
+                            <span>End</span>
+                            <input
+                              type="date"
+                              name="endDate"
+                              value={packageForm.endDate}
+                              onChange={handleFormChange}
+                              min={endDateMin}
+                            />
+                          </div>
+                        </div>
+                        <div className="date-range-actions">
+                          <button type="button" className="date-range-clear" onClick={() => {
+                            setPackageForm(prev => ({
+                              ...prev,
+                              startDate: '',
+                              endDate: '',
+                            }));
+                          }}>
+                            Clear
+                          </button>
+                          <button type="button" className="date-range-apply" onClick={closeDatePicker}>
+                            Done
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                    <label htmlFor="foodAndSpecialRequests">Food Preferences, Allergies & Additional Information</label>
+                    <textarea
+                      id="foodAndSpecialRequests"
+                      name="foodAndSpecialRequests"
+                      value={packageForm.foodAndSpecialRequests}
+                      onChange={handleFormChange}
+                      placeholder="Example: 2 guests are vegetarian, 1 guest is vegan, 1 guest has peanut allergy. Please mention any dietary requirements or food preferences..."
+                      rows={4}
+                    />
+                    <small style={{ display: 'block', marginTop: '8px', color: '#6b7280', fontSize: '0.875rem' }}>
+                      💡 Tip: Mention the count for each requirement (e.g., "2 vegetarian, 1 has shellfish allergy")
+                    </small>
+                  </div>
+
+                  <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                    <label htmlFor="additionalInfo">Additional Information</label>
+                    <textarea
+                      id="additionalInfo"
+                      name="additionalInfo"
+                      value={packageForm.additionalInfo}
+                      onChange={handleFormChange}
+                      placeholder="Any other special requests, accessibility needs, or information we should know..."
+                      rows={4}
+                    />
                   </div>
                 </div>
               </div>
@@ -769,149 +775,214 @@ const CreatePackagePage: React.FC = () => {
         {currentStep === 3 && (
           <section className="submit-section">
             <div className="section-header">
-              <h2>Submit Your Custom Package</h2>
-              <p>Almost done! Just provide your contact information and we'll get back to you within 24 hours.</p>
+              <h2 style={{ fontSize: '2.5rem', fontWeight: '800', color: '#1f2937', marginBottom: '0.5rem' }}>
+                🎉 You're Almost There!
+              </h2>
+              <p style={{ fontSize: '1.15rem', color: '#6b7280', fontWeight: '500' }}>
+                Review your dream tour and submit your request
+              </p>
             </div>
 
             <div className="submit-content">
               <div className="package-summary">
-                <h3>Package Summary</h3>
-                <div className="summary-card">
-                  <h4>{packageForm.name || 'My Custom Tour'}</h4>
-                  <p>{packageForm.description || 'No description provided'}</p>
-                  
-                  <div className="summary-details">
-                    <div className="detail-item">
-                      <span>Total Duration:</span>
-                      <span>{calculateTotalDuration()}</span>
+                <div className="summary-header">
+                  <div className="summary-icon">
+                    <i className="fas fa-map-marked-alt"></i>
+                  </div>
+                  <div>
+                    <h3>{packageForm.name || 'My Custom Tour'}</h3>
+                    <p className="summary-subtitle">{packageForm.description || 'Your personalized Brooklyn experience'}</p>
+                  </div>
+                </div>
+                
+                <div className="summary-stats">
+                  <div className="stat-card">
+                    <div className="stat-icon">
+                      <i className="fas fa-clock"></i>
                     </div>
-                    <div className="detail-item">
-                      <span>Total Places:</span>
-                      <span>{selectedPlaces.length}</span>
-                    </div>
-                    <div className="detail-item">
-                      <span>Pace:</span>
-                      <span className="capitalize">{packageForm.pace}</span>
-                    </div>
-                    <div className="detail-item">
-                      <span>Transport:</span>
-                      <span className="capitalize">{packageForm.transport}</span>
+                    <div className="stat-content">
+                      <span className="stat-value">{calculateTotalDuration()}</span>
+                      <span className="stat-label">Total Duration</span>
                     </div>
                   </div>
+                  <div className="stat-card">
+                    <div className="stat-icon">
+                      <i className="fas fa-map-pin"></i>
+                    </div>
+                    <div className="stat-content">
+                      <span className="stat-value">{selectedPlaces.length}</span>
+                      <span className="stat-label">Places to Visit</span>
+                    </div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-icon">
+                      <i className="fas fa-users"></i>
+                    </div>
+                    <div className="stat-content">
+                      <span className="stat-value">{packageForm.guests}</span>
+                      <span className="stat-label">{packageForm.guests === 1 ? 'Guest' : 'Guests'}</span>
+                    </div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-icon">
+                      <i className="fas fa-calendar-check"></i>
+                    </div>
+                    <div className="stat-content">
+                      <span className="stat-value">{selectedDateLabel !== 'Select dates' ? (packageForm.endDate && packageForm.endDate !== packageForm.startDate ? `${Math.ceil((new Date(packageForm.endDate).getTime() - new Date(packageForm.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1} days` : '1 day') : 'TBD'}</span>
+                      <span className="stat-label">Travel Dates</span>
+                    </div>
+                  </div>
+                </div>
 
-                  <div className="selected-places-list">
-                    <h5>Selected Places:</h5>
-                    <ul>
-                      {selectedPlaces.map((place, index) => (
-                        <li key={place.id}>
-                          <span className="place-number">{index + 1}.</span>
-                          <span className="place-name">{place.name}</span>
-                          <span className="place-duration">{place.duration}</span>
-                        </li>
-                      ))}
-                    </ul>
+                <div className="itinerary-preview">
+                  <h4><i className="fas fa-route"></i> Your Itinerary</h4>
+                  <div className="places-timeline">
+                    {selectedPlaces.map((place, index) => (
+                      <div key={place.id} className="timeline-item">
+                        <div className="timeline-marker">{index + 1}</div>
+                        <div className="timeline-content">
+                          <div className="timeline-place">
+                            <h5>{place.name}</h5>
+                            <span className="timeline-duration">
+                              <i className="fas fa-clock"></i> {place.duration}
+                            </span>
+                          </div>
+                          <p className="timeline-location">
+                            <i className="fas fa-map-marker-alt"></i> {place.location}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                </div>
+
+                <div className="contact-details-card">
+                  <h4><i className="fas fa-address-card"></i> Contact Information</h4>
+                  <div className="contact-grid">
+                    <div className="contact-item">
+                      <i className="fas fa-envelope"></i>
+                      <div>
+                        <span className="contact-label">Email</span>
+                        <span className="contact-value">{packageForm.contactEmail}</span>
+                      </div>
+                    </div>
+                    <div className="contact-item">
+                      <i className="fas fa-phone"></i>
+                      <div>
+                        <span className="contact-label">Phone</span>
+                        <span className="contact-value">{packageForm.contactPhone}</span>
+                      </div>
+                    </div>
+                  </div>
+                  {selectedDateLabel !== 'Select dates' && (
+                    <div className="contact-item full-width">
+                      <i className="fas fa-calendar-alt"></i>
+                      <div>
+                        <span className="contact-label">Preferred Dates</span>
+                        <span className="contact-value">{selectedDateLabel}</span>
+                      </div>
+                    </div>
+                  )}
+                  {packageForm.foodAndSpecialRequests && (
+                    <div className="contact-item full-width">
+                      <i className="fas fa-utensils"></i>
+                      <div>
+                        <span className="contact-label">Dietary Requirements</span>
+                        <span className="contact-value">{packageForm.foodAndSpecialRequests}</span>
+                      </div>
+                    </div>
+                  )}
+                  {packageForm.additionalInfo && (
+                    <div className="contact-item full-width">
+                      <i className="fas fa-info-circle"></i>
+                      <div>
+                        <span className="contact-label">Additional Notes</span>
+                        <span className="contact-value">{packageForm.additionalInfo}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <form className="contact-form" onSubmit={handleSubmitPackage}>
-                <h3>Your Information</h3>
-                
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="contactName">Full Name *</label>
-                    <input
-                      type="text"
-                      id="contactName"
-                      name="contactName"
-                      value={packageForm.contactName}
-                      onChange={handleFormChange}
-                      required
-                    />
+              <div className="submit-panel">
+                <div className="submit-card">
+                  <div className="submit-icon-circle">
+                    <i className="fas fa-paper-plane"></i>
                   </div>
-                  <div className="form-group">
-                    <label htmlFor="contactEmail">Email *</label>
-                    <input
-                      type="email"
-                      id="contactEmail"
-                      name="contactEmail"
-                      value={packageForm.contactEmail}
-                      onChange={handleFormChange}
-                      required
-                    />
-                  </div>
-                </div>
+                  <h3>Ready to Submit?</h3>
+                  <p className="submit-description">
+                    We'll review your custom tour request and prepare a detailed quotation tailored to your preferences.
+                  </p>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="contactPhone">Phone *</label>
-                    <input
-                      type="tel"
-                      id="contactPhone"
-                      name="contactPhone"
-                      value={packageForm.contactPhone}
-                      onChange={handleFormChange}
-                      required
-                    />
+                  <div className="guarantee-badge">
+                    <div className="badge-icon">
+                      <i className="fas fa-clock"></i>
+                    </div>
+                    <div className="badge-content">
+                      <strong>24-Hour Response Guarantee</strong>
+                      <p>You'll receive a personalized quotation via email within 24 hours of submission</p>
+                    </div>
                   </div>
-                  <div className="form-group">
-                    <label htmlFor="preferredDate">Preferred Date</label>
-                    <input
-                      type="date"
-                      id="preferredDate"
-                      name="preferredDate"
-                      value={packageForm.preferredDate}
-                      onChange={handleFormChange}
-                    />
+
+                  <div className="what-happens-next">
+                    <h4>What Happens Next?</h4>
+                    <ul className="next-steps-list">
+                      <li>
+                        <i className="fas fa-check-circle"></i>
+                        <span>We'll review your itinerary and preferences</span>
+                      </li>
+                      <li>
+                        <i className="fas fa-check-circle"></i>
+                        <span>Our team will prepare a detailed quotation</span>
+                      </li>
+                      <li>
+                        <i className="fas fa-check-circle"></i>
+                        <span>You'll receive pricing and availability via email and in My Trips</span>
+                      </li>
+                      <li>
+                        <i className="fas fa-check-circle"></i>
+                        <span>Confirm your booking and we'll finalize the details</span>
+                      </li>
+                    </ul>
                   </div>
-                </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="guests">Number of Guests</label>
-                    <select
-                      id="guests"
-                      name="guests"
-                      value={packageForm.guests}
-                      onChange={handleFormChange}
-                    >
-                      {[1,2,3,4,5,6,7,8,9,10].map(num => (
-                        <option key={num} value={num}>{num} {num === 1 ? 'Guest' : 'Guests'}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+                  <form onSubmit={handleSubmitPackage} className="submit-form">
+                    <div className="form-actions-submit">
+                      <button
+                        type="button"
+                        className="btn-secondary-large"
+                        onClick={handlePrevStep}
+                        disabled={isSubmittingPackage}
+                      >
+                        <i className="fas fa-arrow-left"></i>
+                        Back to Customize
+                      </button>
+                      <button
+                        type="submit"
+                        className="btn-primary-large"
+                        disabled={isSubmittingPackage}
+                      >
+                        {isSubmittingPackage ? (
+                          <>
+                            <i className="fas fa-spinner fa-spin"></i>
+                            Submitting...
+                          </>
+                        ) : (
+                          <>
+                            <i className="fas fa-paper-plane"></i>
+                            Submit My Tour Request
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </form>
 
-                <div className="form-group">
-                  <label htmlFor="specialRequests">Special Requests</label>
-                  <textarea
-                    id="specialRequests"
-                    name="specialRequests"
-                    value={packageForm.specialRequests}
-                    onChange={handleFormChange}
-                    placeholder="Any special requirements or additional information?"
-                    rows={4}
-                  />
+                  <p className="submit-note">
+                    <i className="fas fa-lock"></i>
+                    Your information is secure and will only be used to prepare your quotation
+                  </p>
                 </div>
-
-                <div className="form-actions">
-                  <button
-                    type="button"
-                    className="prev-step-btn"
-                    onClick={handlePrevStep}
-                    disabled={isSubmittingPackage}
-                  >
-                    Back to Customize
-                  </button>
-                  <button
-                    type="submit"
-                    className="submit-package-btn"
-                    disabled={isSubmittingPackage}
-                  >
-                    {isSubmittingPackage ? 'Submitting...' : 'Submit Package to Admin'}
-                  </button>
-                </div>
-              </form>
+              </div>
             </div>
           </section>
         )}

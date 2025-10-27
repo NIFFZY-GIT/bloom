@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import jwt from 'jsonwebtoken';
 
 import { query } from '@/lib/db';
-import DashboardClient, { Booking, Quotation } from './DashboardClient';
+import DashboardClient, { Booking, Quotation, CustomTrip } from './DashboardClient';
 
 const DASHBOARD_ROUTE = '/user_dashboard';
 const LOGIN_REDIRECT = `/login?redirect=${encodeURIComponent(DASHBOARD_ROUTE)}`;
@@ -28,6 +28,7 @@ type DbBookingRow = {
   customer_email: string;
   customer_phone: string | null;
   preferred_date: string | Date | null;
+  preferred_end_date: string | Date | null;
   number_of_guests: number | null;
   special_requests: string | null;
   status: string | null;
@@ -91,6 +92,39 @@ function formatDate(value: string | Date | null | undefined, fallback = 'TBD'): 
     month: 'short',
     day: 'numeric',
   });
+}
+
+function formatDateRange(
+  startValue: string | Date | null | undefined,
+  endValue: string | Date | null | undefined,
+  fallback = 'TBD',
+): string {
+  if (!startValue) {
+    return fallback;
+  }
+
+  const startDate = startValue instanceof Date ? startValue : new Date(startValue);
+  if (Number.isNaN(startDate.getTime())) {
+    return fallback;
+  }
+
+  const startLabel = formatDate(startDate, fallback);
+
+  if (!endValue) {
+    return startLabel;
+  }
+
+  const endDate = endValue instanceof Date ? endValue : new Date(endValue);
+  if (Number.isNaN(endDate.getTime())) {
+    return startLabel;
+  }
+
+  if (startDate.toDateString() === endDate.toDateString()) {
+    return startLabel;
+  }
+
+  const endLabel = formatDate(endDate, fallback);
+  return `${startLabel} – ${endLabel}`;
 }
 
 function toIsoString(value: string | Date | null | undefined): string | null {
@@ -209,7 +243,7 @@ async function fetchBookingsForUser(user: AuthenticatedUser): Promise<Booking[]>
       id: String(row.id),
       packageName: row.package_title ?? 'Custom travel experience',
       destination: row.package_category ?? row.package_title ?? 'Sri Lanka',
-      date: formatDate(row.preferred_date),
+      date: formatDateRange(row.preferred_date, row.preferred_end_date),
       travelers,
       status: toClientBookingStatus(row.status),
       amount: computeAmount(row.package_price, travelers),
@@ -295,10 +329,64 @@ async function fetchReceiptsForUser(user: AuthenticatedUser, bookings: Booking[]
   return items;
 }
 
+async function fetchCustomTripsForUser(user: AuthenticatedUser): Promise<CustomTrip[]> {
+  try {
+    const result = await query(
+      `SELECT
+         cp.id,
+         cp.name,
+         cp.description,
+         cp.total_duration_label,
+         cp.guests,
+         cp.status,
+         cp.quotation_pdf_path,
+         cp.start_date,
+         cp.end_date,
+         cp.created_at,
+         COALESCE(
+           json_agg(
+             json_build_object(
+               'name', p.name,
+               'duration', p.duration
+             )
+             ORDER BY cpp.display_order
+           )
+           FILTER (WHERE p.id IS NOT NULL),
+           '[]'
+         ) AS places
+       FROM custom_packages cp
+       LEFT JOIN custom_package_places cpp ON cpp.custom_package_id = cp.id
+       LEFT JOIN places p ON p.id = cpp.place_id
+       WHERE LOWER(cp.contact_email) = LOWER($1)
+       GROUP BY cp.id
+       ORDER BY cp.created_at DESC`,
+      [user.email],
+    );
+
+    return result.rows.map((row) => ({
+      id: String(row.id),
+      name: row.name,
+      description: row.description,
+      duration: row.total_duration_label ?? 'Duration TBD',
+      guests: row.guests,
+      status: row.status === 'approved' ? 'approved' : row.status === 'rejected' ? 'rejected' : 'pending',
+      quotationPdfPath: row.quotation_pdf_path,
+      dateRange: formatDateRange(row.start_date, row.end_date, 'Dates TBD'),
+      placesCount: Array.isArray(row.places) ? row.places.length : 0,
+      places: Array.isArray(row.places) ? row.places : [],
+      createdAt: formatDate(row.created_at, 'Recently'),
+    }));
+  } catch (error) {
+    console.error('Failed to fetch custom trips:', error);
+    return [];
+  }
+}
+
 export default async function UserDashboardPage() {
   const user = await getAuthenticatedUser();
   const bookings = await fetchBookingsForUser(user);
   const quotations = await fetchReceiptsForUser(user, bookings);
+  const customTrips = await fetchCustomTripsForUser(user);
 
   const displayName = user.username || user.email.split('@')[0] || 'Traveler';
 
@@ -306,6 +394,7 @@ export default async function UserDashboardPage() {
     <DashboardClient
       initialBookings={bookings}
       initialQuotations={quotations}
+      initialCustomTrips={customTrips}
       userName={displayName}
     />
   );

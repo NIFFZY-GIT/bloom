@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const backgroundImages = [
   '/images/hero-bg-1.jpg',
@@ -11,6 +11,7 @@ const backgroundImages = [
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [formData, setFormData] = useState({
     email: '',
@@ -18,6 +19,22 @@ export default function LoginPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  
+  // Forgot password states
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [resetCode, setResetCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [resetStep, setResetStep] = useState<'email' | 'code' | 'success'>('email');
+  const [resetError, setResetError] = useState('');
+  const [resetSuccess, setResetSuccess] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
+  const [devCode, setDevCode] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -26,6 +43,13 @@ export default function LoginPage() {
 
     return () => clearInterval(timer);
   }, []);
+
+  // Check if user was just registered
+  useEffect(() => {
+    if (searchParams.get('registered') === 'true') {
+      setSuccessMessage('🎉 Registration successful! Please log in with your credentials.');
+    }
+  }, [searchParams]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -37,6 +61,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSuccessMessage(null);
     setIsSubmitting(true);
 
     try {
@@ -51,13 +76,123 @@ export default function LoginPage() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Login failed');
-      const destination = data.role === 'ADMIN' ? '/admin/dashboard' : '/';
-      router.push(destination);
-      router.refresh();
+      
+      // Check if there's a redirect URL
+      const redirectUrl = searchParams.get('redirect');
+      
+      // Determine destination: redirect URL, or default based on role
+      const destination = redirectUrl || (data.role === 'ADMIN' ? '/admin/dashboard' : '/');
+      
+      // Use window.location.href for full page reload to ensure cookies are sent
+      window.location.href = destination;
     } catch (err: any) {
       setError(err.message || 'Login failed');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleForgotPasswordClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowForgotModal(true);
+    setResetStep('email');
+    setResetError('');
+    setResetSuccess('');
+    setForgotEmail('');
+    setResetCode('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setDevCode('');
+  };
+
+  const handleCloseForgotModal = () => {
+    setShowForgotModal(false);
+    setResetStep('email');
+    setResetError('');
+    setResetSuccess('');
+    setForgotEmail('');
+    setResetCode('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setDevCode('');
+  };
+
+  const handleSendResetCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsResetting(true);
+    setResetError('');
+    setResetSuccess('');
+
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setResetSuccess(data.message);
+        setResetStep('code');
+        if (data.devCode) {
+          setDevCode(data.devCode);
+        }
+      } else {
+        setResetError(data.message || 'Failed to send code');
+      }
+    } catch (err) {
+      setResetError('Failed to send reset code. Please try again.');
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetError('');
+    setResetSuccess('');
+
+    if (newPassword !== confirmPassword) {
+      setResetError('Passwords do not match');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setResetError('Password must be at least 6 characters');
+      return;
+    }
+
+    setIsResetting(true);
+
+    try {
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: forgotEmail,
+          code: resetCode,
+          newPassword
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setResetSuccess(data.message);
+        setResetStep('success');
+        
+        // Auto-close after 3 seconds
+        setTimeout(() => {
+          handleCloseForgotModal();
+        }, 3000);
+      } else {
+        setResetError(data.message || 'Failed to reset password');
+      }
+    } catch (err) {
+      setResetError('Failed to reset password. Please try again.');
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -150,9 +285,9 @@ export default function LoginPage() {
             </div>
 
             <div className="input-group-modern">
-              <div className="input-container">
+              <div className="input-container password-input-container">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   placeholder=" "
                   className="modern-input"
@@ -161,6 +296,14 @@ export default function LoginPage() {
                   required
                 />
                 <label className="modern-label">Password</label>
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"}></i>
+                </button>
                 <div className="input-underline"></div>
               </div>
             </div>
@@ -172,11 +315,20 @@ export default function LoginPage() {
                 <span className="checkbox-checkmark"></span>
                 Remember me
               </label>
-              <a href="#" className="modern-forgot-link">
+              <a href="#" className="modern-forgot-link" onClick={handleForgotPasswordClick}>
                 Forgot Password?
               </a>
             </div>
 
+            {/* Redirect Notice */}
+            {searchParams.get('redirect') && (
+              <div className="info-message">
+                <i className="fas fa-info-circle"></i>
+                Please log in to continue booking your tour package.
+              </div>
+            )}
+
+            {successMessage && <p className="success-message">{successMessage}</p>}
             {error && <p className="error-message">{error}</p>}
 
             {/* Yellow Login Button */}
@@ -194,10 +346,149 @@ export default function LoginPage() {
 
           {/* Signup Link */}
           <div className="modern-signup-section">
-            <p>Don't have an account? <a href="/sign-up" className="modern-signup-link">Sign Up</a></p>
+            <p>Don't have an account? <a href={`/sign-up${searchParams.get('redirect') ? `?redirect=${searchParams.get('redirect')}` : ''}`} className="modern-signup-link">Sign Up</a></p>
           </div>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotModal && (
+        <div className="modal-overlay" onClick={handleCloseForgotModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={handleCloseForgotModal}>×</button>
+            
+            <div className="modal-header">
+              <div className="modal-icon">🔐</div>
+              <h2>Reset Password</h2>
+              <p>We&apos;ll send you a verification code to reset your password</p>
+            </div>
+
+            {resetError && (
+              <div className="alert alert-error">
+                ❌ {resetError}
+              </div>
+            )}
+
+            {resetSuccess && (
+              <div className="alert alert-success">
+                ✅ {resetSuccess}
+              </div>
+            )}
+
+            {devCode && (
+              <div className="alert alert-info">
+                🔧 Dev Code: <strong>{devCode}</strong>
+              </div>
+            )}
+
+            {resetStep === 'email' && (
+              <form onSubmit={handleSendResetCode} className="modal-form">
+                <div className="form-group">
+                  <label htmlFor="forgot-email">Email Address</label>
+                  <input
+                    id="forgot-email"
+                    type="email"
+                    className="modal-input"
+                    placeholder="Enter your email"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <button type="submit" className="modal-btn" disabled={isResetting}>
+                  {isResetting ? '⏳ Sending...' : '📧 Send Verification Code'}
+                </button>
+              </form>
+            )}
+
+            {resetStep === 'code' && (
+              <form onSubmit={handleResetPassword} className="modal-form">
+                <div className="form-group">
+                  <label htmlFor="reset-code">Verification Code</label>
+                  <input
+                    id="reset-code"
+                    type="text"
+                    className="modal-input"
+                    placeholder="Enter 6-digit code"
+                    value={resetCode}
+                    onChange={(e) => setResetCode(e.target.value)}
+                    maxLength={6}
+                    required
+                  />
+                  <small>Check your email for the verification code</small>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="new-password">New Password</label>
+                  <div className="password-input-wrapper">
+                    <input
+                      id="new-password"
+                      type={showNewPassword ? "text" : "password"}
+                      className="modal-input"
+                      placeholder="Enter new password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      minLength={6}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle-btn-modal"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      aria-label={showNewPassword ? "Hide password" : "Show password"}
+                    >
+                      <i className={showNewPassword ? "fas fa-eye-slash" : "fas fa-eye"}></i>
+                    </button>
+                  </div>
+                  <small>Minimum 6 characters</small>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="confirm-password">Confirm Password</label>
+                  <div className="password-input-wrapper">
+                    <input
+                      id="confirm-password"
+                      type={showConfirmPassword ? "text" : "password"}
+                      className="modal-input"
+                      placeholder="Confirm new password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      minLength={6}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle-btn-modal"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    >
+                      <i className={showConfirmPassword ? "fas fa-eye-slash" : "fas fa-eye"}></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="modal-actions">
+                  <button type="submit" className="modal-btn" disabled={isResetting}>
+                    {isResetting ? '⏳ Updating...' : '🔒 Update Password'}
+                  </button>
+                  <button type="button" className="modal-btn-secondary" onClick={() => setResetStep('email')}>
+                    ← Back
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {resetStep === 'success' && (
+              <div className="success-state">
+                <div className="success-icon">✅</div>
+                <h3>Password Reset Successful!</h3>
+                <p>You can now log in with your new password.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <style jsx>{`
         .hero-container {
@@ -523,6 +814,35 @@ export default function LoginPage() {
           position: relative;
         }
 
+        .password-input-container {
+          position: relative;
+        }
+
+        .password-toggle-btn {
+          position: absolute;
+          right: 1rem;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          color: #6b7280;
+          cursor: pointer;
+          padding: 0.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: color 0.2s ease;
+          z-index: 10;
+        }
+
+        .password-toggle-btn:hover {
+          color: #f59e0b;
+        }
+
+        .password-toggle-btn i {
+          font-size: 1.1rem;
+        }
+
         .modern-input {
           width: 100%;
           background: #f9fafb;
@@ -532,6 +852,10 @@ export default function LoginPage() {
           color: #1f2937;
           font-size: 1rem;
           transition: all 0.3s ease;
+        }
+
+        .password-input-container .modern-input {
+          padding-right: 3rem;
         }
 
         .modern-input:focus {
@@ -561,20 +885,7 @@ export default function LoginPage() {
           padding: 0 0.2rem;
         }
 
-        .input-underline {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 0;
-          height: 2px;
-          background: linear-gradient(90deg, #f59e0b, #d97706);
-          transition: width 0.3s ease;
-          border-radius: 2px;
-        }
-
-        .modern-input:focus ~ .input-underline {
-          width: 100%;
-        }
+       
 
         .modern-form-options {
           display: flex;
@@ -720,6 +1031,40 @@ export default function LoginPage() {
           margin-top: -0.5rem;
         }
 
+        .success-message {
+          background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+          color: #065f46;
+          padding: 0.875rem 1rem;
+          border-radius: 8px;
+          font-size: 0.875rem;
+          text-align: center;
+          margin-top: -0.25rem;
+          border-left: 3px solid #10b981;
+          box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1);
+          font-weight: 500;
+        }
+
+        .info-message {
+          background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
+          color: #1e40af;
+          padding: 0.875rem 1rem;
+          border-radius: 8px;
+          font-size: 0.875rem;
+          text-align: center;
+          margin-top: -0.25rem;
+          border-left: 3px solid #3b82f6;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .info-message i {
+          font-size: 1rem;
+          color: #3b82f6;
+        }
+
         .modern-signup-section {
           text-align: center;
           padding: 1.5rem 2rem;
@@ -765,6 +1110,269 @@ export default function LoginPage() {
             opacity: 1;
             transform: translateX(0) scale(1);
           }
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.7);
+          backdrop-filter: blur(8px);
+          z-index: 9999;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1rem;
+          animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+          background: white;
+          border-radius: 24px;
+          padding: 2.5rem;
+          max-width: 500px;
+          width: 100%;
+          max-height: 90vh;
+          overflow-y: auto;
+          position: relative;
+          box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+          animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-close {
+          position: absolute;
+          top: 1.5rem;
+          right: 1.5rem;
+          background: #f3f4f6;
+          border: none;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          font-size: 1.5rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          color: #6b7280;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          line-height: 1;
+        }
+
+        .modal-close:hover {
+          background: #e5e7eb;
+          color: #1f2937;
+          transform: rotate(90deg);
+        }
+
+        .modal-header {
+          text-align: center;
+          margin-bottom: 2rem;
+        }
+
+        .modal-icon {
+          font-size: 3rem;
+          margin-bottom: 1rem;
+        }
+
+        .modal-header h2 {
+          font-size: 1.8rem;
+          color: #1f2937;
+          margin-bottom: 0.5rem;
+        }
+
+        .modal-header p {
+          color: #6b7280;
+          font-size: 0.95rem;
+        }
+
+        .alert {
+          padding: 1rem 1.5rem;
+          border-radius: 12px;
+          margin-bottom: 1.5rem;
+          font-size: 0.9rem;
+          font-weight: 500;
+        }
+
+        .alert-success {
+          background: #d1fae5;
+          color: #065f46;
+          border: 1px solid #a7f3d0;
+        }
+
+        .alert-error {
+          background: #fee2e2;
+          color: #991b1b;
+          border: 1px solid #fecaca;
+        }
+
+        .alert-info {
+          background: #dbeafe;
+          color: #1e40af;
+          border: 1px solid #bfdbfe;
+        }
+
+        .modal-form {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        .form-group {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .form-group label {
+          font-weight: 600;
+          color: #1f2937;
+          font-size: 0.95rem;
+        }
+
+        .modal-input {
+          width: 100%;
+          padding: 0.875rem 1rem;
+          border: 2px solid #e5e7eb;
+          border-radius: 12px;
+          font-size: 1rem;
+          transition: all 0.3s ease;
+          font-family: inherit;
+        }
+
+        .password-input-wrapper {
+          position: relative;
+        }
+
+        .password-input-wrapper .modal-input {
+          padding-right: 3rem;
+        }
+
+        .password-toggle-btn-modal {
+          position: absolute;
+          right: 0.75rem;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          color: #6b7280;
+          cursor: pointer;
+          padding: 0.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: color 0.2s ease;
+        }
+
+        .password-toggle-btn-modal:hover {
+          color: #f59e0b;
+        }
+
+        .password-toggle-btn-modal i {
+          font-size: 1rem;
+        }
+
+        .modal-input:focus {
+          outline: none;
+          border-color: #f59e0b;
+          box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        .form-group small {
+          color: #6b7280;
+          font-size: 0.85rem;
+        }
+
+        .modal-btn {
+          width: 100%;
+          background: linear-gradient(135deg, #f59e0b, #d97706);
+          color: white;
+          border: none;
+          border-radius: 12px;
+          padding: 1rem 2rem;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+        }
+
+        .modal-btn:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 30px rgba(245, 158, 11, 0.4);
+          background: linear-gradient(135deg, #d97706, #b45309);
+        }
+
+        .modal-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .modal-btn-secondary {
+          width: 100%;
+          background: #f3f4f6;
+          color: #6b7280;
+          border: 2px solid #e5e7eb;
+          border-radius: 12px;
+          padding: 1rem 2rem;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .modal-btn-secondary:hover {
+          background: #e5e7eb;
+          color: #374151;
+        }
+
+        .modal-actions {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+        }
+
+        .success-state {
+          text-align: center;
+          padding: 2rem 1rem;
+        }
+
+        .success-icon {
+          font-size: 4rem;
+          margin-bottom: 1rem;
+        }
+
+        .success-state h3 {
+          font-size: 1.5rem;
+          color: #065f46;
+          margin-bottom: 0.5rem;
+        }
+
+        .success-state p {
+          color: #6b7280;
+          font-size: 1rem;
         }
 
         /* Responsive Design */

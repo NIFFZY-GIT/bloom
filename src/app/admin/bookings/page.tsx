@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import jwt from 'jsonwebtoken';
 
 import { query } from '@/lib/db';
+import { notifyUserBookingStatusChange, notifyUserPaymentStatusChange, notifyAdminNewBooking, sendBookingConfirmationToUser } from '@/lib/email';
 import BookingsFilters from './BookingsFilters';
 import DeleteAllBookingsForm from '@/components/admin/bookings/DeleteAllBookingsForm';
 import DeleteBookingButton from '@/components/admin/bookings/DeleteBookingButton';
@@ -69,8 +70,10 @@ interface DbBookingRow {
   customer_email: string;
   customer_phone: string | null;
   preferred_date: string | null;
+  preferred_end_date: string | null;
   number_of_guests: number | null;
   special_requests: string | null;
+  food_and_special_requests: string | null;
   created_at: string | null;
   status: string | null;
   package_title: string | null;
@@ -86,9 +89,11 @@ interface BookingViewModel {
   customerName: string;
   customerEmail: string;
   customerPhone: string;
-  preferredDate: Date | null;
+  preferredStartDate: Date | null;
+  preferredEndDate: Date | null;
   guests: number | null;
   specialRequests: string | null;
+  foodAndSpecialRequests: string | null;
   createdAt: Date | null;
   status: BookingStatus;
   price: number | null;
@@ -153,9 +158,11 @@ async function getBookings(): Promise<BookingViewModel[]> {
     customerName: row.customer_name,
     customerEmail: row.customer_email,
     customerPhone: row.customer_phone ?? '—',
-    preferredDate: row.preferred_date ? new Date(row.preferred_date) : null,
+    preferredStartDate: row.preferred_date ? new Date(row.preferred_date) : null,
+    preferredEndDate: row.preferred_end_date ? new Date(row.preferred_end_date) : (row.preferred_date ? new Date(row.preferred_date) : null),
     guests: row.number_of_guests,
     specialRequests: row.special_requests,
+    foodAndSpecialRequests: row.food_and_special_requests ?? null,
     createdAt: row.created_at ? new Date(row.created_at) : null,
     status: parseBookingStatus(row.status),
     price: row.price,
@@ -183,6 +190,15 @@ async function getBookings(): Promise<BookingViewModel[]> {
     'b.receiptuploadedat AS receipt_uploaded_at',
     'NULL::timestamp AS receipt_uploaded_at',
   ];
+  const preferredEndSelectors = [
+    'b.preferred_end_date AS preferred_end_date',
+    'b.preferred_date AS preferred_end_date',
+    'NULL::date AS preferred_end_date',
+  ];
+  const foodRequestsSelectors = [
+    'b.food_and_special_requests AS food_and_special_requests',
+    'NULL::text AS food_and_special_requests',
+  ];
 
   const attemptedSql = new Set<string>();
   const errors: unknown[] = [];
@@ -193,15 +209,19 @@ async function getBookings(): Promise<BookingViewModel[]> {
         for (const paymentExpr of paymentStatusSelectors) {
           for (const receiptExpr of receiptSelectors) {
             for (const receiptUploadedExpr of receiptUploadedSelectors) {
-              const sql = `SELECT 
+              for (const preferredEndExpr of preferredEndSelectors) {
+                for (const foodRequestsExpr of foodRequestsSelectors) {
+                  const sql = `SELECT 
            ${idExpr},
            b.package_id,
            b.customer_name,
            b.customer_email,
            b.customer_phone,
            b.preferred_date,
+           ${preferredEndExpr},
            b.number_of_guests,
            b.special_requests,
+           ${foodRequestsExpr},
            ${createdExpr},
            ${statusExpr},
            ${paymentExpr},
@@ -213,22 +233,24 @@ async function getBookings(): Promise<BookingViewModel[]> {
          LEFT JOIN tour_packages tp ON b.package_id = tp.id
          ORDER BY created_at DESC NULLS LAST, id DESC`;
 
-              if (attemptedSql.has(sql)) {
-                continue;
-              }
-              attemptedSql.add(sql);
+                  if (attemptedSql.has(sql)) {
+                    continue;
+                  }
+                  attemptedSql.add(sql);
 
-              try {
-                const result = await query(sql);
-                if (result.rowCount != null && result.rowCount >= 0) {
-                  return mapRows(result.rows as DbBookingRow[]);
+                  try {
+                    const result = await query(sql);
+                    if (result.rowCount != null && result.rowCount >= 0) {
+                      return mapRows(result.rows as DbBookingRow[]);
+                    }
+                  } catch (error) {
+                    errors.push(error);
+                    if (isUndefinedColumnError(error)) {
+                      continue;
+                    }
+                    throw error;
+                  }
                 }
-              } catch (error) {
-                errors.push(error);
-                if (isUndefinedColumnError(error)) {
-                  continue;
-                }
-                throw error;
               }
             }
           }
@@ -262,6 +284,19 @@ function formatDateTime(value: Date | null) {
     dateStyle: 'medium',
     timeStyle: 'short',
   });
+}
+
+function formatDateRange(start: Date | null, end: Date | null) {
+  if (!start || Number.isNaN(start.valueOf())) {
+    return '—';
+  }
+
+  const startLabel = formatDate(start);
+  if (!end || Number.isNaN(end.valueOf()) || start.toDateString() === end.toDateString()) {
+    return startLabel;
+  }
+
+  return `${startLabel} – ${formatDate(end)}`;
 }
 
 function formatCurrency(amount: number | null) {
@@ -399,6 +434,90 @@ async function updateBookingStatus(formData: FormData) {
     return;
   }
 
+  // If status changed to CONFIRMED, send invoice emails to both admin and customer
+  if (status === 'CONFIRMED') {
+    try {
+      const bookingDetailsResult = await query(
+        `SELECT 
+          b.customer_name, 
+          b.customer_email, 
+          b.customer_phone,
+          b.preferred_date,
+          b.preferred_end_date,
+          b.number_of_guests,
+          b.special_requests,
+          tp.title AS package_name,
+          tp.price
+         FROM bookings b
+         LEFT JOIN tour_packages tp ON b.package_id = tp.id
+         WHERE b.id = $1 OR b.booking_id = $1`,
+        [bookingId]
+      );
+
+      if (bookingDetailsResult.rows.length > 0) {
+        const booking = bookingDetailsResult.rows[0];
+        const totalAmount = Number(booking.price || 0) * Number(booking.number_of_guests);
+
+        // Send detailed invoice to admin
+        await notifyAdminNewBooking({
+          bookingId: String(bookingId),
+          customerName: booking.customer_name,
+          customerEmail: booking.customer_email,
+          customerPhone: booking.customer_phone,
+          packageName: booking.package_name || 'Package',
+          preferredDate: booking.preferred_date,
+          preferredEndDate: booking.preferred_end_date,
+          numberOfGuests: Number(booking.number_of_guests),
+          totalAmount,
+          pricePerPerson: Number(booking.price || 0),
+          specialRequests: booking.special_requests,
+        });
+
+        // Send detailed invoice confirmation to customer
+        await sendBookingConfirmationToUser({
+          bookingId: String(bookingId),
+          customerName: booking.customer_name,
+          customerEmail: booking.customer_email,
+          customerPhone: booking.customer_phone,
+          packageName: booking.package_name || 'Package',
+          preferredStartDate: booking.preferred_date,
+          preferredEndDate: booking.preferred_end_date,
+          numberOfGuests: Number(booking.number_of_guests),
+          pricePerPerson: Number(booking.price || 0),
+          totalAmount,
+          specialRequests: booking.special_requests,
+        });
+      }
+    } catch (invoiceEmailError) {
+      console.error('Failed to send invoice emails on confirmation:', invoiceEmailError);
+      // Continue - status was already updated successfully
+    }
+  }
+
+  // Send status change notification email to customer
+  try {
+    const bookingResult = await query(
+      `SELECT b.customer_email, tp.title AS package_name
+       FROM bookings b
+       LEFT JOIN tour_packages tp ON b.package_id = tp.id
+       WHERE b.id = $1 OR b.booking_id = $1`,
+      [bookingId]
+    );
+
+    if (bookingResult.rows.length > 0) {
+      const bookingData = bookingResult.rows[0];
+      await notifyUserBookingStatusChange({
+        email: bookingData.customer_email,
+        bookingId: String(bookingId),
+        packageName: bookingData.package_name || 'Your Package',
+        newStatus: status.toLowerCase(),
+      });
+    }
+  } catch (emailError) {
+    // Log email error but don't fail the request
+    console.error('Failed to send booking status notification email:', emailError);
+  }
+
   revalidatePath('/admin/bookings');
 }
 
@@ -472,6 +591,30 @@ async function updatePaymentStatus(formData: FormData) {
   if (updatedRows === 0) {
     console.warn('No booking rows updated for payment status id:', bookingId);
     return;
+  }
+
+  // Send notification email to customer
+  try {
+    const bookingResult = await query(
+      `SELECT b.customer_email, tp.title AS package_name
+       FROM bookings b
+       LEFT JOIN tour_packages tp ON b.package_id = tp.id
+       WHERE b.id = $1 OR b.booking_id = $1`,
+      [bookingId]
+    );
+
+    if (bookingResult.rows.length > 0) {
+      const bookingData = bookingResult.rows[0];
+      await notifyUserPaymentStatusChange({
+        email: bookingData.customer_email,
+        bookingId: String(bookingId),
+        packageName: bookingData.package_name || 'Your Package',
+        newPaymentStatus: status.toLowerCase(),
+      });
+    }
+  } catch (emailError) {
+    // Log email error but don't fail the request
+    console.error('Failed to send payment status notification email:', emailError);
   }
 
   revalidatePath('/admin/bookings');
@@ -613,10 +756,12 @@ export default async function AdminBookingsPage({
     if (booking.status === 'CONFIRMED') {
       confirmedCount += 1;
     }
-    if (booking.preferredDate) {
-      const preferred = new Date(booking.preferredDate);
-      preferred.setHours(0, 0, 0, 0);
-      if (preferred >= today) {
+    if (booking.preferredStartDate) {
+      const start = new Date(booking.preferredStartDate);
+      const end = booking.preferredEndDate ? new Date(booking.preferredEndDate) : start;
+      start.setHours(0, 0, 0, 0);
+      end.setHours(0, 0, 0, 0);
+      if (end >= today) {
         upcomingCount += 1;
       }
     }
@@ -743,95 +888,124 @@ export default async function AdminBookingsPage({
             )}
           </div>
         ) : (
-          <div className={styles.tableWrapper}>
-            <table className={styles.table}>
-              <thead>
-                <tr className={styles.tableHeadRow}>
-                  <th className={styles.tableHeaderCell}>Package</th>
-                  <th className={styles.tableHeaderCell}>Guest</th>
-                  <th className={styles.tableHeaderCell}>Preferred Date</th>
-                  <th className={styles.tableHeaderCell}>Guests</th>
-                  <th className={styles.tableHeaderCell}>Status</th>
-                  <th className={styles.tableHeaderCell}>Payment</th>
-                  <th className={styles.tableHeaderCell}>Booked On</th>
-                  <th className={styles.tableHeaderCell}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {visibleBookings.map((booking) => {
-                  const statusLabel = STATUS_LABELS[booking.status] ?? STATUS_LABELS.PENDING;
-                  const statusKey = `${booking.id}-${booking.status}`;
-                  const paymentLabel = PAYMENT_STATUS_LABELS[booking.paymentStatus] ?? PAYMENT_STATUS_LABELS.PENDING;
-                  const paymentKey = `${booking.id}-${booking.paymentStatus}`;
+          <div className={styles.bookingsGrid}>
+            {visibleBookings.map((booking) => {
+              const statusLabel = STATUS_LABELS[booking.status] ?? STATUS_LABELS.PENDING;
+              const paymentLabel = PAYMENT_STATUS_LABELS[booking.paymentStatus] ?? PAYMENT_STATUS_LABELS.PENDING;
+              const hasDetails = booking.specialRequests || booking.foodAndSpecialRequests;
 
-                  return (
-                    <tr key={booking.id} className={styles.tableRow}>
-                    <td className={styles.tableCell}>
-                      <div className={styles.packChip}>{booking.packageTitle}</div>
-                      {booking.price != null && (
-                        <div>{formatCurrency(booking.price)}</div>
-                      )}
-                    </td>
-                    <td className={styles.tableCell}>
-                      <div>{booking.customerName}</div>
-                      <div>{booking.customerEmail}</div>
-                      {booking.customerPhone && booking.customerPhone !== '—' && (
-                        <div>{booking.customerPhone}</div>
-                      )}
-                      {booking.specialRequests && (
-                        <ul className={styles.notesList}>
-                          <li>{booking.specialRequests}</li>
-                        </ul>
-                      )}
-                    </td>
-                    <td className={styles.tableCell}>{formatDate(booking.preferredDate)}</td>
-                    <td className={styles.tableCell}>{booking.guests ?? '—'}</td>
-                    <td className={styles.tableCell}>
-                      <div className={styles.statusCell} key={statusKey}>
-                        <span className={`${styles.statusBadge} ${getStatusClassName(booking.status)}`}>
-                          {statusLabel}
+              return (
+                <div key={booking.id} className={styles.bookingCard}>
+                  <div className={styles.bookingId}>#{booking.id}</div>
+                  
+                  {/* Left Column: Package & Customer Info */}
+                  <div className={styles.bookingHeader}>
+                    <div className={styles.bookingPackage}>
+                      <h3 className={styles.packageTitle}>{booking.packageTitle}</h3>
+                      <div className={styles.packageMeta}>
+                        {booking.price && (
+                          <span className={styles.metaItem}>
+                            <i className="fas fa-tag"></i>
+                            {formatCurrency(booking.price)}
+                          </span>
+                        )}
+                        <span className={styles.metaItem}>
+                          <i className="fas fa-users"></i>
+                          {booking.guests ?? 0} {booking.guests === 1 ? 'guest' : 'guests'}
                         </span>
-                        <form className={styles.statusForm} action={updateBookingStatus}>
-                          <input type="hidden" name="bookingId" value={booking.id} />
-                          <select
-                            id={`status-${booking.id}`}
-                            name="status"
-                            defaultValue={booking.status}
-                            className={styles.statusSelect}
-                            aria-label={`Update status for ${booking.customerName}`}
-                          >
-                            {ALLOWED_STATUSES.map((statusOption) => (
-                              <option key={statusOption} value={statusOption}>
-                                {STATUS_LABELS[statusOption]}
-                              </option>
-                            ))}
-                          </select>
-                          <button type="submit" className={styles.statusSubmit}>
-                            Save
-                          </button>
-                        </form>
                       </div>
-                    </td>
-                    <td className={`${styles.tableCell} ${styles.paymentCell}`}>
-                      <div className={`${styles.paymentBadge} ${getPaymentClassName(booking.paymentStatus)}`} key={paymentKey}>
-                        {paymentLabel}
+                      <div className={styles.packageMeta} style={{ marginTop: '0.5rem' }}>
+                        <span className={styles.metaItem}>
+                          <i className="fas fa-calendar-day"></i>
+                          <strong>Start:</strong> {formatDate(booking.preferredStartDate)}
+                        </span>
+                        <span className={styles.metaItem}>
+                          <i className="fas fa-calendar-check"></i>
+                          <strong>End:</strong> {formatDate(booking.preferredEndDate)}
+                        </span>
                       </div>
-                      {booking.receiptUrl ? (
-                        <ReceiptPreview
-                          url={booking.receiptUrl}
-                          uploadedAt={booking.receiptUploadedAt}
-                        />
-                      ) : (
-                        <div className={styles.receiptMissing}>Receipt not provided</div>
+                    </div>
+
+                    <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.5rem' }}>
+                      Booked on {formatDate(booking.createdAt)}
+                    </div>
+                  </div>
+
+                  {/* Middle Column: Customer Details */}
+                  <div className={styles.customerInfo}>
+                    <h4 className={styles.customerName}>
+                      <i className="fas fa-user"></i>
+                      {booking.customerName}
+                    </h4>
+                    <div className={styles.contactInfo}>
+                      <div className={styles.contactItem}>
+                        <i className="fas fa-envelope"></i>
+                        {booking.customerEmail}
+                      </div>
+                      {booking.customerPhone && booking.customerPhone !== '—' && (
+                        <div className={styles.contactItem}>
+                          <i className="fas fa-phone"></i>
+                          {booking.customerPhone}
+                        </div>
                       )}
-                      <form className={styles.paymentForm} action={updatePaymentStatus}>
+                    </div>
+
+                    {booking.receiptUrl && (
+                      <div style={{ marginTop: '1rem' }}>
+                        <a 
+                          href={booking.receiptUrl} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className={`${styles.actionButton} ${styles.receiptButton}`}
+                          style={{ width: '100%' }}
+                        >
+                          <i className="fas fa-receipt"></i>
+                          View Receipt
+                          <span className={styles.receiptBadge}>✓</span>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Right Column: Status Controls */}
+                  <div className={styles.statusSection}>
+                    <div className={styles.statusGroup}>
+                      <label className={styles.statusLabel} htmlFor={`status-${booking.id}`}>
+                        Booking Status
+                      </label>
+                      <form action={updateBookingStatus} style={{ display: 'flex', gap: '0.5rem' }}>
                         <input type="hidden" name="bookingId" value={booking.id} />
                         <select
-                          id={`payment-status-${booking.id}`}
+                          id={`status-${booking.id}`}
+                          name="status"
+                          defaultValue={booking.status}
+                          className={styles.statusSelect}
+                          style={{ flex: 1 }}
+                        >
+                          {ALLOWED_STATUSES.map((statusOption) => (
+                            <option key={statusOption} value={statusOption}>
+                              {STATUS_LABELS[statusOption]}
+                            </option>
+                          ))}
+                        </select>
+                        <button type="submit" className={styles.statusSubmit}>
+                          Save
+                        </button>
+                      </form>
+                    </div>
+
+                    <div className={styles.statusGroup}>
+                      <label className={styles.statusLabel} htmlFor={`payment-${booking.id}`}>
+                        Payment Status
+                      </label>
+                      <form action={updatePaymentStatus} style={{ display: 'flex', gap: '0.5rem' }}>
+                        <input type="hidden" name="bookingId" value={booking.id} />
+                        <select
+                          id={`payment-${booking.id}`}
                           name="paymentStatus"
                           defaultValue={booking.paymentStatus}
                           className={styles.paymentSelect}
-                          aria-label={`Update payment status for ${booking.customerName}`}
+                          style={{ flex: 1 }}
                         >
                           {PAYMENT_STATUSES.map((statusOption) => (
                             <option key={statusOption} value={statusOption}>
@@ -843,20 +1017,47 @@ export default async function AdminBookingsPage({
                           Save
                         </button>
                       </form>
-                    </td>
-                    <td className={styles.tableCell}>{formatDate(booking.createdAt)}</td>
-                    <td className={`${styles.tableCell} ${styles.tableActionsCell}`}>
-                      <DeleteBookingButton
-                        bookingId={booking.id}
-                        customerName={booking.customerName}
-                        action={deleteBooking}
-                      />
-                    </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                    </div>
+
+                    <DeleteBookingButton
+                      bookingId={booking.id}
+                      customerName={booking.customerName}
+                      action={deleteBooking}
+                    />
+                  </div>
+
+                  {/* Full Width: Additional Details */}
+                  {hasDetails && (
+                    <details className={styles.detailsSection}>
+                      <summary className={styles.detailsToggle}>
+                        <span>📋 Additional Information</span>
+                        <i className="fas fa-chevron-down"></i>
+                      </summary>
+                      <div className={styles.detailsContent}>
+                        {booking.specialRequests && (
+                          <div className={styles.noteBox}>
+                            <h5 className={styles.noteTitle}>
+                              <i className="fas fa-sticky-note"></i>
+                              Special Notes
+                            </h5>
+                            <p className={styles.noteText}>{booking.specialRequests}</p>
+                          </div>
+                        )}
+                        {booking.foodAndSpecialRequests && (
+                          <div className={styles.foodBox}>
+                            <h5 className={styles.foodTitle}>
+                              <i className="fas fa-utensils"></i>
+                              Food & Dietary Requirements
+                            </h5>
+                            <p className={styles.foodText}>{booking.foodAndSpecialRequests}</p>
+                          </div>
+                        )}
+                      </div>
+                    </details>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </section>

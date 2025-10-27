@@ -10,18 +10,55 @@ export async function POST(request: Request) {
       email,
       phone,
       date,
+      startDate,
+      endDate,
       guests,
       message,
       countryCode,
+      foodAndSpecialRequests,
     } = body;
 
-    if (!packageId || !name || !email || !date || !guests) {
+    const preferredStartRaw: string | null = typeof startDate === 'string' && startDate
+      ? startDate
+      : typeof date === 'string'
+        ? date
+        : null;
+
+    const preferredEndRaw: string | null = typeof endDate === 'string' && endDate
+      ? endDate
+      : preferredStartRaw;
+
+    if (!packageId || !name || !email || !preferredStartRaw || !guests) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
-    const insertQuery = `
-      INSERT INTO bookings (package_id, customer_name, customer_email, customer_phone, preferred_date, number_of_guests, special_requests)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+    const preferredStart = new Date(preferredStartRaw);
+    const preferredEnd = preferredEndRaw ? new Date(preferredEndRaw) : null;
+
+    if (Number.isNaN(preferredStart.valueOf())) {
+      return NextResponse.json({ message: 'Invalid preferred start date' }, { status: 400 });
+    }
+
+    if (preferredEnd && Number.isNaN(preferredEnd.valueOf())) {
+      return NextResponse.json({ message: 'Invalid preferred end date' }, { status: 400 });
+    }
+
+    if (preferredEnd && preferredEnd < preferredStart) {
+      return NextResponse.json({ message: 'Preferred end date cannot be before start date' }, { status: 400 });
+    }
+
+    const preferredStartIso = preferredStartRaw;
+    const preferredEndIso = preferredEndRaw ?? preferredStartRaw;
+
+    const insertWithEndQuery = `
+      INSERT INTO bookings (package_id, customer_name, customer_email, customer_phone, preferred_date, preferred_end_date, number_of_guests, special_requests, food_and_special_requests)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      RETURNING *;
+    `;
+
+    const insertLegacyQuery = `
+      INSERT INTO bookings (package_id, customer_name, customer_email, customer_phone, preferred_date, number_of_guests, special_requests, food_and_special_requests)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *;
     `;
 
@@ -43,11 +80,41 @@ export async function POST(request: Request) {
 
     const sanitizedPhone = phoneWithCountry ? phoneWithCountry.replace(/\s+/g, ' ').trim() : null;
 
-    const values = [packageId, name, email, sanitizedPhone, date, guests, message || null];
+    const valuesWithEnd = [
+      packageId, 
+      name, 
+      email, 
+      sanitizedPhone, 
+      preferredStartIso, 
+      preferredEndIso, 
+      guests, 
+      message || null,
+      foodAndSpecialRequests || null
+    ];
 
-    const result = await query(insertQuery, values);
+    let result;
 
-    return NextResponse.json({ success: true, booking: result.rows[0] }, { status: 201 });
+    try {
+      result = await query(insertWithEndQuery, valuesWithEnd);
+    } catch (error) {
+      const pgCode = typeof error === 'object' && error && 'code' in error ? (error as { code?: string }).code : undefined;
+      if (pgCode === '42703' || error instanceof Error && error.message.includes('preferred_end_date')) {
+        const legacyValues = [packageId, name, email, sanitizedPhone, preferredStartIso, guests, message || null, foodAndSpecialRequests || null];
+        result = await query(insertLegacyQuery, legacyValues);
+      } else {
+        throw error;
+      }
+    }
+
+    const createdBooking = result.rows[0];
+    if (createdBooking && !createdBooking.preferred_end_date) {
+      createdBooking.preferred_end_date = preferredEndIso;
+    }
+
+    // Emails will be sent when user uploads receipt on confirmation page
+    // No emails sent at this stage
+
+    return NextResponse.json({ success: true, booking: createdBooking }, { status: 201 });
 
   } catch (error) {
     console.error('Error creating booking:', error);
@@ -73,8 +140,10 @@ export async function GET(request: Request) {
           b.customer_email,
           b.customer_phone,
           b.preferred_date,
+          b.preferred_end_date,
           b.number_of_guests,
           b.special_requests,
+          b.food_and_special_requests,
           b.created_at,
           b.status,
           tp.title AS package_title,
@@ -95,8 +164,13 @@ export async function GET(request: Request) {
           b.customer_email,
           b.customer_phone,
           b.preferred_date,
+          b.preferred_end_date,
           b.number_of_guests,
           b.special_requests,
+          b.food_and_special_requests,
+          b.payment_status,
+          b.receipt_url,
+          b.receipt_uploaded_at,
           b.created_at,
           b.status,
           tp.title AS package_title,

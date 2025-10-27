@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const backgroundImages = ['/images/signup-bg-1.jpg'];
 
 export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [formData, setFormData] = useState({
     username: '',
@@ -16,6 +17,8 @@ export default function SignupPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -49,9 +52,18 @@ export default function SignupPage() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Signup failed');
-      const destination = data.role === 'ADMIN' ? '/admin/dashboard' : '/';
-      router.push(destination);
-      router.refresh();
+      
+      // After successful registration, redirect to login page
+      const redirectUrl = searchParams.get('redirect');
+      
+      // Build login URL with success message and optional redirect
+      let loginUrl = '/login?registered=true';
+      if (redirectUrl) {
+        loginUrl += `&redirect=${encodeURIComponent(redirectUrl)}`;
+      }
+      
+      // Redirect to login page
+      window.location.href = loginUrl;
     } catch (err: any) {
       setError(err.message || 'Signup failed');
     } finally {
@@ -147,9 +159,9 @@ export default function SignupPage() {
             </div>
 
             <div className="input-group-modern">
-              <div className="input-container">
+              <div className="input-container password-input-container">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   placeholder=" "
                   className="modern-input"
@@ -159,13 +171,21 @@ export default function SignupPage() {
                 />
                 <label className="modern-label">Password</label>
                 <div className="input-underline"></div>
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label="Toggle password visibility"
+                >
+                  <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"}></i>
+                </button>
               </div>
             </div>
 
             <div className="input-group-modern">
-              <div className="input-container">
+              <div className="input-container password-input-container">
                 <input
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   name="confirmPassword"
                   placeholder=" "
                   className="modern-input"
@@ -175,17 +195,33 @@ export default function SignupPage() {
                 />
                 <label className="modern-label">Confirm Password</label>
                 <div className="input-underline"></div>
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  aria-label="Toggle confirm password visibility"
+                >
+                  <i className={showConfirmPassword ? "fas fa-eye-slash" : "fas fa-eye"}></i>
+                </button>
               </div>
             </div>
 
             {/* Form Options */}
-            <div className="modern-form-options">
+            <div className="terms-checkbox">
               <label className="modern-checkbox">
                 <input type="checkbox" className="checkbox-input" required />
                 <span className="checkbox-checkmark"></span>
                 I agree to the <a href="#" className="terms-link">Terms of Service</a> and <a href="#" className="terms-link">Privacy Policy</a>
               </label>
             </div>
+
+            {/* Redirect Notice */}
+            {searchParams.get('redirect') && (
+              <div className="info-message">
+                <i className="fas fa-info-circle"></i>
+                Please create an account or log in to continue booking.
+              </div>
+            )}
 
             {error && <p className="error-message">{error}</p>}
 
@@ -465,20 +501,7 @@ export default function SignupPage() {
           padding: 0 0.2rem;
         }
 
-        .input-underline {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 0;
-          height: 2px;
-          background: linear-gradient(90deg, #f59e0b, #d97706);
-          transition: width 0.3s ease;
-          border-radius: 2px;
-        }
-
-        .modern-input:focus ~ .input-underline {
-          width: 100%;
-        }
+     
 
         .modern-form-options {
           margin: 0.5rem 0;
@@ -619,6 +642,27 @@ export default function SignupPage() {
           font-size: 0.9rem;
           text-align: center;
           margin-bottom: 1rem;
+        }
+
+        .info-message {
+          background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
+          color: #1e40af;
+          padding: 0.875rem 1rem;
+          border-radius: 8px;
+          font-size: 0.875rem;
+          text-align: center;
+          margin-bottom: 1rem;
+          border-left: 3px solid #3b82f6;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .info-message i {
+          font-size: 1rem;
+          color: #3b82f6;
         }
 
         /* Google Signup Section with Yellow */
@@ -823,6 +867,36 @@ export default function SignupPage() {
           .modern-checkbox {
             font-size: 0.85rem;
           }
+        }
+
+        /* Password toggle button */
+        .password-input-container {
+          position: relative;
+        }
+
+        .password-toggle-btn {
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 5px 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #64748b;
+          transition: color 0.2s ease;
+          z-index: 10;
+        }
+
+        .password-toggle-btn:hover {
+          color: #f59e0b;
+        }
+
+        .password-toggle-btn i {
+          font-size: 1.1rem;
         }
       `}</style>
     </div>

@@ -36,7 +36,8 @@ interface BookingRow {
   customerName: string;
   packageTitle: string;
   status: string;
-  preferredDate: Date | null;
+  preferredStartDate: Date | null;
+  preferredEndDate: Date | null;
   createdAt: Date | null;
 }
 
@@ -45,6 +46,7 @@ interface DbBookingRow {
   booking_id?: number;
   customer_name: string;
   preferred_date: string | null;
+  preferred_end_date: string | null;
   created_at: string | null;
   status: string | null;
   package_title: string | null;
@@ -133,7 +135,8 @@ async function getRecentBookings(): Promise<BookingRow[]> {
       customerName: row.customer_name,
       packageTitle: row.package_title ?? 'Unknown package',
       status: (row.status ?? 'PENDING').toUpperCase(),
-      preferredDate: row.preferred_date ? new Date(row.preferred_date) : null,
+      preferredStartDate: row.preferred_date ? new Date(row.preferred_date) : null,
+      preferredEndDate: row.preferred_end_date ? new Date(row.preferred_end_date) : (row.preferred_date ? new Date(row.preferred_date) : null),
       createdAt: row.created_at ? new Date(row.created_at) : null,
     }));
 
@@ -143,6 +146,7 @@ async function getRecentBookings(): Promise<BookingRow[]> {
          b.id,
          b.customer_name,
          b.preferred_date,
+         b.preferred_end_date,
          b.created_at,
          b.status,
          tp.title AS package_title
@@ -161,6 +165,7 @@ async function getRecentBookings(): Promise<BookingRow[]> {
            b.booking_id AS id,
            b.customer_name,
            b.preferred_date,
+           NULL::date AS preferred_end_date,
            NULL::timestamp AS created_at,
            NULL::text AS status,
            tp.title AS package_title
@@ -188,6 +193,19 @@ function formatDate(value: Date | null) {
     month: 'short',
     day: 'numeric',
   });
+}
+
+function formatDateRange(start: Date | null, end: Date | null) {
+  if (!start || Number.isNaN(start.valueOf())) {
+    return '—';
+  }
+
+  const startLabel = formatDate(start);
+  if (!end || Number.isNaN(end.valueOf()) || start.toDateString() === end.toDateString()) {
+    return startLabel;
+  }
+
+  return `${startLabel} – ${formatDate(end)}`;
 }
 
 function formatCurrency(amount: number) {
@@ -291,9 +309,11 @@ export default async function AdminDashboard() {
                 </div>
               ) : (
                 recentBookings.map((booking) => {
-                  const requestedDate = formatDate(booking.preferredDate);
+                  const requestedRange = formatDateRange(booking.preferredStartDate, booking.preferredEndDate);
                   const createdDate = formatDate(booking.createdAt);
-                  const displayDate = booking.createdAt ? `Booked on ${createdDate}` : `Requested for ${requestedDate}`;
+                  const displayDate = booking.createdAt && createdDate !== '—'
+                    ? `Booked on ${createdDate} · ${requestedRange}`
+                    : `Requested for ${requestedRange}`;
 
                   return (
                     <div className={styles.bookingItem} key={booking.id}>

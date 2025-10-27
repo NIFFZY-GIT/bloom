@@ -112,117 +112,59 @@ CREATE INDEX IF NOT EXISTS idx_tour_package_images_package
     ON tour_package_images(package_id, sort_order);
 
 
-CREATE TABLE gallery_items (
-    id SERIAL PRIMARY KEY,
-    category VARCHAR(255) NOT NULL,
-    image_path VARCHAR(255) NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    description TEXT
-);
 
-CREATE TABLE reviews (
+
+
+
+
+
+
+
+
+CREATE TABLE places (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    position VARCHAR(255),
-    avatar VARCHAR(255),
-    rating NUMERIC(2, 1) CHECK (rating >= 0 AND rating <= 5),
-    text TEXT NOT NULL
+    description TEXT,
+    image_path VARCHAR(255),
+    category VARCHAR(100),
+    duration VARCHAR(50),
+    location VARCHAR(255),
+    highlights JSONB, -- Or TEXT[] for a simple array of strings
+    price DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-
-
-
-
-
-
-
-CREATE TABLE IF NOT EXISTS custom_places (
-    id              SERIAL PRIMARY KEY,
-    name            VARCHAR(150) NOT NULL,
-    description     TEXT,
-    image_path      VARCHAR(255),
-    category        VARCHAR(40) NOT NULL,
-    default_duration_minutes INTEGER CHECK (default_duration_minutes >= 0),
-    base_price      NUMERIC(10,2) DEFAULT 0 CHECK (base_price >= 0),
-    location        VARCHAR(255),
-    highlights      TEXT[],
-    created_at      TIMESTAMPTZ DEFAULT NOW()
+-- Next, the main custom_packages table
+CREATE TABLE custom_packages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Or SERIAL PRIMARY KEY for integer IDs
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    total_duration_minutes INTEGER,
+    total_duration_label VARCHAR(50),
+    guests INTEGER NOT NULL DEFAULT 1,
+    contact_email VARCHAR(255) NOT NULL,
+    contact_phone VARCHAR(50),
+    start_date DATE,
+    end_date DATE,
+    food_and_special_requests TEXT,
+    additional_info TEXT,
+    status VARCHAR(50) NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Master record for every custom package request
-CREATE TABLE IF NOT EXISTS custom_packages (
-    id                  SERIAL PRIMARY KEY,
-    name                VARCHAR(160) NOT NULL,
-    description         TEXT,
-    total_duration_minutes INTEGER CHECK (total_duration_minutes >= 0),
-    total_price         NUMERIC(10,2) DEFAULT 0 CHECK (total_price >= 0),
-    pace                VARCHAR(20) NOT NULL DEFAULT 'moderate',      -- relaxed | moderate | fast
-    transport           VARCHAR(20) NOT NULL DEFAULT 'walking',       -- walking | public | private
-    wants_guide         BOOLEAN NOT NULL DEFAULT FALSE,
-    wants_meals         BOOLEAN NOT NULL DEFAULT FALSE,
-    wants_photography   BOOLEAN NOT NULL DEFAULT FALSE,
-    contact_name        VARCHAR(150) NOT NULL,
-    contact_email       VARCHAR(180) NOT NULL,
-    contact_phone       VARCHAR(40),
-    preferred_date      DATE,
-    guests              INTEGER NOT NULL DEFAULT 1 CHECK (guests > 0),
-    special_requests    TEXT,
-    status              VARCHAR(20) NOT NULL DEFAULT 'NEW',           -- NEW | IN_PROGRESS | SENT | CLOSED
-    created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+-- Finally, the join table to link them
+CREATE TABLE custom_package_places (
+    custom_package_id UUID REFERENCES custom_packages(id) ON DELETE CASCADE, -- Use INTEGER if custom_packages.id is SERIAL
+    place_id INTEGER REFERENCES places(id) ON DELETE RESTRICT,
+    display_order INTEGER NOT NULL,
+    PRIMARY KEY (custom_package_id, place_id)
 );
 
--- Places attached to each custom package
-CREATE TABLE IF NOT EXISTS custom_package_places (
-    id              SERIAL PRIMARY KEY,
-    custom_package_id INTEGER NOT NULL REFERENCES custom_packages(id) ON DELETE CASCADE,
-    place_id        INTEGER REFERENCES custom_places(id),             -- optional link to catalog
-    name            VARCHAR(150) NOT NULL,
-    description     TEXT,
-    image_path      VARCHAR(255),
-    category        VARCHAR(40),
-    duration_label  VARCHAR(40),
-    duration_minutes INTEGER CHECK (duration_minutes >= 0),
-    price           NUMERIC(10,2) DEFAULT 0 CHECK (price >= 0),
-    location        VARCHAR(255),
-    highlights      TEXT[],
-    display_order   INTEGER NOT NULL,
-    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- Optional gallery images uploaded with a custom package
-CREATE TABLE IF NOT EXISTS custom_package_images (
-    id              SERIAL PRIMARY KEY,
-    custom_package_id INTEGER NOT NULL REFERENCES custom_packages(id) ON DELETE CASCADE,
-    image_path      VARCHAR(255) NOT NULL,
-    alt_text        VARCHAR(150),
-    sort_order      INTEGER DEFAULT 1,
-    uploaded_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- Keep updated_at in sync
-CREATE OR REPLACE FUNCTION set_updated_at_custom_packages()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at := NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_custom_packages_updated_at
-BEFORE UPDATE ON custom_packages
-FOR EACH ROW
-EXECUTE PROCEDURE set_updated_at_custom_packages();
-
--- Supporting indexes
-CREATE INDEX IF NOT EXISTS idx_custom_package_places_package
-    ON custom_package_places(custom_package_id, display_order);
-
-CREATE INDEX IF NOT EXISTS idx_custom_packages_status
-    ON custom_packages(status);
-
-
-
+-- Add indexes for better performance on foreign keys
+CREATE INDEX ON custom_package_places (custom_package_id);
+CREATE INDEX ON custom_package_places (place_id);
 
 
 
@@ -265,3 +207,37 @@ CREATE INDEX IF NOT EXISTS booking_receipts_booking_id_idx
   ON booking_receipts (booking_id);
 
 COMMIT;
+
+
+
+CREATE TABLE gallery_items (
+    id SERIAL PRIMARY KEY,
+    category VARCHAR(255) NOT NULL,
+    image_path VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT
+);
+
+CREATE TABLE reviews (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    position VARCHAR(255),
+    avatar VARCHAR(255),
+    rating NUMERIC(2, 1) CHECK (rating >= 0 AND rating <= 5),
+    text TEXT NOT NULL
+);
+
+
+ALTER TABLE bookings 
+ADD COLUMN dietary_preferences TEXT,
+ADD COLUMN food_allergies TEXT;
+--ADD COLUMN special_requests TEXT;
+
+-- Optional: Add comments to document the columns
+COMMENT ON COLUMN bookings.dietary_preferences IS 'Dietary preferences (e.g., vegetarian, vegan, halal, kosher)';
+COMMENT ON COLUMN bookings.food_allergies IS 'Food allergies and intolerances';
+COMMENT ON COLUMN bookings.special_requests IS 'Any other special requirements or requests';
+
+ALTER TABLE bookings ADD COLUMN food_and_special_requests TEXT;
+
+select *from bookings;
