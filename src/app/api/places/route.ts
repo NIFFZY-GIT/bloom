@@ -5,33 +5,18 @@ export async function GET() {
   try {
     const result = await query(
       `SELECT
-         id,
-         name,
-         description,
-         image_path as "imagePath",
-         category,
-         duration,
-         location,
-         highlights,
-         gallery_images as "galleryImages",
-         created_at as "createdAt"
-       FROM places
-       ORDER BY created_at DESC`
+         p.id,
+         p.name,
+         p.description,
+         p.image,
+         p."categoryId",
+         c.name as "categoryName"
+       FROM "Place" p
+       LEFT JOIN "Category" c ON p."categoryId" = c.id
+       ORDER BY p.id ASC`
     );
 
-    const places = result.rows.map((row: any) => ({
-      id: row.id,
-      name: row.name,
-      description: row.description,
-      imagePath: row.imagePath,
-      category: row.category,
-      duration: row.duration,
-      location: row.location,
-      highlights: Array.isArray(row.highlights) ? row.highlights : [],
-      galleryImages: Array.isArray(row.galleryImages) ? row.galleryImages : [],
-    }));
-
-    return NextResponse.json({ success: true, places }, { status: 200 });
+    return NextResponse.json({ success: true, places: result.rows }, { status: 200 });
   } catch (error) {
     console.error('Failed to load places:', error);
     return NextResponse.json({ message: 'Failed to load places' }, { status: 500 });
@@ -47,24 +32,30 @@ export async function POST(request: Request) {
   }
 
   const name = body?.name?.trim();
-  const description = body?.description?.trim() || null;
-  const imagePath = body?.imagePath?.trim() || null;
-  const category = body?.category?.trim() || null;
-  const duration = body?.duration?.trim() || '1 hour';
-  const location = body?.location?.trim() || null;
-  const highlights = Array.isArray(body?.highlights) ? body.highlights : [];
-  const galleryImages = Array.isArray(body?.galleryImages) ? body.galleryImages : [];
+  const description = body?.description?.trim();
+  const image = body?.image?.trim();
+  const categoryId = parseInt(body?.categoryId, 10);
 
-  if (!name) {
-    return NextResponse.json({ message: 'Place name is required' }, { status: 400 });
+  if (!name || !description || !image || isNaN(categoryId)) {
+    return NextResponse.json({ message: 'All fields are required (name, description, image, categoryId)' }, { status: 400 });
   }
 
   try {
+    // Verify category exists
+    const categoryCheck = await query(
+      `SELECT id FROM "Category" WHERE id = $1`,
+      [categoryId]
+    );
+
+    if (categoryCheck.rows.length === 0) {
+      return NextResponse.json({ message: 'Category not found' }, { status: 404 });
+    }
+
     const result = await query(
-      `INSERT INTO places (name, description, image_path, category, duration, location, highlights, gallery_images)
-       VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8::jsonb)
-       RETURNING id, name, description, image_path as "imagePath", category, duration, location, highlights, gallery_images as "galleryImages"`,
-      [name, description, imagePath, category, duration, location, JSON.stringify(highlights), JSON.stringify(galleryImages)]
+      `INSERT INTO "Place" (name, description, image, "categoryId")
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, name, description, image, "categoryId"`,
+      [name, description, image, categoryId]
     );
 
     const newPlace = result.rows[0];
@@ -72,17 +63,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ 
       success: true, 
       message: 'Place created successfully',
-      place: {
-        id: newPlace.id,
-        name: newPlace.name,
-        description: newPlace.description,
-        imagePath: newPlace.imagePath,
-        category: newPlace.category,
-        duration: newPlace.duration,
-        location: newPlace.location,
-        highlights: Array.isArray(newPlace.highlights) ? newPlace.highlights : [],
-        galleryImages: Array.isArray(newPlace.galleryImages) ? newPlace.galleryImages : [],
-      }
+      place: newPlace
     }, { status: 201 });
   } catch (error) {
     console.error('Failed to create place:', error);

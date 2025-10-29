@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
+import { gsap } from 'gsap';
 import { Category } from '../Types';
 
 interface CategorySelectorProps {
@@ -9,12 +10,13 @@ interface CategorySelectorProps {
   onCategorySelect: (category: Category) => void;
 }
 
-export default function CategorySelector({ 
-  categories, 
-  selectedCategory, 
-  onCategorySelect 
+export default function CategorySelector({
+  categories,
+  selectedCategory,
+  onCategorySelect
 }: CategorySelectorProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const categoryCardsRef = useRef<(HTMLDivElement | null)[]>([]);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
@@ -23,9 +25,48 @@ export default function CategorySelector({
 
   useEffect(() => {
     checkScroll();
+    
+    // Initial animation for category cards
+    gsap.fromTo(
+      categoryCardsRef.current,
+      {
+        opacity: 0,
+        y: 50,
+        scale: 0.8
+      },
+      {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: 'power3.out'
+      }
+    );
   }, []);
 
-  const checkScroll = () => {
+  // Animate when category selection changes
+  useEffect(() => {
+    categoryCardsRef.current.forEach((card, index) => {
+      if (card) {
+        if (categories[index]?.id === selectedCategory.id) {
+          gsap.to(card, {
+            scale: 1.05,
+            y: -20,
+            duration: 0.5,
+            ease: 'power3.out'
+          });
+        } else {
+          gsap.to(card, {
+            scale: 1,
+            y: 0,
+            duration: 0.5,
+            ease: 'power3.out'
+          });
+        }
+      }
+    });
+  }, [selectedCategory, categories]);  const checkScroll = () => {
     if (scrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
       setShowLeftArrow(scrollLeft > 0);
@@ -71,6 +112,24 @@ export default function CategorySelector({
     scrollContainerRef.current!.scrollLeft = scrollLeft - walk;
   };
 
+  const handleCategoryClick = (category: Category, index: number) => {
+    const card = categoryCardsRef.current[index];
+    if (card) {
+      gsap.to(card, {
+        scale: 1.1,
+        duration: 0.2,
+        yoyo: true,
+        repeat: 1,
+        ease: 'power2.inOut',
+        onComplete: () => {
+          onCategorySelect(category);
+        }
+      });
+    } else {
+      onCategorySelect(category);
+    }
+  };
+
   return (
     <div className="category-selector-wrapper">
       {showLeftArrow && (
@@ -98,13 +157,14 @@ export default function CategorySelector({
         onMouseMove={handleMouseMove}
       >
         <div className="categories-track">
-          {categories.map((category) => (
+          {categories.map((category, index) => (
             <div
               key={category.id}
+              ref={el => { categoryCardsRef.current[index] = el; }}
               className={`category-card ${
                 selectedCategory.id === category.id ? 'active' : ''
               }`}
-              onClick={() => onCategorySelect(category)}
+              onClick={() => handleCategoryClick(category, index)}
             >
               <div className="card-inner">
                 <div className="category-image-container">
@@ -181,7 +241,7 @@ export default function CategorySelector({
           scroll-behavior: smooth;
           scrollbar-width: none;
           -ms-overflow-style: none;
-          padding: 40px 0;
+          padding: 60px 0 80px 0;
           margin: 0 -20px;
           cursor: grab;
           position: relative;
@@ -200,6 +260,7 @@ export default function CategorySelector({
           gap: 2.5rem;
           padding: 0 20px;
           min-width: min-content;
+          justify-content: center;
         }
 
         .category-card {
@@ -395,13 +456,16 @@ export default function CategorySelector({
 
         .sparkle {
           position: absolute;
-          width: 4px;
-          height: 4px;
+          width: 6px;
+          height: 6px;
           background: white;
           border-radius: 50%;
-          animation: sparkleFloat 2s ease-in-out infinite;
-          animation-delay: calc(var(--i) * 0.2s);
+          box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+          animation: sparkleFloat 3s ease-in-out infinite;
+          animation-delay: calc(var(--i) * 0.3s);
           opacity: 0;
+          top: 50%;
+          left: 50%;
         }
 
         .nav-arrow {
@@ -518,13 +582,21 @@ export default function CategorySelector({
         }
 
         @keyframes sparkleFloat {
-          0%, 100% {
+          0% {
             opacity: 0;
-            transform: translate(calc(var(--i) * 10px - 50px), calc(var(--i) * 5px - 25px)) scale(0);
+            transform: translate(-50%, -50%) rotate(0deg) translateX(0) scale(0);
           }
-          50% {
+          20% {
             opacity: 1;
-            transform: translate(calc(var(--i) * 20px - 100px), calc(var(--i) * 10px - 50px)) scale(1);
+            transform: translate(-50%, -50%) rotate(calc(var(--i) * 45deg)) translateX(80px) scale(1);
+          }
+          80% {
+            opacity: 1;
+            transform: translate(-50%, -50%) rotate(calc(var(--i) * 45deg + 180deg)) translateX(100px) scale(1);
+          }
+          100% {
+            opacity: 0;
+            transform: translate(-50%, -50%) rotate(calc(var(--i) * 45deg + 360deg)) translateX(120px) scale(0);
           }
         }
 
@@ -535,7 +607,7 @@ export default function CategorySelector({
 
           .categories-scroll-container {
             margin: 0 -15px;
-            padding: 30px 0;
+            padding: 50px 0 70px 0;
           }
 
           .categories-track {

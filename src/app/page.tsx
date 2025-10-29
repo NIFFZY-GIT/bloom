@@ -1,203 +1,106 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-import footer from '../components/ui/footer';
 import HeroCarousel from '../components/HeroCarousel';
 import CategorySelector from '../components/CategorySelector';
 import CategoryDetails from '../components/CategoryDetails';
 import BackgroundAnimation from '../components/BackgroundAnimation';
 import { Category, Place } from '../Types';
 
-const categories: Category[] = [
-  {
-    id: 1,
-    name: 'Beaches & Coastal',
-    image: '/images/categories/beaches.png',
-    color: '#1e40af',
-    bgColor: 'linear-gradient(135deg, #1e40af, #3b82f6)',
-    description: 'Pristine beaches and coastal destinations with golden sands and turquoise waters',
-    animation: 'waves'
-  },
-  {
-    id: 2,
-    name: 'Rainforests & Natural',
-    image: '/images/categories/rainforests.png',
-    color: '#059669',
-    bgColor: 'linear-gradient(135deg, #059669, #10b981)',
-    description: 'Lush rainforests and natural reserves teeming with biodiversity',
-    animation: 'forest'
-  },
-  {
-    id: 3,
-    name: 'National Parks & Wildlife',
-    image: '/images/categories/wildlife.png',
-    color: '#92400e',
-    bgColor: 'linear-gradient(135deg, #92400e, #b45309)',
-    description: 'Wildlife sanctuaries and national parks for incredible animal encounters',
-    animation: 'wildlife'
-  },
-  {
-    id: 4,
-    name: 'Cultural Heritage',
-    image: '/images/categories/cultural.png',
-    color: '#7c3aed',
-    bgColor: 'linear-gradient(135deg, #7c3aed, #8b5cf6)',
-    description: 'Ancient cities and UNESCO World Heritage sites',
-    animation: 'heritage'
-  },
-  {
-    id: 5,
-    name: 'Hill Country',
-    image: '/images/categories/hill-country.png',
-    color: '#0d9488',
-    bgColor: 'linear-gradient(135deg, #0d9488, #14b8a6)',
-    description: 'Scenic highlands with tea plantations and cool climates',
-    animation: 'mountains'
-  },
-  {
-    id: 6,
-    name: 'Religious & Spiritual',
-    image: '/images/categories/temples.png',
-    color: '#dc2626',
-    bgColor: 'linear-gradient(135deg, #dc2626, #ef4444)',
-    description: 'Sacred temples, churches, and spiritual sites',
-    animation: 'spiritual'
-  },
-  {
-    id: 7,
-    name: 'Urban & Modern',
-    image: '/images/categories/urban.png',
-    color: '#4f46e5',
-    bgColor: 'linear-gradient(135deg, #4f46e5, #6366f1)',
-    description: 'Modern cities with contemporary attractions',
-    animation: 'urban'
-  },
-  {
-    id: 8,
-    name: 'Waterfalls & Lakes',
-    image: '/images/categories/waterfalls.png',
-    color: '#0891b2',
-    bgColor: 'linear-gradient(135deg, #0891b2, #06b6d4)',
-    description: 'Majestic waterfalls and serene lakes',
-    animation: 'waterfalls'
-  },
-  {
-    id: 9,
-    name: 'Adventure & Eco',
-    image: '/images/categories/adventure.png',
-    color: '#65a30d',
-    bgColor: 'linear-gradient(135deg, #65a30d, #84cc16)',
-    description: 'Thrilling adventures and eco-tourism experiences',
-    animation: 'adventure'
-  },
-  {
-    id: 10,
-    name: 'Village & Cultural',
-    image: '/images/categories/village.png',
-    color: '#db2777',
-    bgColor: 'linear-gradient(135deg, #db2777, #ec4899)',
-    description: 'Traditional village life and cultural experiences',
-    animation: 'village'
-  },
-  {
-    id: 11,
-    name: 'Fortresses & Colonial',
-    image: '/images/categories/fortresses.png',
-    color: '#d97706',
-    bgColor: 'linear-gradient(135deg, #d97706, #f59e0b)',
-    description: 'Historic fortresses and colonial architecture',
-    animation: 'fortresses'
-  }
-];
-
-const places: Place[] = [
-  // Beaches & Coastal
-  {
-    id: 1,
-    name: 'Mirissa',
-    description: 'A beautiful crescent-shaped beach known for whale watching and vibrant beach cafes. Perfect for surfing and sunset views.',
-    image: '/images/places/mirissa.png',
-    category: 'Beaches & Coastal'
-  },
-  {
-    id: 2,
-    name: 'Hikkaduwa',
-    description: 'Famous for its coral reefs, surfing spots, and lively nightlife. A paradise for snorkeling and diving enthusiasts.',
-    image: '/images/places/hikkaduwa.png',
-    category: 'Beaches & Coastal'
-  },
-    {
-    id: 3,
-    name: 'Arugam Bay',
-    description: 'World-class surfing destination on the east coast',
-    image: '/images/places/Arugam.jpg',
-    category: 'Beaches & Coastal'
-  },
-   {
-    id: 4,
-    name: 'Arugam Bay',
-    description: 'World-class surfing destination on the east coast',
-    image: '/images/places/Pasikudah.jpg',
-    category: 'Beaches & Coastal'
-  },
-    {
-    id: 5,
-    name: 'Arugam Bay',
-    description: 'World-class surfing destination on the east coast',
-    image: '/images/places/Sinharaja.jpg',
-    category: 'Rainforests & Natural'
-  },
-    {
-    id: 6,
-    name: 'Arugam Bay',
-    description: 'World-class surfing destination on the east coast',
-    image: '/images/places/Kanneliya.jpg',
-    category: 'Rainforests & Natural'
-  },
-    {
-    id: 7,
-    name: 'Mirissa',
-    description: 'A beautiful crescent-shaped beach known for whale watching and vibrant beach cafes. Perfect for surfing and sunset views.',
-    image: '/images/places/mirissa.png',
-    category: 'National Parks & Wildlife'
-  },
-  {
-    id: 8,
-    name: 'Hikkaduwa',
-    description: 'Famous for its coral reefs, surfing spots, and lively nightlife. A paradise for snorkeling and diving enthusiasts.',
-    image: '/images/places/hikkaduwa.png',
-    category: 'National Parks & Wildlife'
-  },
-    {
-    id: 9,
-    name: 'Arugam Bay',
-    description: 'World-class surfing destination on the east coast',
-    image: '/images/places/Arugam.jpg',
-    category: 'National Parks & Wildlife'
-  },
-   {
-    id: 10,
-    name: 'Arugam Bay',
-    description: 'World-class surfing destination on the east coast',
-    image: '/images/places/Pasikudah.jpg',
-    category: 'National Parks & Wildlife'
-  },
-  // ... other places (same as before)
-];
-
 export default function Home() {
-  const [selectedCategory, setSelectedCategory] = useState<Category>(categories[0]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [places, setPlaces] = useState<Place[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [filteredPlaces, setFilteredPlaces] = useState<Place[]>([]);
-  const [bgColor, setBgColor] = useState<string>(categories[0].bgColor);
+  const [bgColor, setBgColor] = useState<string>('linear-gradient(135deg, #1e40af, #3b82f6)');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  // Fetch categories on mount
   useEffect(() => {
-    const categoryPlaces = places.filter(place => 
-      place.category === selectedCategory.name
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/categories');
+        const data = await response.json();
+        
+        if (data.success && data.categories.length > 0) {
+          setCategories(data.categories);
+          setSelectedCategory(data.categories[0]);
+        } else {
+          setError('No categories found');
+        }
+      } catch (err) {
+        console.error('Failed to fetch categories:', err);
+        setError('Failed to load categories');
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Fetch places on mount
+  useEffect(() => {
+    const fetchPlaces = async () => {
+      try {
+        const response = await fetch('/api/places');
+        const data = await response.json();
+        
+        if (data.success) {
+          setPlaces(data.places);
+        }
+        setLoading(false);
+      } catch (err) {
+        console.error('Failed to fetch places:', err);
+        setError('Failed to load places');
+        setLoading(false);
+      }
+    };
+
+    fetchPlaces();
+  }, []);
+
+  // Filter places when category changes
+  useEffect(() => {
+    if (selectedCategory) {
+      // Convert both to numbers to ensure proper comparison
+      const categoryPlaces = places.filter(
+        (place) => Number(place.categoryId) === Number(selectedCategory.id)
+      );
+      setFilteredPlaces(categoryPlaces);
+      setBgColor(selectedCategory.bgColor);
+      
+      // Debug logging
+      console.log('Selected Category:', selectedCategory);
+      console.log('Selected Category ID (type):', typeof selectedCategory.id, selectedCategory.id);
+      console.log('All Places:', places);
+      console.log('Places categoryId types:', places.map(p => ({ name: p.name, categoryId: p.categoryId, type: typeof p.categoryId })));
+      console.log('Filtered Places:', categoryPlaces);
+    }
+  }, [selectedCategory, places]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-blue-800">
+        <div className="text-white text-2xl font-semibold">Loading...</div>
+      </div>
     );
-    setFilteredPlaces(categoryPlaces);
-    setBgColor(selectedCategory.bgColor);
-  }, [selectedCategory]);
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-600 to-red-800">
+        <div className="text-white text-2xl font-semibold">{error}</div>
+      </div>
+    );
+  }
+
+  if (!selectedCategory) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-600 to-gray-800">
+        <div className="text-white text-2xl font-semibold">No categories available</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen relative overflow-hidden">

@@ -3,7 +3,8 @@ export interface Place {
   name: string;
   description: string;
   image: string;
-  category: string;
+  categoryId: number;
+  categoryName?: string;
 }
 
 export interface Category {

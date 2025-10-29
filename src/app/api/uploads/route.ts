@@ -11,6 +11,7 @@ const ALLOWED_MIME_TYPES = new Set([
   'image/png',
   'image/webp',
   'image/gif',
+  'image/jpg',
   'application/pdf',
 ]);
 
@@ -44,8 +45,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'File too large. Max size is 4MB.' }, { status: 400 });
     }
 
-  const uploadsDir = path.join(process.cwd(), 'public', 'uploads', ...folderSegments);
-  await mkdir(uploadsDir, { recursive: true });
+  // Support both 'uploads' and 'images' directories
+  const baseDir = folderSegments.includes('categories') || folderSegments.includes('places') 
+    ? path.join(process.cwd(), 'public', 'images', ...folderSegments)
+    : path.join(process.cwd(), 'public', 'uploads', ...folderSegments);
+  
+  await mkdir(baseDir, { recursive: true });
 
     const extensionByType: Record<string, string> = {
       'image/jpeg': '.jpg',
@@ -58,12 +63,16 @@ export async function POST(request: Request) {
     const inferredExtension = extensionByType[file.type];
     const fileExtension = inferredExtension || path.extname(file.name) || '.bin';
     const uniqueName = `${crypto.randomUUID()}${fileExtension}`;
-  const filePath = path.join(uploadsDir, uniqueName);
+    const filePath = path.join(baseDir, uniqueName);
 
     await writeFile(filePath, buffer);
 
-  const publicPathSegments = ['uploads', ...folderSegments, uniqueName];
-  const publicUrl = `/${publicPathSegments.join('/')}`;
+    // Construct public URL
+    const isImagesDir = folderSegments.includes('categories') || folderSegments.includes('places');
+    const publicPathSegments = isImagesDir 
+      ? ['images', ...folderSegments, uniqueName]
+      : ['uploads', ...folderSegments, uniqueName];
+    const publicUrl = `/${publicPathSegments.join('/')}`;
 
     return NextResponse.json({ success: true, url: publicUrl }, { status: 201 });
   } catch (error) {

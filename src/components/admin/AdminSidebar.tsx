@@ -21,6 +21,8 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/users', label: 'Users', icon: '👥' },
   { href: '/admin/admingallery', label: 'Gallery', icon: '📸' },
   { href: '/admin/reviews', label: 'Reviews', icon: '⭐' },
+  { href: '/admin/categories', label: 'Add Categories', icon: '📂' },
+  { href: '/admin/home_places', label: 'Add Places', icon: '📍' },
 ];
 
 export default function AdminSidebar() {

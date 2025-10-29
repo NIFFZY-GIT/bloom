@@ -1,3 +1,7 @@
+'use client';
+
+import { useRef, useEffect } from 'react';
+import { gsap } from 'gsap';
 import { Category, Place } from '../Types';
 import PlaceCard from './PlaceCard';
 
@@ -7,11 +11,46 @@ interface CategoryDetailsProps {
 }
 
 export default function CategoryDetails({ category, places }: CategoryDetailsProps) {
+  const headerRef = useRef<HTMLDivElement>(null);
+  const badgeRef = useRef<HTMLDivElement>(null);
+  const infoRef = useRef<HTMLDivElement>(null);
+  const placesGridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Animate header on category change
+    if (headerRef.current && badgeRef.current && infoRef.current) {
+      const tl = gsap.timeline();
+      
+      tl.fromTo(
+        badgeRef.current,
+        { scale: 0, rotation: -180, opacity: 0 },
+        { scale: 1, rotation: 0, opacity: 1, duration: 0.6, ease: 'back.out(1.7)' }
+      ).fromTo(
+        infoRef.current,
+        { x: -50, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.5, ease: 'power3.out' },
+        '-=0.3'
+      );
+    }
+  }, [category]);
+
+  useEffect(() => {
+    // Animate places grid when places change
+    if (placesGridRef.current) {
+      const placeCards = placesGridRef.current.children;
+      gsap.fromTo(
+        placeCards,
+        { y: 30, opacity: 0, scale: 0.9 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.5, stagger: 0.1, ease: 'power3.out' }
+      );
+    }
+  }, [places]);
+
   return (
     <section className="category-details">
       <div className="container mx-auto px-4">
-        <div className="category-header">
-          <div className="category-badge">
+        <div className="category-header" ref={headerRef}>
+          <div className="category-badge" ref={badgeRef}>
             <div 
               className="badge-icon"
               style={{ backgroundColor: category.color }}
@@ -22,7 +61,7 @@ export default function CategoryDetails({ category, places }: CategoryDetailsPro
               />
             </div>
           </div>
-          <div className="category-info">
+          <div className="category-info" ref={infoRef}>
             <h2 className="category-title">{category.name}</h2>
             <p className="category-description">{category.description}</p>
           </div>
@@ -31,7 +70,7 @@ export default function CategoryDetails({ category, places }: CategoryDetailsPro
         {places.length > 0 ? (
           <div className="places-section">
             <h3 className="places-title">Featured Destinations</h3>
-            <div className="places-grid">
+            <div className="places-grid" ref={placesGridRef}>
               {places.map((place) => (
                 <PlaceCard key={place.id} place={place} />
               ))}
@@ -122,9 +161,10 @@ export default function CategoryDetails({ category, places }: CategoryDetailsPro
         }
 
         .places-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+          display: flex;
+          flex-wrap: wrap;
           gap: 2rem;
+          justify-content: center;
         }
 
         .no-places {
@@ -172,7 +212,6 @@ export default function CategoryDetails({ category, places }: CategoryDetailsPro
           }
 
           .places-grid {
-            grid-template-columns: 1fr;
             gap: 1.5rem;
           }
 

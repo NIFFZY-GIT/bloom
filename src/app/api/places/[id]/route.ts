@@ -13,7 +13,16 @@ export async function GET(
     }
 
     const result = await query(
-      'SELECT id, name, description, image_path, category, duration, location, highlights, gallery_images FROM places WHERE id = $1',
+      `SELECT 
+         p.id, 
+         p.name, 
+         p.description, 
+         p.image, 
+         p."categoryId",
+         c.name as "categoryName"
+       FROM "Place" p
+       LEFT JOIN "Category" c ON p."categoryId" = c.id
+       WHERE p.id = $1`,
       [id]
     );
 
@@ -21,21 +30,9 @@ export async function GET(
       return NextResponse.json({ message: 'Place not found' }, { status: 404 });
     }
 
-    const place = result.rows[0];
-    
     return NextResponse.json({
       success: true,
-      place: {
-        id: place.id,
-        name: place.name,
-        description: place.description,
-        imagePath: place.image_path,
-        category: place.category,
-        duration: place.duration,
-        location: place.location,
-        highlights: place.highlights || [],
-        galleryImages: place.gallery_images || [],
-      }
+      place: result.rows[0]
     });
   } catch (error) {
     console.error('Failed to fetch place:', error);
@@ -54,19 +51,7 @@ export async function DELETE(
       return NextResponse.json({ message: 'Invalid place ID' }, { status: 400 });
     }
 
-    // Check if place is used in any custom packages
-    const usageCheck = await query(
-      'SELECT COUNT(*) as count FROM custom_package_places WHERE place_id = $1',
-      [id]
-    );
-
-    if (usageCheck.rows[0].count > 0) {
-      return NextResponse.json({ 
-        message: 'Cannot delete place: it is used in one or more custom packages' 
-      }, { status: 400 });
-    }
-
-    const result = await query('DELETE FROM places WHERE id = $1 RETURNING id', [id]);
+    const result = await query('DELETE FROM "Place" WHERE id = $1 RETURNING id', [id]);
 
     if (result.rowCount === 0) {
       return NextResponse.json({ message: 'Place not found' }, { status: 404 });
@@ -91,21 +76,30 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { name, description, imagePath, category, duration, location, highlights, galleryImages } = body;
+    const { name, description, image, categoryId } = body;
 
-    if (!name || !category || !duration) {
+    if (!name || !description || !image || isNaN(parseInt(categoryId, 10))) {
       return NextResponse.json({ 
-        message: 'Name, category, and duration are required' 
+        message: 'All fields are required (name, description, image, categoryId)' 
       }, { status: 400 });
     }
 
+    // Verify category exists
+    const categoryCheck = await query(
+      `SELECT id FROM "Category" WHERE id = $1`,
+      [categoryId]
+    );
+
+    if (categoryCheck.rows.length === 0) {
+      return NextResponse.json({ message: 'Category not found' }, { status: 404 });
+    }
+
     const result = await query(
-      `UPDATE places 
-       SET name = $1, description = $2, image_path = $3, category = $4, 
-           duration = $5, location = $6, highlights = $7, gallery_images = $8
-       WHERE id = $9
+      `UPDATE "Place" 
+       SET name = $1, description = $2, image = $3, "categoryId" = $4
+       WHERE id = $5
        RETURNING id`,
-      [name, description, imagePath, category, duration, location, JSON.stringify(highlights || []), JSON.stringify(galleryImages || []), id]
+      [name, description, image, categoryId, id]
     );
 
     if (result.rowCount === 0) {
@@ -118,3 +112,4 @@ export async function PUT(
     return NextResponse.json({ message: 'Failed to update place' }, { status: 500 });
   }
 }
+
