@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 
+// This API uses the old "Place" table with categoryId FK to "Category"
+// Used by /admin/home_places
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -15,19 +18,15 @@ export async function GET(
 
     const result = await query(
       `SELECT 
-         id,
-         name,
-         description,
-         image_path as "imagePath",
-         category,
-         duration,
-         location,
-         highlights,
-         price,
-         created_at as "createdAt",
-         updated_at as "updatedAt"
-       FROM places
-       WHERE id = $1`,
+         p.id, 
+         p.name, 
+         p.description, 
+         p.image, 
+         p."categoryId",
+         c.name as "categoryName"
+       FROM "Place" p
+       LEFT JOIN "Category" c ON p."categoryId" = c.id
+       WHERE p.id = $1`,
       [id]
     );
 
@@ -40,7 +39,7 @@ export async function GET(
       place: result.rows[0]
     });
   } catch (error) {
-    console.error('Failed to fetch place:', error);
+    console.error('Failed to fetch admin place:', error);
     return NextResponse.json({ message: 'Failed to fetch place' }, { status: 500 });
   }
 }
@@ -57,7 +56,7 @@ export async function DELETE(
       return NextResponse.json({ message: 'Invalid place ID' }, { status: 400 });
     }
 
-    const result = await query('DELETE FROM places WHERE id = $1 RETURNING id', [id]);
+    const result = await query('DELETE FROM "Place" WHERE id = $1 RETURNING id', [id]);
 
     if (result.rowCount === 0) {
       return NextResponse.json({ message: 'Place not found' }, { status: 404 });
@@ -65,7 +64,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, message: 'Place deleted successfully' });
   } catch (error) {
-    console.error('Failed to delete place:', error);
+    console.error('Failed to delete admin place:', error);
     return NextResponse.json({ message: 'Failed to delete place' }, { status: 500 });
   }
 }
@@ -83,42 +82,39 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { name, description, imagePath, category, duration, location, highlights, price } = body;
+    const { name, description, image, categoryId } = body;
 
-    if (!name) {
+    if (!name || !description || !image || isNaN(parseInt(categoryId, 10))) {
       return NextResponse.json({ 
-        message: 'Name is required' 
+        message: 'All fields are required (name, description, image, categoryId)' 
       }, { status: 400 });
     }
 
+    // Verify category exists
+    const categoryCheck = await query(
+      `SELECT id FROM "Category" WHERE id = $1`,
+      [categoryId]
+    );
+
+    if (categoryCheck.rows.length === 0) {
+      return NextResponse.json({ message: 'Category not found' }, { status: 404 });
+    }
+
     const result = await query(
-      `UPDATE places 
-       SET name = $1, 
-           description = $2, 
-           image_path = $3, 
-           category = $4,
-           duration = $5,
-           location = $6,
-           highlights = $7::jsonb,
-           price = $8,
-           updated_at = CURRENT_TIMESTAMP
-       WHERE id = $9
-       RETURNING id, name, description, image_path as "imagePath", category, duration, location, highlights, price`,
-      [name, description, imagePath, category, duration, location, JSON.stringify(highlights || []), price || 0, id]
+      `UPDATE "Place" 
+       SET name = $1, description = $2, image = $3, "categoryId" = $4
+       WHERE id = $5
+       RETURNING id`,
+      [name, description, image, categoryId, id]
     );
 
     if (result.rowCount === 0) {
       return NextResponse.json({ message: 'Place not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Place updated successfully',
-      place: result.rows[0]
-    });
+    return NextResponse.json({ success: true, message: 'Place updated successfully' });
   } catch (error) {
-    console.error('Failed to update place:', error);
+    console.error('Failed to update admin place:', error);
     return NextResponse.json({ message: 'Failed to update place' }, { status: 500 });
   }
 }
-

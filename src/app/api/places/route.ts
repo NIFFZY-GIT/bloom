@@ -5,16 +5,23 @@ export async function GET() {
   try {
     const result = await query(
       `SELECT
-         p.id,
-         p.name,
-         p.description,
-         p.image,
-         p."categoryId",
-         c.name as "categoryName"
-       FROM "Place" p
-       LEFT JOIN "Category" c ON p."categoryId" = c.id
-       ORDER BY p.id ASC`
+         id,
+         name,
+         description,
+         image_path as "imagePath",
+         category,
+         duration,
+         location,
+         highlights,
+         price,
+         created_at as "createdAt",
+         updated_at as "updatedAt"
+       FROM places
+       ORDER BY id ASC`
     );
+
+    console.log('[API] Places fetched:', result.rows.length);
+    console.log('[API] Place data:', result.rows.map(p => ({ name: p.name, imagePath: p.imagePath, category: p.category })));
 
     return NextResponse.json({ success: true, places: result.rows }, { status: 200 });
   } catch (error) {
@@ -24,7 +31,16 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  let body: { name?: string; description?: string; image?: string; categoryId?: string | number };
+  let body: { 
+    name?: string; 
+    description?: string; 
+    imagePath?: string;
+    category?: string;
+    duration?: string;
+    location?: string;
+    highlights?: string[];
+    price?: number;
+  };
   try {
     body = await request.json();
   } catch {
@@ -33,32 +49,28 @@ export async function POST(request: Request) {
 
   const name = body?.name?.trim();
   const description = body?.description?.trim();
-  const image = body?.image?.trim();
-  const categoryId = parseInt(String(body?.categoryId || ''), 10);
+  const imagePath = body?.imagePath?.trim() || null;
+  const category = body?.category?.trim() || null;
+  const duration = body?.duration?.trim() || null;
+  const location = body?.location?.trim() || null;
+  const highlights = Array.isArray(body?.highlights) ? body.highlights : [];
+  const price = typeof body?.price === 'number' ? body.price : 0;
 
-  if (!name || !description || !image || isNaN(categoryId)) {
-    return NextResponse.json({ message: 'All fields are required (name, description, image, categoryId)' }, { status: 400 });
+  if (!name) {
+    return NextResponse.json({ message: 'Name is required' }, { status: 400 });
   }
 
   try {
-    // Verify category exists
-    const categoryCheck = await query(
-      `SELECT id FROM "Category" WHERE id = $1`,
-      [categoryId]
-    );
-
-    if (categoryCheck.rows.length === 0) {
-      return NextResponse.json({ message: 'Category not found' }, { status: 404 });
-    }
-
     const result = await query(
-      `INSERT INTO "Place" (name, description, image, "categoryId")
-       VALUES ($1, $2, $3, $4)
-       RETURNING id, name, description, image, "categoryId"`,
-      [name, description, image, categoryId]
+      `INSERT INTO places (name, description, image_path, category, duration, location, highlights, price)
+       VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8)
+       RETURNING id, name, description, image_path as "imagePath", category, duration, location, highlights, price`,
+      [name, description, imagePath, category, duration, location, JSON.stringify(highlights), price]
     );
 
     const newPlace = result.rows[0];
+
+    console.log('[API] Place created:', newPlace);
 
     return NextResponse.json({ 
       success: true, 

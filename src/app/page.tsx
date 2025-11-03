@@ -41,7 +41,7 @@ export default function Home() {
   useEffect(() => {
     const fetchPlaces = async () => {
       try {
-        const response = await fetch('/api/places');
+        const response = await fetch('/api/admin-places');
         const data = await response.json();
         
         if (data.success) {

@@ -489,11 +489,13 @@ const CreatePackagePage: React.FC = () => {
                             <span>{place.location}</span>
                           </div>
                           
-                          <div className="place-highlights">
-                            {place.highlights.map((highlight, idx) => (
-                              <span key={idx} className="highlight-tag">#{highlight}</span>
-                            ))}
-                          </div>
+                          {place.highlights && place.highlights.length > 0 && (
+                            <div className="place-highlights">
+                              {place.highlights.map((highlight, idx) => (
+                                <span key={idx} className="highlight-tag">#{highlight}</span>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}

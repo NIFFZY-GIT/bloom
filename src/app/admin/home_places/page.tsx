@@ -30,7 +30,7 @@ export default function PlacesPage() {
   const fetchData = async () => {
     try {
       const [placesRes, categoriesRes] = await Promise.all([
-        fetch('/api/places'),
+        fetch('/api/admin-places'),
         fetch('/api/categories')
       ]);
 
@@ -59,8 +59,8 @@ export default function PlacesPage() {
 
     try {
       const url = editingPlace 
-        ? `/api/places/${editingPlace.id}`
-        : '/api/places';
+        ? `/api/admin-places/${editingPlace.id}`
+        : '/api/admin-places';
       
       const method = editingPlace ? 'PUT' : 'POST';
 
@@ -96,7 +96,7 @@ export default function PlacesPage() {
     }
 
     try {
-      const response = await fetch(`/api/places/${id}`, {
+      const response = await fetch(`/api/admin-places/${id}`, {
         method: 'DELETE'
       });
 
