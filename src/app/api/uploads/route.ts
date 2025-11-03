@@ -20,11 +20,19 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get('file');
 
-    if (!(file instanceof File)) {
+    // Check if file exists and is a Blob/File-like object
+    if (!file || typeof file === 'string') {
       return NextResponse.json({ message: 'No file uploaded' }, { status: 400 });
     }
 
-    if (!ALLOWED_MIME_TYPES.has(file.type)) {
+    // Type guard for file-like objects in Node.js environment
+    const fileObj = file as Blob & { name?: string; type: string };
+    
+    if (!fileObj.arrayBuffer || !fileObj.type) {
+      return NextResponse.json({ message: 'Invalid file object' }, { status: 400 });
+    }
+
+    if (!ALLOWED_MIME_TYPES.has(fileObj.type)) {
       return NextResponse.json({ message: 'Unsupported file type' }, { status: 400 });
     }
 
@@ -38,11 +46,11 @@ export async function POST(request: Request) {
       }
     }
 
-    const bytes = await file.arrayBuffer();
+    const bytes = await fileObj.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
     if (buffer.length > MAX_BYTES) {
-      return NextResponse.json({ message: 'File too large. Max size is 4MB.' }, { status: 400 });
+      return NextResponse.json({ message: 'File too large. Max size is 10MB.' }, { status: 400 });
     }
 
   // Support both 'uploads' and 'images' directories
@@ -60,8 +68,9 @@ export async function POST(request: Request) {
       'application/pdf': '.pdf',
     };
 
-    const inferredExtension = extensionByType[file.type];
-    const fileExtension = inferredExtension || path.extname(file.name) || '.bin';
+    const inferredExtension = extensionByType[fileObj.type];
+    const fileName = fileObj.name || 'unnamed';
+    const fileExtension = inferredExtension || path.extname(fileName) || '.bin';
     const uniqueName = `${crypto.randomUUID()}${fileExtension}`;
     const filePath = path.join(baseDir, uniqueName);
 
