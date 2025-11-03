@@ -342,10 +342,10 @@ export default function CategoriesPage() {
                   value={formData.image}
                   onChange={handleInputChange}
                   required
-                  placeholder="/images/categories/beaches.png"
+                  placeholder="/uploads/categories/example.png"
                   className={styles.pathInput}
                 />
-                <small>Upload an image or enter path manually</small>
+                <small>Upload an image or enter path manually (files saved to /uploads/)</small>
               </div>
 
               <div className={styles.formRow}>

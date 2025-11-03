@@ -373,10 +373,10 @@ export default function PlacesPage() {
                   value={formData.image}
                   onChange={handleInputChange}
                   required
-                  placeholder="/images/places/mirissa.png"
+                  placeholder="/uploads/places/example.png"
                   className={styles.pathInput}
                 />
-                <small>Upload an image or enter path manually</small>
+                <small>Upload an image or enter path manually (files saved to /uploads/)</small>
               </div>
 
               <div className={styles.formGroup}>
