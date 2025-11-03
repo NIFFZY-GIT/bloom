@@ -12,7 +12,6 @@ export default function Home() {
   const [places, setPlaces] = useState<Place[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [filteredPlaces, setFilteredPlaces] = useState<Place[]>([]);
-  const [bgColor, setBgColor] = useState<string>('linear-gradient(135deg, #1e40af, #3b82f6)');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,7 +66,6 @@ export default function Home() {
         (place) => Number(place.categoryId) === Number(selectedCategory.id)
       );
       setFilteredPlaces(categoryPlaces);
-      setBgColor(selectedCategory.bgColor);
       
       // Debug logging
       console.log('Selected Category:', selectedCategory);

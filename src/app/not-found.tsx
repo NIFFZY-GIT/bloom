@@ -8,8 +8,8 @@ export default function NotFound() {
         <div className={styles.errorCode}>404</div>
         <h1 className={styles.title}>Page Not Found</h1>
         <p className={styles.description}>
-          Oops! It looks like you've wandered off the beaten path. 
-          The page you're looking for doesn't exist or may have been moved.
+          Oops! It looks like you&apos;ve wandered off the beaten path. 
+          The page you&apos;re looking for doesn&apos;t exist or may have been moved.
         </p>
         
         <div className={styles.illustration}>

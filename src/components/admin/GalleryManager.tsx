@@ -338,7 +338,7 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
       router.refresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to delete gallery item';
-      // eslint-disable-next-line no-alert
+       
       window.alert(message);
     } finally {
       setDeletingId(null);

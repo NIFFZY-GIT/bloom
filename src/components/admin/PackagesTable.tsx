@@ -40,7 +40,7 @@ export default function PackagesTable({ packages }: PackagesTableProps) {
       router.refresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to delete package';
-      // eslint-disable-next-line no-alert
+       
       window.alert(message);
     } finally {
       setDeletingId(null);

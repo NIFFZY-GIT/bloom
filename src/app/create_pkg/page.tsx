@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { isAuthenticated } from '@/lib/auth-client';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
@@ -17,30 +18,6 @@ interface Place {
   price: number;
   location: string;
   highlights: string[];
-}
-
-interface CustomPackage {
-  id: string;
-  name: string;
-  description: string;
-  places: Place[];
-  totalDuration: string;
-  totalPrice: number;
-  preferences: {
-    pace: string;
-    transport: string;
-    guide: boolean;
-    meals: boolean;
-    photography: boolean;
-  };
-  contactInfo: {
-    name: string;
-    email: string;
-    phone: string;
-    date: string;
-    guests: number;
-    specialRequests: string;
-  };
 }
 
 const CreatePackagePage: React.FC = () => {
@@ -190,10 +167,6 @@ const CreatePackagePage: React.FC = () => {
     return Number.isInteger(totalHours) ? `${totalHours} hours` : `${totalHours.toFixed(1)} hours`;
   };
 
-  const calculateTotalPrice = () => {
-    return selectedPlaces.reduce((total, place) => total + place.price, 0);
-  };
-
   const handleNextStep = async () => {
     if (currentStep < 3) {
       setSubmitError(null);
@@ -327,13 +300,14 @@ const CreatePackagePage: React.FC = () => {
       { threshold: 0.1 }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
+    const element = sectionRef.current;
+    if (element) {
+      observer.observe(element);
     }
 
     return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
+      if (element) {
+        observer.unobserve(element);
       }
     };
   }, []);
@@ -375,7 +349,7 @@ const CreatePackagePage: React.FC = () => {
           <div className="auth-notice-content">
             <i className="fas fa-info-circle"></i>
             <span>
-              <strong>Browsing Mode:</strong> You can explore places, but you'll need to{' '}
+              <strong>Browsing Mode:</strong> You can explore places, but you&apos;ll need to{' '}
               <a href="/login?redirect=/create_pkg" className="login-link">log in</a> or{' '}
               <a href="/sign-up?redirect=/create_pkg" className="login-link">sign up</a> to customize and submit your package.
             </span>
@@ -492,7 +466,7 @@ const CreatePackagePage: React.FC = () => {
                         style={{ animationDelay: `${index * 0.1}s` }}
                       >
                         <div className="place-image">
-                          <img src={place.imagePath} alt={place.name} />
+                          <Image src={place.imagePath} alt={place.name} width={300} height={200} style={{ objectFit: 'cover' }} />
                           <button 
                             className="add-place-btn"
                             onClick={() => handleAddPlace(place)}
@@ -741,7 +715,7 @@ const CreatePackagePage: React.FC = () => {
                       rows={4}
                     />
                     <small style={{ display: 'block', marginTop: '8px', color: '#6b7280', fontSize: '0.875rem' }}>
-                      💡 Tip: Mention the count for each requirement (e.g., "2 vegetarian, 1 has shellfish allergy")
+                      💡 Tip: Mention the count for each requirement (e.g., &quot;2 vegetarian, 1 has shellfish allergy&quot;)
                     </small>
                   </div>
 
@@ -776,7 +750,7 @@ const CreatePackagePage: React.FC = () => {
           <section className="submit-section">
             <div className="section-header">
               <h2 style={{ fontSize: '2.5rem', fontWeight: '800', color: '#1f2937', marginBottom: '0.5rem' }}>
-                🎉 You're Almost There!
+                🎉 You&apos;re Almost There!
               </h2>
               <p style={{ fontSize: '1.15rem', color: '#6b7280', fontWeight: '500' }}>
                 Review your dream tour and submit your request
@@ -911,7 +885,7 @@ const CreatePackagePage: React.FC = () => {
                   </div>
                   <h3>Ready to Submit?</h3>
                   <p className="submit-description">
-                    We'll review your custom tour request and prepare a detailed quotation tailored to your preferences.
+                    We&apos;ll review your custom tour request and prepare a detailed quotation tailored to your preferences.
                   </p>
 
                   <div className="guarantee-badge">
@@ -920,7 +894,7 @@ const CreatePackagePage: React.FC = () => {
                     </div>
                     <div className="badge-content">
                       <strong>24-Hour Response Guarantee</strong>
-                      <p>You'll receive a personalized quotation via email within 24 hours of submission</p>
+                      <p>You&apos;ll receive a personalized quotation via email within 24 hours of submission</p>
                     </div>
                   </div>
 
@@ -929,7 +903,7 @@ const CreatePackagePage: React.FC = () => {
                     <ul className="next-steps-list">
                       <li>
                         <i className="fas fa-check-circle"></i>
-                        <span>We'll review your itinerary and preferences</span>
+                        <span>We&apos;ll review your itinerary and preferences</span>
                       </li>
                       <li>
                         <i className="fas fa-check-circle"></i>
@@ -937,11 +911,11 @@ const CreatePackagePage: React.FC = () => {
                       </li>
                       <li>
                         <i className="fas fa-check-circle"></i>
-                        <span>You'll receive pricing and availability via email and in My Trips</span>
+                        <span>You&apos;ll receive pricing and availability via email and in My Trips</span>
                       </li>
                       <li>
                         <i className="fas fa-check-circle"></i>
-                        <span>Confirm your booking and we'll finalize the details</span>
+                        <span>Confirm your booking and we&apos;ll finalize the details</span>
                       </li>
                     </ul>
                   </div>

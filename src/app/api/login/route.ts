@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     console.log('[Login API] Cookie set successfully');
 
     return response;
-  } catch (err: any) {
+  } catch (err) {
     console.error(err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }

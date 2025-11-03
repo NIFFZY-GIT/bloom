@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import styles from './Maintenance.module.css';
 
 export default function Maintenance() {
@@ -6,10 +5,10 @@ export default function Maintenance() {
     <div className={styles.container}>
       <div className={styles.content}>
         <div className={styles.icon}>🔧</div>
-        <h1 className={styles.title}>We'll Be Right Back!</h1>
+        <h1 className={styles.title}>We&apos;ll Be Right Back!</h1>
         <p className={styles.description}>
           Bloom Travel is currently undergoing scheduled maintenance to improve 
-          your experience. We'll be back online shortly.
+          your experience. We&apos;ll be back online shortly.
         </p>
         
         <div className={styles.illustration}>
@@ -19,7 +18,7 @@ export default function Maintenance() {
         </div>
 
         <div className={styles.statusBox}>
-          <h3>What's happening?</h3>
+          <h3>What&apos;s happening?</h3>
           <p>
             Our team is working hard to enhance our services and add new features. 
             This maintenance is scheduled and should be completed soon.

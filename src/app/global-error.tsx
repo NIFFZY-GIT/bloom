@@ -18,7 +18,7 @@ export default function GlobalError({
             <div className={styles.errorIcon}>🚨</div>
             <h1 className={styles.title}>Critical Error</h1>
             <p className={styles.description}>
-              We've encountered a critical system error. Our technical team has been 
+              We&apos;ve encountered a critical system error. Our technical team has been 
               automatically notified and is working to resolve this issue as quickly as possible.
             </p>
 
@@ -46,7 +46,7 @@ export default function GlobalError({
             <div className={styles.helpBox}>
               <h3>What can you do?</h3>
               <ul>
-                <li>Try refreshing the page or clicking "Reload Application"</li>
+                <li>Try refreshing the page or clicking &quot;Reload Application&quot;</li>
                 <li>Clear your browser cache and cookies</li>
                 <li>Try again in a few minutes</li>
                 <li>Contact our support team if the issue persists</li>

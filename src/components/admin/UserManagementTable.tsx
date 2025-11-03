@@ -42,7 +42,7 @@ export default function UserManagementTable({ users, currentUserId, adminCount }
       router.refresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to update role';
-      // eslint-disable-next-line no-alert
+       
       window.alert(message);
     } finally {
       setUpdatingId(null);
@@ -69,7 +69,7 @@ export default function UserManagementTable({ users, currentUserId, adminCount }
       router.refresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to delete user';
-      // eslint-disable-next-line no-alert
+       
       window.alert(message);
     } finally {
       setDeletingId(null);

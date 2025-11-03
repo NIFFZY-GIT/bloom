@@ -3,9 +3,10 @@ import { query } from '@/lib/db';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = parseInt(params.id, 10);
+  const { id: paramId } = await params;
+  const id = parseInt(paramId, 10);
 
   if (isNaN(id)) {
     return NextResponse.json({ message: 'Invalid category ID' }, { status: 400 });
@@ -32,18 +33,19 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = parseInt(params.id, 10);
+  const { id: paramId } = await params;
+  const id = parseInt(paramId, 10);
 
   if (isNaN(id)) {
     return NextResponse.json({ message: 'Invalid category ID' }, { status: 400 });
   }
 
-  let body: any;
+  let body: { name?: string; image?: string; color?: string; bgColor?: string; description?: string; animation?: string };
   try {
     body = await request.json();
-  } catch (error) {
+  } catch {
     return NextResponse.json({ message: 'Invalid JSON payload' }, { status: 400 });
   }
 
@@ -84,9 +86,10 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = parseInt(params.id, 10);
+  const { id: paramId } = await params;
+  const id = parseInt(paramId, 10);
 
   if (isNaN(id)) {
     return NextResponse.json({ message: 'Invalid category ID' }, { status: 400 });

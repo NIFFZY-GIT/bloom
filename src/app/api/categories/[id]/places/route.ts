@@ -4,9 +4,10 @@ import { query } from '@/lib/db';
 // Get all places for a specific category
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const categoryId = parseInt(params.id, 10);
+  const { id } = await params;
+  const categoryId = parseInt(id, 10);
 
   if (isNaN(categoryId)) {
     return NextResponse.json({ message: 'Invalid category ID' }, { status: 400 });

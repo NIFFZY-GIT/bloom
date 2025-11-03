@@ -60,9 +60,9 @@ export default function AddPackageForm({ isOpen, onClose, onPackageAdded }: AddP
 
       onPackageAdded();
       onClose();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally{
       setIsSubmitting(false);
     }
   };

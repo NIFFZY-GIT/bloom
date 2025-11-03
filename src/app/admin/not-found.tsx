@@ -8,7 +8,7 @@ export default function AdminNotFound() {
         <div className={styles.errorCode}>404</div>
         <h1 className={styles.title}>Admin Page Not Found</h1>
         <p className={styles.description}>
-          The admin page you're looking for doesn't exist or you may not have 
+          The admin page you&apos;re looking for doesn&apos;t exist or you may not have 
           the required permissions to access it.
         </p>
         

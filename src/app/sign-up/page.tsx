@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 const backgroundImages = ['/images/signup-bg-1.jpg'];
 
 export default function SignupPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide] = useState(0);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -64,8 +63,8 @@ export default function SignupPage() {
       
       // Redirect to login page
       window.location.href = loginUrl;
-    } catch (err: any) {
-      setError(err.message || 'Signup failed');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Signup failed');
     } finally {
       setIsSubmitting(false);
     }

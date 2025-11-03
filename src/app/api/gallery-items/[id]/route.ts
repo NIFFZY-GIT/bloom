@@ -4,9 +4,9 @@ import { revalidatePath } from 'next/cache';
 import { query } from '@/lib/db';
 
 type RouteParams = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 const COLUMNS = 'id, category, image_path, title, description';
@@ -28,7 +28,8 @@ const parseId = (idValue: string) => {
 
 export async function PUT(request: Request, { params }: RouteParams) {
   try {
-    const id = parseId(params.id);
+    const { id: paramId } = await params;
+    const id = parseId(paramId);
     const body = await request.json();
 
     const category = normalizeText(body?.category);
@@ -71,7 +72,8 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
 export async function DELETE(request: Request, { params }: RouteParams) {
   try {
-    const id = parseId(params.id);
+    const { id: paramId } = await params;
+    const id = parseId(paramId);
     const result = await query('DELETE FROM gallery_items WHERE id = $1 RETURNING id', [id]);
     if (result.rowCount === 0) {
       return NextResponse.json({ message: 'Gallery item not found' }, { status: 404 });

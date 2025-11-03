@@ -11,6 +11,7 @@ import {
 } from 'react';
 import type { ChangeEvent, FormEvent, MouseEvent as ReactMouseEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 import styles from '@/app/admin/admingallery/AdminGallery.module.css';
 
@@ -292,7 +293,7 @@ const ReviewsManager = forwardRef<ReviewsManagerHandle, ReviewsManagerProps>(fun
       router.refresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to delete review';
-      // eslint-disable-next-line no-alert
+       
       window.alert(message);
     } finally {
       setDeletingId(null);
@@ -394,10 +395,13 @@ const ReviewsManager = forwardRef<ReviewsManagerHandle, ReviewsManagerProps>(fun
                     <td className={styles.tableCell}>
                       <div className={styles.clientCell}>
                         {review.avatar ? (
-                          <img
+                          <Image
                             src={review.avatar}
                             alt={review.name ? `${review.name} avatar` : 'Client avatar'}
                             className={styles.clientAvatar}
+                            width={50}
+                            height={50}
+                            style={{ objectFit: 'cover', borderRadius: '50%' }}
                           />
                         ) : (
                           <div className={`${styles.clientAvatar} ${styles.clientAvatarFallback}`}>

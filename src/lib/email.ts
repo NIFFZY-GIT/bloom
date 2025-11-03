@@ -2499,7 +2499,7 @@ View in Admin Panel: ${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:300
   });
 }
 
-export default {
+const emailService = {
   sendEmail,
   sendPasswordResetCode,
   sendPasswordChangedConfirmation,
@@ -2513,3 +2513,5 @@ export default {
   sendSimpleBookingAcknowledgment,
   notifyAdminNewPendingBooking,
 };
+
+export default emailService;

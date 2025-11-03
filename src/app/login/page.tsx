@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 const backgroundImages = [
   '/images/hero-bg-1.jpg',
@@ -10,7 +10,6 @@ const backgroundImages = [
 ];
 
 export default function LoginPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [formData, setFormData] = useState({
@@ -85,8 +84,8 @@ export default function LoginPage() {
       
       // Use window.location.href for full page reload to ensure cookies are sent
       window.location.href = destination;
-    } catch (err: any) {
-      setError(err.message || 'Login failed');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setIsSubmitting(false);
     }
@@ -141,7 +140,7 @@ export default function LoginPage() {
       } else {
         setResetError(data.message || 'Failed to send code');
       }
-    } catch (err) {
+    } catch {
       setResetError('Failed to send reset code. Please try again.');
     } finally {
       setIsResetting(false);
@@ -189,7 +188,7 @@ export default function LoginPage() {
       } else {
         setResetError(data.message || 'Failed to reset password');
       }
-    } catch (err) {
+    } catch {
       setResetError('Failed to reset password. Please try again.');
     } finally {
       setIsResetting(false);
@@ -346,7 +345,7 @@ export default function LoginPage() {
 
           {/* Signup Link */}
           <div className="modern-signup-section">
-            <p>Don't have an account? <a href={`/sign-up${searchParams.get('redirect') ? `?redirect=${searchParams.get('redirect')}` : ''}`} className="modern-signup-link">Sign Up</a></p>
+            <p>Don&apos;t have an account? <a href={`/sign-up${searchParams.get('redirect') ? `?redirect=${searchParams.get('redirect')}` : ''}`} className="modern-signup-link">Sign Up</a></p>
           </div>
         </div>
       </div>

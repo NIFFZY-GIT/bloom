@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { isAuthenticated } from '@/lib/auth-client';
 
 import 'react-phone-number-input/style.css';
@@ -38,7 +39,7 @@ interface PackagesClientProps {
 const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/400x250?text=Tour+Image';
 
 const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
-  const [tourPackages, setTourPackages] = useState<TourPackage[]>(initialTourPackages);
+  const [tourPackages] = useState<TourPackage[]>(initialTourPackages);
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [selectedPackage, setSelectedPackage] = useState<TourPackage | null>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -321,9 +322,10 @@ const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
       if (entry.isIntersecting) setIsVisible(true);
     }, { threshold: 0.1 });
 
-    if (sectionRef.current) observer.observe(sectionRef.current);
+    const element = sectionRef.current;
+    if (element) observer.observe(element);
     return () => {
-      if (sectionRef.current) observer.unobserve(sectionRef.current);
+      if (element) observer.unobserve(element);
     };
   }, []);
 
@@ -587,12 +589,15 @@ const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
                     <div className="package-image">
                       <div className="package-slider">
                         {packageImages.map((imageSrc, imageIndex) => (
-                          <img
+                          <Image
                             key={`${pkg.id}-image-${imageIndex}`}
                             src={imageSrc}
                             alt={`${pkg.title} image ${imageIndex + 1}`}
                             className={`package-slider-image ${imageIndex === activeIndex ? 'active' : ''}`}
-                            loading={imageIndex === 0 ? 'eager' : 'lazy'}
+                            width={400}
+                            height={300}
+                            style={{ objectFit: 'cover' }}
+                            priority={imageIndex === 0}
                           />
                         ))}
                       </div>
@@ -687,13 +692,13 @@ const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
         <section className="features-section">
             <div className="section-header">
                 <h2>Why Choose Our Tours?</h2>
-                <p>We provide exceptional experiences that you'll remember forever</p>
+                <p>We provide exceptional experiences that you&apos;ll remember forever</p>
             </div>
             <div className="features-grid">
                 <div className="feature-card">
                     <div className="feature-icon"><i className="fas fa-map-marked-alt"></i></div>
                     <h3>Expert Guides</h3>
-                    <p>Our local guides are passionate about Brooklyn and will share hidden gems you won't find in guidebooks.</p>
+                    <p>Our local guides are passionate about Brooklyn and will share hidden gems you won&apos;t find in guidebooks.</p>
                 </div>
                 <div className="feature-card">
                     <div className="feature-icon"><i className="fas fa-users"></i></div>
@@ -864,13 +869,13 @@ const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
                       rows={5}
                     ></textarea>
                     <small style={{ display: 'block', marginTop: '0.5rem', color: '#6b7280', fontSize: '0.875rem' }}>
-                      💡 Tip: Mention the count for each requirement (e.g., "2 vegetarian, 1 has shellfish allergy")
+                      💡 Tip: Mention the count for each requirement (e.g., &quot;2 vegetarian, 1 has shellfish allergy&quot;)
                     </small>
                   </div>
                   
                   <div className="form-group">
                     <label htmlFor="message">Additional Notes</label>
-                    <textarea id="message" name="message" value={bookingForm.message} onChange={handleBookingChange} placeholder="Any other information you'd like to share..." rows={3}></textarea>
+                    <textarea id="message" name="message" value={bookingForm.message} onChange={handleBookingChange} placeholder="Any other information you&apos;d like to share..." rows={3}></textarea>
                   </div>
                 </div>
 

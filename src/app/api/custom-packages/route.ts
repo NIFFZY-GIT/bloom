@@ -43,13 +43,6 @@ const normalizeOptionalString = (value: unknown) => {
   return trimmed.length > 0 ? trimmed : null;
 };
 
-const coerceBoolean = (value: unknown, fallback: boolean) => {
-  if (typeof value === 'boolean') {
-    return value;
-  }
-  return fallback;
-};
-
 const coerceNumber = (value: unknown, fallback: number) => {
   if (typeof value === 'number') {
     return Number.isFinite(value) ? value : fallback;
@@ -62,10 +55,10 @@ const coerceNumber = (value: unknown, fallback: number) => {
 };
 
 export async function POST(request: Request) {
-  let body: any;
+  let body: Record<string, unknown>;
   try {
     body = await request.json();
-  } catch (error) {
+  } catch {
     return NextResponse.json({ message: 'Invalid JSON payload' }, { status: 400 });
   }
 
@@ -81,7 +74,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Select at least one place for your tour' }, { status: 400 });
   }
 
-  const places: PlacePayload[] = placesInput.map((place: any, index: number) => {
+  const places: PlacePayload[] = placesInput.map((place: Record<string, unknown>, index: number) => {
     const highlightsArray = Array.isArray(place?.highlights)
       ? place.highlights.filter((item: unknown) => typeof item === 'string' && item.trim().length > 0)
       : [];
@@ -105,11 +98,11 @@ export async function POST(request: Request) {
     };
   });
 
-  const totals = body?.totals ?? {};
+  const totals = (body?.totals ?? {}) as Record<string, unknown>;
   const totalDurationMinutes = coerceNumber(totals?.durationMinutes, 0);
   const totalDurationLabel = normalizeOptionalString(totals?.durationLabel) || '0 hours';
 
-  const contact = body?.contact ?? {};
+  const contact = (body?.contact ?? {}) as Record<string, unknown>;
   const contactEmail = normalizeString(contact?.email);
   const contactPhone = normalizeOptionalString(contact?.phone);
   const startDate = normalizeOptionalString(contact?.startDate);

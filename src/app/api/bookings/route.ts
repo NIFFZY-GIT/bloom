@@ -128,7 +128,7 @@ export async function GET(request: Request) {
     const userId = searchParams.get('userId');
 
     let selectQuery: string;
-    let values: any[] = [];
+    let values: (string | number)[] = [];
 
     if (userId) {
       // Get bookings for a specific user (if you track user_id in bookings table)

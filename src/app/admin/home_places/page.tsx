@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Category, Place } from '@/Types';
 import styles from './Places.module.css';
 
@@ -351,7 +352,7 @@ export default function PlacesPage() {
                   </label>
                   {imagePreview && (
                     <div className={styles.imagePreview}>
-                      <img src={imagePreview} alt="Preview" />
+                      <Image src={imagePreview} alt="Preview" width={200} height={200} style={{ objectFit: 'cover' }} />
                       <button 
                         type="button" 
                         className={styles.removeImage}

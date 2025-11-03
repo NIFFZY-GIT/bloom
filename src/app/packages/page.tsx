@@ -54,11 +54,11 @@ async function getTourPackages(): Promise<TourPackage[]> {
 
   return res.rows.map((pkg): TourPackage => {
     const galleryRaw = Array.isArray(pkg.gallery_images) ? pkg.gallery_images : [];
-    const gallery: GalleryImage[] = galleryRaw.map((img: any) => ({
-      id: img.id,
-      image_path: img.image_path,
-      alt_text: img.alt_text ?? null,
-      sort_order: img.sort_order ?? 0,
+    const gallery: GalleryImage[] = galleryRaw.map((img: Record<string, unknown>) => ({
+      id: typeof img.id === 'number' ? img.id : 0,
+      image_path: typeof img.image_path === 'string' ? img.image_path : '',
+      alt_text: typeof img.alt_text === 'string' ? img.alt_text : null,
+      sort_order: typeof img.sort_order === 'number' ? img.sort_order : 0,
     }));
 
     const numericPrice = typeof pkg.price === 'number' ? pkg.price : Number.parseFloat(pkg.price);

@@ -24,17 +24,17 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  let body: any;
+  let body: { name?: string; description?: string; image?: string; categoryId?: string | number };
   try {
     body = await request.json();
-  } catch (error) {
+  } catch {
     return NextResponse.json({ message: 'Invalid JSON payload' }, { status: 400 });
   }
 
   const name = body?.name?.trim();
   const description = body?.description?.trim();
   const image = body?.image?.trim();
-  const categoryId = parseInt(body?.categoryId, 10);
+  const categoryId = parseInt(String(body?.categoryId || ''), 10);
 
   if (!name || !description || !image || isNaN(categoryId)) {
     return NextResponse.json({ message: 'All fields are required (name, description, image, categoryId)' }, { status: 400 });

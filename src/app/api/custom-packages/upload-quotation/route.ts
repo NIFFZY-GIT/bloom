@@ -19,7 +19,7 @@ async function requireAdmin() {
     const secret = process.env.JWT_SECRET || 'dev-secret';
     const payload = jwt.verify(token, secret) as { role?: string };
     return payload.role === 'ADMIN';
-  } catch (error) {
+  } catch {
     return false;
   }
 }

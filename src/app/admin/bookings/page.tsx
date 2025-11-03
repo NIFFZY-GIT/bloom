@@ -2,6 +2,7 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import jwt from 'jsonwebtoken';
+import Image from 'next/image';
 
 import { query } from '@/lib/db';
 import { notifyUserBookingStatusChange, notifyUserPaymentStatusChange, notifyAdminNewBooking, sendBookingConfirmationToUser } from '@/lib/email';
@@ -286,6 +287,7 @@ function formatDateTime(value: Date | null) {
   });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function formatDateRange(start: Date | null, end: Date | null) {
   if (!start || Number.isNaN(start.valueOf())) {
     return '—';
@@ -324,6 +326,8 @@ function detectReceiptType(url: string): ReceiptPreviewKind {
   return 'other';
 }
 
+// Unused component - keeping for future use  
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function ReceiptPreview({ url, uploadedAt }: { url: string; uploadedAt: Date | null }) {
   const type = detectReceiptType(url);
   const uploadedLabel = uploadedAt ? formatDateTime(uploadedAt) : null;
@@ -334,11 +338,13 @@ function ReceiptPreview({ url, uploadedAt }: { url: string; uploadedAt: Date | n
         <summary className={styles.receiptSummary}>Review uploaded receipt</summary>
         <div className={styles.receiptPreview}>
           {type === 'image' ? (
-            <img
+            <Image
               src={url}
               alt="Uploaded payment receipt"
               className={styles.receiptImage}
-              loading="lazy"
+              width={800}
+              height={600}
+              style={{ objectFit: 'contain' }}
             />
           ) : type === 'pdf' ? (
             <iframe
@@ -695,29 +701,23 @@ async function deleteAllBookings() {
   revalidatePath('/admin/bookings');
 }
 
-function getStatusClassName(status: BookingStatus) {
-  switch (status) {
-    case 'CONFIRMED':
-      return styles.statusConfirmed;
-    case 'CANCELLED':
-      return styles.statusCancelled;
-    default:
-      return styles.statusPending;
-  }
-}
+// Unused helper functions - keeping for future use
+// function getStatusClassName(status: BookingStatus) {
+//   switch (status) {
+//     case 'CONFIRMED': return styles.statusConfirmed;
+//     case 'CANCELLED': return styles.statusCancelled;
+//     default: return styles.statusPending;
+//   }
+// }
 
-function getPaymentClassName(status: PaymentStatus) {
-  switch (status) {
-    case 'APPROVED':
-      return styles.paymentApproved;
-    case 'UNDER_REVIEW':
-      return styles.paymentReview;
-    case 'REJECTED':
-      return styles.paymentRejected;
-    default:
-      return styles.paymentPending;
-  }
-}
+// function getPaymentClassName(status: PaymentStatus) {
+//   switch (status) {
+//     case 'APPROVED': return styles.paymentApproved;
+//     case 'UNDER_REVIEW': return styles.paymentReview;
+//     case 'REJECTED': return styles.paymentRejected;
+//     default: return styles.paymentPending;
+//   }
+// }
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -890,8 +890,6 @@ export default async function AdminBookingsPage({
         ) : (
           <div className={styles.bookingsGrid}>
             {visibleBookings.map((booking) => {
-              const statusLabel = STATUS_LABELS[booking.status] ?? STATUS_LABELS.PENDING;
-              const paymentLabel = PAYMENT_STATUS_LABELS[booking.paymentStatus] ?? PAYMENT_STATUS_LABELS.PENDING;
               const hasDetails = booking.specialRequests || booking.foodAndSpecialRequests;
 
               return (

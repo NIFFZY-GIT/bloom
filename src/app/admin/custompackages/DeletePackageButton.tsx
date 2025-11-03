@@ -41,7 +41,7 @@ export default function DeletePackageButton({
       {showConfirm ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <p style={{ fontSize: '0.75rem', color: '#dc2626', margin: 0 }}>
-            Delete "{packageName}"?
+            Delete &quot;{packageName}&quot;?
           </p>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button

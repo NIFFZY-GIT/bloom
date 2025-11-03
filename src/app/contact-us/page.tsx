@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -100,7 +99,7 @@ export default function ContactPage() {
           <div className="hero-text">
             <h1 className="hero-title">Get In Touch</h1>
             <p className="hero-subtitle">
-              Ready to plan your perfect Sri Lankan adventure? Let's start the conversation.
+              Ready to plan your perfect Sri Lankan adventure? Let&apos;s start the conversation.
             </p>
           </div>
           {/* Login / Profile Button */}
@@ -120,14 +119,14 @@ export default function ContactPage() {
             <div className="contact-form-section">
               <div className="section-header">
                 <h2>Send Us a Message</h2>
-                <p>We'll get back to you within 24 hours</p>
+                <p>We&apos;ll get back to you within 24 hours</p>
               </div>
 
               {isSubmitted ? (
                 <div className="success-message">
                   <div className="success-icon">✓</div>
                   <h3>Message Sent Successfully!</h3>
-                  <p>Thank you for contacting us. We'll get back to you soon.</p>
+                  <p>Thank you for contacting us. We&apos;ll get back to you soon.</p>
                 </div>
               ) : (
                 <form className="contact-form" onSubmit={handleSubmit}>
@@ -240,7 +239,7 @@ export default function ContactPage() {
                       <small>Colombo, Sri Lanka</small>
                     </div>
                     <div className="map-frame">
-                     // Replace the map placeholder section with:
+                     {/* Replace the map placeholder section with: */}
 <div className="map-frame">
   <iframe
     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.798467112139!2d79.85275541532638!3d6.92706619500827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae259130df8cb3d%3A0xcb2d5bceae83c41!2sColombo%2C%20Sri%20Lanka!5e0!3m2!1sen!2sus!4v1633021634345!5m2!1sen!2sus"

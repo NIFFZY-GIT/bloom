@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 import styles from '@/app/admin/packages/AdminPackages.module.css';
 
@@ -42,7 +43,7 @@ export default function PlacesTable({ places }: PlacesTableProps) {
       router.refresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to delete place';
-      // eslint-disable-next-line no-alert
+       
       window.alert(message);
     } finally {
       setDeletingId(null);
@@ -68,12 +69,12 @@ export default function PlacesTable({ places }: PlacesTableProps) {
             <tr key={place.id} className={styles.tableRow}>
               <td className={styles.tableCell}>
                 {place.imagePath ? (
-                  <img 
+                  <Image 
                     src={place.imagePath} 
                     alt={place.name}
+                    width={60}
+                    height={60}
                     style={{ 
-                      width: '60px', 
-                      height: '60px', 
                       objectFit: 'cover', 
                       borderRadius: '8px' 
                     }}

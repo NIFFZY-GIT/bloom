@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import Image from 'next/image';
 import './GalleryPage.css';
 
 interface GalleryItem {
@@ -124,13 +125,14 @@ const GalleryPage: React.FC = () => {
       { threshold: 0.1 }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
+    const element = sectionRef.current;
+    if (element) {
+      observer.observe(element);
     }
 
     return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
+      if (element) {
+        observer.unobserve(element);
       }
     };
   }, []);
@@ -225,7 +227,7 @@ const GalleryPage: React.FC = () => {
                   data-category={item.category}
                 >
                   <div className="gallery-image">
-                    <img src={item.imagePath} alt={item.title} />
+                    <Image src={item.imagePath} alt={item.title} width={400} height={300} style={{ objectFit: 'cover' }} />
                   </div>
                   <div className="gallery-overlay">
                     <h3>{item.title}</h3>
@@ -264,7 +266,7 @@ const GalleryPage: React.FC = () => {
                 >
                   <div className="review-header">
                     <div className="review-avatar">
-                      <img src={review.avatar} alt={review.name} />
+                      <Image src={review.avatar} alt={review.name} width={80} height={80} style={{ objectFit: 'cover', borderRadius: '50%' }} />
                     </div>
                     <div className="review-info">
                       <h3>{review.name}</h3>

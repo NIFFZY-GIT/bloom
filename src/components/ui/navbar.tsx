@@ -61,6 +61,7 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
     }
     setIsBookingsDropdownOpen(false);
     setIsProfileDropdownOpen(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   // Effect to disable body scroll when mobile menu is open

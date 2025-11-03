@@ -24,10 +24,10 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  let body: any;
+  let body: { name?: string; image?: string; color?: string; bgColor?: string; description?: string; animation?: string };
   try {
     body = await request.json();
-  } catch (error) {
+  } catch {
     return NextResponse.json({ message: 'Invalid JSON payload' }, { status: 400 });
   }
 

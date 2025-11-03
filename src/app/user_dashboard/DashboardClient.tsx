@@ -59,7 +59,7 @@ export default function DashboardClient({ initialBookings, initialQuotations, in
   const [bookings, setBookings] = useState<Booking[]>(initialBookings);
   const [quotations, setQuotations] = useState<Quotation[]>(initialQuotations);
   const [customTrips, setCustomTrips] = useState<CustomTrip[]>(initialCustomTrips);
-  const [isEditing, setIsEditing] = useState(false);
+  const [, setIsEditing] = useState(false);
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
   const [newBooking, setNewBooking] = useState({
     packageName: '',
@@ -100,6 +100,8 @@ export default function DashboardClient({ initialBookings, initialQuotations, in
     pendingCustomTrips: customTrips.filter((t) => t.status === 'pending').length,
   }), [bookings, quotations, customTrips]);
 
+  // Unused handlers - keeping for future feature expansion
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleCreateBooking = (e: React.FormEvent) => {
     e.preventDefault();
     const booking: Booking = {
@@ -121,6 +123,7 @@ export default function DashboardClient({ initialBookings, initialQuotations, in
     });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleUpdateBooking = (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingBooking) return;
@@ -132,10 +135,12 @@ export default function DashboardClient({ initialBookings, initialQuotations, in
     setEditingBooking(null);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDeleteBooking = (id: string) => {
     setBookings(bookings.filter((booking) => booking.id !== id));
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleEditBooking = (booking: Booking) => {
     setEditingBooking(booking);
     setIsEditing(true);
@@ -162,7 +167,7 @@ export default function DashboardClient({ initialBookings, initialQuotations, in
       } else {
         setResetError(data.message || 'Failed to send code');
       }
-    } catch (error) {
+    } catch {
       setResetError('Failed to send verification code');
     } finally {
       setIsLoading(false);
@@ -210,7 +215,7 @@ export default function DashboardClient({ initialBookings, initialQuotations, in
       } else {
         setResetError(data.message || 'Failed to reset password');
       }
-    } catch (error) {
+    } catch {
       setResetError('Failed to reset password');
     } finally {
       setIsLoading(false);

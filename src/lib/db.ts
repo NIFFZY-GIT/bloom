@@ -16,12 +16,14 @@ const pool = new Pool({
       : false,
 });
 
-export async function query(text: string, params?: any[]) {
+export async function query(text: string, params?: unknown[]) {
   const res = await pool.query(text, params);
   return res;
 }
 
-export default {
+const db = {
   query,
   pool,
 };
+
+export default db;

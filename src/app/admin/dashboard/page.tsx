@@ -233,7 +233,7 @@ function getStatusClass(status: string) {
 
 export default async function AdminDashboard() {
   await requireAdmin();
-  const [stats, packages, recentBookings] = await Promise.all([
+  const [stats, , recentBookings] = await Promise.all([
     getDashboardStats(),
     getPackages(),
     getRecentBookings(),

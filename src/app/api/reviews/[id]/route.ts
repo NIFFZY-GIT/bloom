@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 
 type RouteParams = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 const COLUMNS = 'id, name, position, avatar, rating, text';
@@ -37,8 +37,9 @@ const parseId = (idValue: string) => {
   return numericId;
 };
 
-export async function PUT(request: Request, { params }: RouteParams) {
+export async function PUT(request: Request, { params: paramsPromise }: RouteParams) {
   try {
+    const params = await paramsPromise;
     const id = parseId(params.id);
     const body = await request.json();
 
@@ -88,8 +89,9 @@ export async function PUT(request: Request, { params }: RouteParams) {
   }
 }
 
-export async function DELETE(request: Request, { params }: RouteParams) {
+export async function DELETE(request: Request, { params: paramsPromise }: RouteParams) {
   try {
+    const params = await paramsPromise;
     const id = parseId(params.id);
     const result = await query('DELETE FROM reviews WHERE id = $1 RETURNING id', [id]);
     if (result.rowCount === 0) {

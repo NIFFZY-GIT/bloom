@@ -47,10 +47,10 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
-  } catch (err: any) {
+  } catch (err) {
     console.error('Signup error', err);
     // unique violation (duplicate email/username)
-    if (err?.code === '23505') {
+    if (err && typeof err === 'object' && 'code' in err && err.code === '23505') {
       return NextResponse.json({ error: 'Email or username already in use' }, { status: 409 });
     }
     return NextResponse.json({ error: 'Server error' }, { status: 500 });

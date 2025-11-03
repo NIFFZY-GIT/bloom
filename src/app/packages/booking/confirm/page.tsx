@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect, ChangeEvent } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from './ConfirmPage.module.css';
 
 type UploadStatus = 'idle' | 'uploading' | 'success' | 'error';
@@ -552,7 +553,7 @@ export default function BookingConfirmationPage({ searchParams }: PageProps) {
               {receiptFile && (
                 <div className={styles.previewWrapper}>
                   {receiptPreview ? (
-                    <img src={receiptPreview} alt="Receipt preview" className={styles.previewImage} />
+                    <Image src={receiptPreview} alt="Receipt preview" className={styles.previewImage} width={300} height={400} style={{ objectFit: 'contain' }} />
                   ) : (
                     <span className={styles.pdfBadge}>
                       <i className="far fa-file-pdf" aria-hidden="true"></i>

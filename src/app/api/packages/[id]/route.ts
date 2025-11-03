@@ -3,9 +3,9 @@ import { NextResponse } from 'next/server';
 import db, { query } from '@/lib/db';
 
 type Params = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 const MAX_GALLERY_IMAGES = 10;
@@ -70,7 +70,8 @@ const toNumber = (value: unknown, fallback: number) => {
   return fallback;
 };
 
-export async function GET(request: Request, { params }: Params) {
+export async function GET(request: Request, { params: paramsPromise }: Params) {
+  const params = await paramsPromise;
   const numericId = Number(params.id);
   if (!Number.isInteger(numericId) || numericId <= 0) {
     return NextResponse.json({ message: 'Invalid package id' }, { status: 400 });
@@ -90,7 +91,8 @@ export async function GET(request: Request, { params }: Params) {
   }
 }
 
-export async function PUT(request: Request, { params }: Params) {
+export async function PUT(request: Request, { params: paramsPromise }: Params) {
+  const params = await paramsPromise;
   const numericId = Number(params.id);
   if (!Number.isInteger(numericId) || numericId <= 0) {
     return NextResponse.json({ message: 'Invalid package id' }, { status: 400 });
@@ -213,7 +215,8 @@ export async function PUT(request: Request, { params }: Params) {
   }
 }
 
-export async function DELETE(request: Request, { params }: Params) {
+export async function DELETE(request: Request, { params: paramsPromise }: Params) {
+  const params = await paramsPromise;
   const numericId = Number(params.id);
   if (!Number.isInteger(numericId) || numericId <= 0) {
     return NextResponse.json({ message: 'Invalid package id' }, { status: 400 });

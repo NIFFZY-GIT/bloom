@@ -23,7 +23,7 @@ export default function Error({
         <h1 className={styles.title}>Something Went Wrong</h1>
         <p className={styles.description}>
           We encountered an unexpected error while processing your request. 
-          Don't worry, our team has been notified and we're working to fix it.
+          Don&apos;t worry, our team has been notified and we&apos;re working to fix it.
         </p>
 
         {error.message && (

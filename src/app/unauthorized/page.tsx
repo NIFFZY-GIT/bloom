@@ -8,7 +8,7 @@ export default function Unauthorized() {
         <div className={styles.errorCode}>403</div>
         <h1 className={styles.title}>Access Denied</h1>
         <p className={styles.description}>
-          Sorry, you don't have permission to access this page. 
+          Sorry, you don&apos;t have permission to access this page. 
           This area is restricted to authorized users only.
         </p>
         
@@ -22,7 +22,7 @@ export default function Unauthorized() {
           <ul>
             <li>You may need to log in with an authorized account</li>
             <li>Your session may have expired</li>
-            <li>You don't have the required permissions</li>
+            <li>You don&apos;t have the required permissions</li>
             <li>This page is for administrators only</li>
           </ul>
         </div>

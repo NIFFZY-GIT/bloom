@@ -5,9 +5,9 @@ import jwt from 'jsonwebtoken';
 import { query } from '@/lib/db';
 
 type Params = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 function unauthorized() {
@@ -48,7 +48,8 @@ function badRequest(message: string) {
   return NextResponse.json({ message }, { status: 400 });
 }
 
-export async function PATCH(request: Request, { params }: Params) {
+export async function PATCH(request: Request, { params: paramsPromise }: Params) {
+  const params = await paramsPromise;
   try {
     const adminId = await requireAdmin();
     const numericId = Number(params.id);
@@ -101,9 +102,10 @@ export async function PATCH(request: Request, { params }: Params) {
   }
 }
 
-export async function DELETE(request: Request, { params }: Params) {
+export async function DELETE(request: Request, { params: paramsPromise }: Params) {
   try {
     const adminId = await requireAdmin();
+    const params = await paramsPromise;
     const numericId = Number(params.id);
 
     if (!Number.isInteger(numericId) || numericId <= 0) {

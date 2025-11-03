@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 import styles from './PlaceForm.module.css';
 
@@ -426,7 +427,7 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
                 {galleryImages.map((imageUrl, index) => (
                   <div key={index} className={styles.galleryCard}>
                     <div className={styles.galleryCardImage}>
-                      <img src={imageUrl} alt={`Gallery ${index + 1}`} />
+                      <Image src={imageUrl} alt={`Gallery ${index + 1}`} width={200} height={150} style={{ objectFit: 'cover' }} />
                       {index === 0 && (
                         <span className={styles.mainImageBadge}>Main Image</span>
                       )}

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 import styles from './PackageForm.module.css';
 
@@ -534,7 +535,7 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
                         >
                           <div className={styles.galleryCardImage}>
                             {isCover && <span className={styles.coverBadge}>Cover image</span>}
-                            <img src={url} alt={`Gallery asset ${index + 1}`} />
+                            <Image src={url} alt={`Gallery asset ${index + 1}`} width={200} height={150} style={{ objectFit: 'cover' }} />
                           </div>
                           <div className={styles.galleryCardBody}>
                             <p className={styles.galleryUrl} title={url}>
@@ -647,7 +648,7 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
 
               <div className={styles.previewImageFrame}>
                 {coverImage ? (
-                  <img src={coverImage} alt="Cover preview" />
+                  <Image src={coverImage} alt="Cover preview" width={300} height={200} style={{ objectFit: 'cover' }} />
                 ) : (
                   'Cover image preview'
                 )}

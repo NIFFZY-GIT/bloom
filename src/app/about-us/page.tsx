@@ -1,17 +1,12 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 
 
 export default function AboutUs() {
   const [activeTab, setActiveTab] = useState('mission');
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
 
   const stats = [
     { number: '15+', label: 'Years Experience' },
@@ -103,7 +98,7 @@ export default function AboutUs() {
                 Founded in 2010, Tropical Bloom Tourism emerged from a simple passion: 
                 to share the breathtaking beauty and rich cultural tapestry of Sri Lanka 
                 with the world. What started as a small family-run operation has blossomed 
-                into one of Sri Lanka's most trusted travel curators.
+                into one of Sri Lanka&apos;s most trusted travel curators.
               </p>
               <p>
                 We believe that travel should be transformative, sustainable, and deeply 
@@ -208,7 +203,7 @@ export default function AboutUs() {
                   cultural authenticity.
                 </p>
                 <ul>
-                  <li>Become Sri Lanka's most sustainable tour operator by 2025</li>
+                  <li>Become Sri Lanka&apos;s most sustainable tour operator by 2025</li>
                   <li>Expand community-based tourism initiatives</li>
                   <li>Pioneer carbon-neutral travel experiences</li>
                   <li>Set new standards for ethical tourism</li>
@@ -267,7 +262,7 @@ export default function AboutUs() {
             <h2>Ready to Begin Your Journey?</h2>
             <p>
               Let us craft your perfect Sri Lankan adventure. Share your dreams, 
-              and we'll make them a reality.
+              and we&apos;ll make them a reality.
             </p>
             <div className="cta-buttons">
               <button className="explore-button">Explore Packages</button>

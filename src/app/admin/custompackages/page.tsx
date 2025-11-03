@@ -178,6 +178,8 @@ function formatDate(value: Date | string | null) {
   });
 }
 
+// Unused helper function - keeping for future use
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function formatDateTime(value: Date | null) {
   if (!value || Number.isNaN(value.valueOf())) {
     return '—';
@@ -276,6 +278,8 @@ async function deleteAllPackages() {
   }
 }
 
+// Unused helper function - keeping for future use
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getStatusClassName(status: PackageStatus) {
   switch (status) {
     case 'APPROVED':
@@ -438,7 +442,6 @@ export default async function AdminCustomPackagesPage({
         ) : (
           <div className={styles.bookingsGrid}>
             {visiblePackages.map((pkg) => {
-              const statusLabel = STATUS_LABELS[pkg.status] ?? STATUS_LABELS.PENDING;
               const hasDetails = pkg.foodAndSpecialRequests || pkg.additionalInfo;
 
               return (
