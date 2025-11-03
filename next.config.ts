@@ -1,17 +1,29 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // 1. Configure and ENABLE the image optimizer
   images: {
+    // This allows images from your own domain. It's secure.
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'chemquest.lk',
       },
+      {
+        protocol: 'https',
+        hostname: 'www.chemquest.lk',
+      },
     ],
-    // For production - allows local images from /uploads and /images
-    unoptimized: process.env.NODE_ENV === 'production',
+    // The sizes can be tuned for your specific design if needed
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+  },
+  
+  // 2. Set the API body size limit for file uploads
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb', // Make sure this matches your Nginx setting
+    },
   },
 };
 
