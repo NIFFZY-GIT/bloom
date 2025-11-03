@@ -466,7 +466,18 @@ const CreatePackagePage: React.FC = () => {
                         style={{ animationDelay: `${index * 0.1}s` }}
                       >
                         <div className="place-image">
-                          <Image src={place.imagePath} alt={place.name} width={300} height={200} style={{ objectFit: 'cover' }} />
+                          <Image 
+                            src={place.imagePath || '/images/places/placeholder.jpg'} 
+                            alt={place.name} 
+                            width={300} 
+                            height={200} 
+                            style={{ objectFit: 'cover' }}
+                            unoptimized={!place.imagePath || place.imagePath.startsWith('/uploads/')}
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = '/images/places/placeholder.jpg';
+                            }}
+                          />
                           <button 
                             className="add-place-btn"
                             onClick={() => handleAddPlace(place)}

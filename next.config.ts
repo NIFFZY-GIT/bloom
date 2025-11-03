@@ -17,6 +17,11 @@ const nextConfig: NextConfig = {
     // The sizes can be tuned for your specific design if needed
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Allow local images from /uploads directory
+    unoptimized: false, // Keep optimization enabled
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   
   // 2. Set the API body size limit for file uploads

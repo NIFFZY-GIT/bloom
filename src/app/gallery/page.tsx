@@ -227,7 +227,18 @@ const GalleryPage: React.FC = () => {
                   data-category={item.category}
                 >
                   <div className="gallery-image">
-                    <Image src={item.imagePath} alt={item.title} width={400} height={300} style={{ objectFit: 'cover' }} />
+                    <Image 
+                      src={item.imagePath || '/images/gallery/placeholder.jpg'} 
+                      alt={item.title} 
+                      width={400} 
+                      height={300} 
+                      style={{ objectFit: 'cover' }}
+                      unoptimized={item.imagePath?.startsWith('/uploads/')}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/images/gallery/placeholder.jpg';
+                      }}
+                    />
                   </div>
                   <div className="gallery-overlay">
                     <h3>{item.title}</h3>

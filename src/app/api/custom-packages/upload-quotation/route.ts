@@ -71,7 +71,7 @@ export async function POST(request: Request) {
     }
 
     // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), 'public', 'Uploads', 'quotations');
+    const uploadsDir = join(process.cwd(), 'public', 'uploads', 'quotations');
     if (!existsSync(uploadsDir)) {
       await mkdir(uploadsDir, { recursive: true });
     }
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
     const sanitizedFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
     const filename = `quotation_pkg${packageId}_${timestamp}_${sanitizedFilename}`;
     const filepath = join(uploadsDir, filename);
-    const publicPath = `/Uploads/quotations/${filename}`;
+    const publicPath = `/uploads/quotations/${filename}`;
 
     // Convert file to buffer and save
     const bytes = await file.arrayBuffer();
