@@ -53,11 +53,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'File too large. Max size is 10MB.' }, { status: 400 });
     }
 
-  // Support both 'uploads' and 'images' directories
-  const baseDir = folderSegments.includes('categories') || folderSegments.includes('places') 
-    ? path.join(process.cwd(), 'public', 'images', ...folderSegments)
-    : path.join(process.cwd(), 'public', 'uploads', ...folderSegments);
-  
+  // Always store uploads under public/uploads to keep a single writable directory
+  // This avoids splitting files between public/images and public/uploads which
+  // caused confusion and missing files in production.
+  const baseDir = path.join(process.cwd(), 'public', 'uploads', ...folderSegments);
   await mkdir(baseDir, { recursive: true });
 
     const extensionByType: Record<string, string> = {
@@ -68,19 +67,16 @@ export async function POST(request: Request) {
       'application/pdf': '.pdf',
     };
 
-    const inferredExtension = extensionByType[fileObj.type];
-    const fileName = fileObj.name || 'unnamed';
-    const fileExtension = inferredExtension || path.extname(fileName) || '.bin';
-    const uniqueName = `${crypto.randomUUID()}${fileExtension}`;
-    const filePath = path.join(baseDir, uniqueName);
+  const inferredExtension = extensionByType[fileObj.type];
+  const fileName = fileObj.name || 'unnamed';
+  const fileExtension = inferredExtension || path.extname(fileName) || '.bin';
+  const uniqueName = `${crypto.randomUUID()}${fileExtension}`;
+  const filePath = path.join(baseDir, uniqueName);
 
     await writeFile(filePath, buffer);
 
-    // Construct public URL
-    const isImagesDir = folderSegments.includes('categories') || folderSegments.includes('places');
-    const publicPathSegments = isImagesDir 
-      ? ['images', ...folderSegments, uniqueName]
-      : ['uploads', ...folderSegments, uniqueName];
+    // Construct public URL - always point to /uploads
+    const publicPathSegments = ['uploads', ...folderSegments, uniqueName];
     const publicUrl = `/${publicPathSegments.join('/')}`;
 
     return NextResponse.json({ success: true, url: publicUrl }, { status: 201 });
