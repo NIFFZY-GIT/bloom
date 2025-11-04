@@ -18,6 +18,13 @@ function decodeJWT(token: string): { sub: string; email: string; role: string } 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Rewrite /uploads/* to API route for serving files
+  if (pathname.startsWith('/uploads/')) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/api/serve-uploads${pathname.replace('/uploads', '')}`;
+    return NextResponse.rewrite(url);
+  }
+
   // Protected routes that require authentication
   const protectedRoutes = ['/profile', '/bookings'];
   
@@ -89,5 +96,7 @@ export const config = {
      * - public (public files)
      */
     '/((?!api|_next/static|_next/image|favicon.ico|images|.*\\..*|_next).*)',
+    // Also match /uploads/* for file serving
+    '/uploads/:path*',
   ],
 };

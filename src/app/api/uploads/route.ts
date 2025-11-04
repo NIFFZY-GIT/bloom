@@ -57,7 +57,7 @@ export async function POST(request: Request) {
   // This avoids splitting files between public/images and public/uploads which
   // caused confusion and missing files in production.
   const baseDir = path.join(process.cwd(), 'public', 'uploads', ...folderSegments);
-  await mkdir(baseDir, { recursive: true });
+  await mkdir(baseDir, { recursive: true, mode: 0o755 });
 
     const extensionByType: Record<string, string> = {
       'image/jpeg': '.jpg',
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
   const uniqueName = `${crypto.randomUUID()}${fileExtension}`;
   const filePath = path.join(baseDir, uniqueName);
 
-    await writeFile(filePath, buffer);
+    await writeFile(filePath, buffer, { mode: 0o644 });
 
     // Construct public URL - always point to /uploads
     const publicPathSegments = ['uploads', ...folderSegments, uniqueName];
