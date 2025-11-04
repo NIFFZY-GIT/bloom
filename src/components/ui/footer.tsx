@@ -181,7 +181,7 @@ export default function Footer() {
           <div className="bottom-bar">
             <div className="bottom-content">
               <div className="copyright-section">
-                <span>© {currentYear} VisitX. All rights reserved.</span>
+                <span>© {currentYear} Tropical Bloom Tourism. All rights reserved.</span>
                 <div className="legal-links">
                   <a href="#" className="legal-link">Privacy</a>
                   <a href="#" className="legal-link">Terms</a>
@@ -189,9 +189,23 @@ export default function Footer() {
                 </div>
               </div>
               
-              <div className="location-tag">
-                <span>🇱🇰</span>
-                <span>Made with passion in Sri Lanka</span>
+              <div className="developer-section">
+                <div className="location-tag">
+                  <span>🇱🇰</span>
+                  <span>Made with passion in Sri Lanka</span>
+                </div>
+                <div className="developer-tag">
+                  <span className="developed-text">Developed by</span>
+                  <a 
+                    href="https://zevarone.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="developer-link"
+                  >
+                    <span className="developer-icon">⚡</span>
+                    <span className="developer-name">ZEVARONE & Co.</span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -600,12 +614,89 @@ export default function Footer() {
           color: #f59e0b;
         }
 
+        .developer-section {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        @media (min-width: 1024px) {
+          .developer-section {
+            flex-direction: row;
+            align-items: center;
+            gap: 1.5rem;
+          }
+        }
+
         .location-tag {
           display: flex;
           align-items: center;
           gap: 0.5rem;
           color: #94a3b8;
           font-size: 0.875rem;
+        }
+
+        .developer-tag {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.875rem;
+        }
+
+        .developed-text {
+          color: #94a3b8;
+        }
+
+        .developer-link {
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+          padding: 0.375rem 0.75rem;
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.05));
+          border: 1px solid rgba(245, 158, 11, 0.2);
+          border-radius: 0.5rem;
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .developer-link::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.1));
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .developer-link:hover::before {
+          opacity: 1;
+        }
+
+        .developer-link:hover {
+          border-color: rgba(245, 158, 11, 0.4);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+
+        .developer-icon {
+          font-size: 1rem;
+          position: relative;
+          z-index: 1;
+        }
+
+        .developer-name {
+          color: #f59e0b;
+          font-weight: 700;
+          letter-spacing: 0.05em;
+          font-size: 0.875rem;
+          position: relative;
+          z-index: 1;
+          background: linear-gradient(135deg, #f59e0b, #fbbf24);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
 
         /* Floating Elements */

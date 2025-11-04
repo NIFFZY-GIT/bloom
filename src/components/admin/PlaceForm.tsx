@@ -54,11 +54,12 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
   const [galleryImages, setGalleryImages] = useState<string[]>(
     initialData?.galleryImages || []
   );
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [galleryUploading, setGalleryUploading] = useState(false);
   const galleryFileInputRef = useRef<HTMLInputElement | null>(null);
 
   const isEdit = mode === 'edit';
@@ -77,7 +78,7 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
   ];
 
   const completedRequired = requiredFields.filter(field => formState[field]?.trim().length);
-  const hasGalleryImages = galleryImages.length > 0;
+  const hasGalleryImages = galleryImages.length > 0 || pendingFiles.length > 0;
   const totalRequirements = requiredFields.length + 1; // +1 for gallery images
   const totalCompleted = completedRequired.length + (hasGalleryImages ? 1 : 0);
   const completionPercent = Math.round((totalCompleted / totalRequirements) * 100);
@@ -119,26 +120,36 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
     return data.url as string;
   };
 
-  const handleGalleryUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGalleryUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
       return;
     }
 
-    setGalleryUploading(true);
     setError(null);
 
-    try {
-      const url = await uploadImageToServer(file);
-      setGalleryImages(prev => [...prev, url]);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to upload image';
-      setError(message);
-    } finally {
-      setGalleryUploading(false);
-      if (galleryFileInputRef.current) {
-        galleryFileInputRef.current.value = '';
-      }
+    // Validate file
+    if (!file.type.startsWith('image/')) {
+      setError('Please select a valid image file.');
+      return;
+    }
+
+    const maxBytes = 10 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      setError('Image is too large. Maximum size is 10MB.');
+      return;
+    }
+
+    // Create preview URL
+    const previewUrl = URL.createObjectURL(file);
+    
+    // Add to pending files and previews
+    setPendingFiles(prev => [...prev, file]);
+    setPreviewUrls(prev => [...prev, previewUrl]);
+
+    // Reset file input
+    if (galleryFileInputRef.current) {
+      galleryFileInputRef.current.value = '';
     }
   };
 
@@ -159,15 +170,61 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
   };
 
   const handleRemoveImage = (index: number) => {
-    setGalleryImages(prev => prev.filter((_, i) => i !== index));
+    const totalExisting = galleryImages.length;
+    
+    if (index < totalExisting) {
+      // Removing an existing uploaded image
+      setGalleryImages(prev => prev.filter((_, i) => i !== index));
+    } else {
+      // Removing a pending file
+      const pendingIndex = index - totalExisting;
+      
+      // Revoke the preview URL to free memory
+      if (previewUrls[pendingIndex]) {
+        URL.revokeObjectURL(previewUrls[pendingIndex]);
+      }
+      
+      setPendingFiles(prev => prev.filter((_, i) => i !== pendingIndex));
+      setPreviewUrls(prev => prev.filter((_, i) => i !== pendingIndex));
+    }
   };
 
   const handleMoveImageToFirst = (index: number) => {
     if (index === 0) return; // Already first
-    const newGallery = [...galleryImages];
-    const [movedImage] = newGallery.splice(index, 1);
-    newGallery.unshift(movedImage);
-    setGalleryImages(newGallery);
+    
+    const totalExisting = galleryImages.length;
+    const allImages = [...galleryImages, ...previewUrls];
+    const allFiles = [...pendingFiles];
+    
+    if (index < totalExisting) {
+      // Moving an existing image
+      const newGallery = [...galleryImages];
+      const [movedImage] = newGallery.splice(index, 1);
+      newGallery.unshift(movedImage);
+      setGalleryImages(newGallery);
+    } else {
+      // Moving a pending file
+      const pendingIndex = index - totalExisting;
+      const newPendingFiles = [...pendingFiles];
+      const newPreviewUrls = [...previewUrls];
+      
+      const [movedFile] = newPendingFiles.splice(pendingIndex, 1);
+      const [movedPreview] = newPreviewUrls.splice(pendingIndex, 1);
+      
+      // If there are existing images, we can't move pending to first
+      // Instead, move it to first position among pending files
+      if (galleryImages.length === 0) {
+        newPendingFiles.unshift(movedFile);
+        newPreviewUrls.unshift(movedPreview);
+      } else {
+        // Just reorder within pending
+        newPendingFiles.unshift(movedFile);
+        newPreviewUrls.unshift(movedPreview);
+      }
+      
+      setPendingFiles(newPendingFiles);
+      setPreviewUrls(newPreviewUrls);
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -188,7 +245,7 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
       return;
     }
 
-    if (galleryImages.length === 0) {
+    if (galleryImages.length === 0 && pendingFiles.length === 0) {
       setError('Please add at least one image to the gallery.');
       setIsSubmitting(false);
       return;
@@ -196,8 +253,25 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
 
     const highlights = highlightTags.length > 0 ? highlightTags : [];
 
+    // Upload pending files first
+    const uploadedUrls: string[] = [];
+    try {
+      for (const file of pendingFiles) {
+        const url = await uploadImageToServer(file);
+        uploadedUrls.push(url);
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to upload images';
+      setError(message);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Combine existing images with newly uploaded ones
+    const allGalleryImages = [...galleryImages, ...uploadedUrls];
+
     // First image in gallery is the main image
-    const imagePath = galleryImages.length > 0 ? galleryImages[0] : null;
+    const imagePath = allGalleryImages.length > 0 ? allGalleryImages[0] : null;
 
     const payload = {
       name,
@@ -207,7 +281,7 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
       location,
       imagePath,
       highlights,
-      galleryImages,
+      galleryImages: allGalleryImages,
     };
 
     try {
@@ -418,14 +492,18 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
                 accept="image/*"
                 onChange={handleGalleryUpload}
                 className={styles.fileInput}
-                disabled={galleryUploading}
+                disabled={isSubmitting}
               />
-              {galleryUploading && <p className={styles.uploadingText}>Uploading...</p>}
+              {pendingFiles.length > 0 && (
+                <p className={styles.uploadingText}>
+                  {pendingFiles.length} file(s) ready to upload
+                </p>
+              )}
             </div>
 
-            {galleryImages.length > 0 && (
+            {(galleryImages.length > 0 || previewUrls.length > 0) && (
               <div className={styles.galleryGrid}>
-                {galleryImages.map((imageUrl, index) => (
+                {[...galleryImages, ...previewUrls].map((imageUrl, index) => (
                   <div key={index} className={styles.galleryCard}>
                     <div className={styles.galleryCardImage}>
                       <Image 
@@ -443,6 +521,9 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
                       {index === 0 && (
                         <span className={styles.mainImageBadge}>Main Image</span>
                       )}
+                      {index >= galleryImages.length && (
+                        <span className={styles.pendingBadge}>Pending Upload</span>
+                      )}
                     </div>
                     <div className={styles.galleryCardActions}>
                       {index !== 0 && (
@@ -450,6 +531,7 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
                           type="button"
                           onClick={() => handleMoveImageToFirst(index)}
                           className={styles.setMainBtn}
+                          disabled={isSubmitting}
                         >
                           Set as Main
                         </button>
@@ -458,6 +540,7 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
                         type="button"
                         onClick={() => handleRemoveImage(index)}
                         className={styles.removeImageBtn}
+                        disabled={isSubmitting}
                       >
                         Remove
                       </button>
@@ -467,7 +550,7 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
               </div>
             )}
 
-            {galleryImages.length === 0 && (
+            {galleryImages.length === 0 && previewUrls.length === 0 && (
               <div className={styles.emptyGallery}>
                 <i className="fas fa-images" style={{ fontSize: '2rem', color: '#9ca3af', marginBottom: '0.5rem' }}></i>
                 <p>No images in gallery yet</p>
@@ -494,7 +577,11 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
             </div>
             <div className={styles.summaryItem}>
               <span className={styles.summaryLabel}>Gallery Images:</span>
-              <span className={styles.summaryValue}>{galleryImages.length > 0 ? `${galleryImages.length} image${galleryImages.length > 1 ? 's' : ''}` : 'None added yet'}</span>
+              <span className={styles.summaryValue}>
+                {galleryImages.length > 0 || pendingFiles.length > 0 
+                  ? `${galleryImages.length + pendingFiles.length} image${galleryImages.length + pendingFiles.length > 1 ? 's' : ''}${pendingFiles.length > 0 ? ` (${pendingFiles.length} pending)` : ''}` 
+                  : 'None added yet'}
+              </span>
             </div>
 
             <div className={styles.progressBar}>

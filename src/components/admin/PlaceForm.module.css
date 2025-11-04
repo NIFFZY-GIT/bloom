@@ -527,6 +527,22 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+.pendingBadge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  padding: 0.4rem 0.85rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  animation: pulse 2s ease-in-out infinite;
+}
+
 .galleryCardActions {
   display: flex;
   flex-direction: column;
