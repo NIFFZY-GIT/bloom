@@ -14,6 +14,7 @@ export async function GET() {
          location,
          highlights,
          price,
+         gallery_images as "galleryImages",
          created_at as "createdAt",
          updated_at as "updatedAt"
        FROM places
@@ -39,6 +40,7 @@ export async function POST(request: Request) {
     duration?: string;
     location?: string;
     highlights?: string[];
+    galleryImages?: string[];
     price?: number;
   };
   try {
@@ -54,6 +56,7 @@ export async function POST(request: Request) {
   const duration = body?.duration?.trim() || null;
   const location = body?.location?.trim() || null;
   const highlights = Array.isArray(body?.highlights) ? body.highlights : [];
+  const galleryImages = Array.isArray(body?.galleryImages) ? body.galleryImages : [];
   const price = typeof body?.price === 'number' ? body.price : 0;
 
   if (!name) {
@@ -62,10 +65,10 @@ export async function POST(request: Request) {
 
   try {
     const result = await query(
-      `INSERT INTO places (name, description, image_path, category, duration, location, highlights, price)
-       VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8)
-       RETURNING id, name, description, image_path as "imagePath", category, duration, location, highlights, price`,
-      [name, description, imagePath, category, duration, location, JSON.stringify(highlights), price]
+      `INSERT INTO places (name, description, image_path, category, duration, location, highlights, price, gallery_images)
+       VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9::jsonb)
+       RETURNING id, name, description, image_path as "imagePath", category, duration, location, highlights, price, gallery_images as "galleryImages"`,
+      [name, description, imagePath, category, duration, location, JSON.stringify(highlights), price, JSON.stringify(galleryImages)]
     );
 
     const newPlace = result.rows[0];

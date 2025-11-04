@@ -109,6 +109,7 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
     try {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('folder', 'gallery');
 
       const response = await fetch('/api/uploads', {
         method: 'POST',

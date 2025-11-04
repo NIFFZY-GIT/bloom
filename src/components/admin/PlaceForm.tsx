@@ -95,13 +95,14 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
       throw new Error('Please select a valid image file.');
     }
 
-    const maxBytes = 4 * 1024 * 1024;
+    const maxBytes = 10 * 1024 * 1024;
     if (file.size > maxBytes) {
-      throw new Error('Image is too large. Maximum size is 4MB.');
+      throw new Error('Image is too large. Maximum size is 10MB.');
     }
 
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('folder', 'custom_places');
 
     const response = await fetch('/api/uploads', {
       method: 'POST',
@@ -427,7 +428,18 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
                 {galleryImages.map((imageUrl, index) => (
                   <div key={index} className={styles.galleryCard}>
                     <div className={styles.galleryCardImage}>
-                      <Image src={imageUrl} alt={`Gallery ${index + 1}`} width={200} height={150} style={{ objectFit: 'cover' }} />
+                      <Image 
+                        src={imageUrl || '/images/places/placeholder.jpg'} 
+                        alt={`Gallery ${index + 1}`} 
+                        width={200} 
+                        height={150} 
+                        style={{ objectFit: 'cover' }}
+                        unoptimized={imageUrl?.startsWith('/uploads/')}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = '/images/places/placeholder.jpg';
+                        }}
+                      />
                       {index === 0 && (
                         <span className={styles.mainImageBadge}>Main Image</span>
                       )}

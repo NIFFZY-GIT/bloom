@@ -128,6 +128,7 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
 
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('folder', 'packages');
 
     const response = await fetch('/api/uploads', {
       method: 'POST',

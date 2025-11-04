@@ -24,6 +24,7 @@ export async function GET(
          location,
          highlights,
          price,
+         gallery_images as "galleryImages",
          created_at as "createdAt",
          updated_at as "updatedAt"
        FROM places
@@ -83,7 +84,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { name, description, imagePath, category, duration, location, highlights, price } = body;
+    const { name, description, imagePath, category, duration, location, highlights, galleryImages, price } = body;
 
     if (!name) {
       return NextResponse.json({ 
@@ -101,10 +102,11 @@ export async function PUT(
            location = $6,
            highlights = $7::jsonb,
            price = $8,
+           gallery_images = $9::jsonb,
            updated_at = CURRENT_TIMESTAMP
-       WHERE id = $9
-       RETURNING id, name, description, image_path as "imagePath", category, duration, location, highlights, price`,
-      [name, description, imagePath, category, duration, location, JSON.stringify(highlights || []), price || 0, id]
+       WHERE id = $10
+       RETURNING id, name, description, image_path as "imagePath", category, duration, location, highlights, price, gallery_images as "galleryImages"`,
+      [name, description, imagePath, category, duration, location, JSON.stringify(highlights || []), price || 0, JSON.stringify(galleryImages || []), id]
     );
 
     if (result.rowCount === 0) {

@@ -28,7 +28,7 @@ async function getAuthStatus() {
 async function getPlace(id: number) {
   try {
     const result = await query(
-      `SELECT id, name, description, image_path, category, duration, location, highlights, price
+      `SELECT id, name, description, image_path, category, duration, location, highlights, price, gallery_images
        FROM places
        WHERE id = $1`,
       [id]
@@ -39,6 +39,14 @@ async function getPlace(id: number) {
     }
 
     const row = result.rows[0];
+    // Use gallery_images if available, otherwise fallback to image_path
+    let galleryImages = [];
+    if (row.gallery_images && Array.isArray(row.gallery_images) && row.gallery_images.length > 0) {
+      galleryImages = row.gallery_images;
+    } else if (row.image_path) {
+      galleryImages = [row.image_path];
+    }
+
     return {
       name: row.name,
       description: row.description,
@@ -48,7 +56,7 @@ async function getPlace(id: number) {
       location: row.location,
       highlights: row.highlights || [],
       price: parseFloat(row.price),
-      galleryImages: [], // Add empty gallery images array
+      galleryImages: galleryImages,
     };
   } catch (error) {
     console.error('Failed to fetch place:', error);
