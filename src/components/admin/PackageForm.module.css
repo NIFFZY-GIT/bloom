@@ -594,3 +594,35 @@
     opacity: 0.8;
   }
 }
+
+.placeholderImage {
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #6b7280;
+}
+
+.placeholderIcon {
+  font-size: 48px;
+  opacity: 0.5;
+}
+
+.placeholderText {
+  color: #9ca3af;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.submitWarning {
+  color: #dc2626;
+  font-size: 13px;
+  text-align: center;
+  margin-top: 8px;
+  font-weight: 500;
+}

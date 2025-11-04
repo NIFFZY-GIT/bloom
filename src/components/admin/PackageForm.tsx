@@ -60,7 +60,7 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
     price: initialData ? String(initialData.price ?? '') : '',
     duration: initialData ? String(initialData.duration ?? '') : '',
     image_path: initialData?.image_path ?? initialGalleryImages[0] ?? '',
-    category: initialData?.category ?? '',
+    category: initialData?.category ?? 'Adventure',
     highlights: initialData?.highlights?.join(', ') ?? '',
     includes: initialData?.includes?.join(', ') ?? '',
     difficulty: initialData?.difficulty ?? 'Moderate',
@@ -415,14 +415,22 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
 
                   <label className={styles.field}>
                     <span className={styles.fieldLabel}>Category *</span>
-                    <input
-                      type="text"
+                    <select
                       name="category"
                       value={formState.category}
                       onChange={handleChange}
                       required
-                      className={styles.input}
-                    />
+                      className={styles.select}
+                    >
+                      <option value="Adventure">🏔️ Adventure</option>
+                      <option value="Beach & Coastal">🏖️ Beach & Coastal</option>
+                      <option value="Cultural">🏛️ Cultural</option>
+                      <option value="Wildlife">🦁 Wildlife</option>
+                      <option value="Wellness">🧘 Wellness</option>
+                      <option value="City Tours">🏙️ City Tours</option>
+                      <option value="Food & Culinary">🍽️ Food & Culinary</option>
+                      <option value="Photography">📸 Photography</option>
+                    </select>
                   </label>
 
                   <label className={styles.field}>
@@ -433,9 +441,9 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
                       onChange={handleChange}
                       className={styles.select}
                     >
-                      <option value="Easy">Easy</option>
-                      <option value="Moderate">Moderate</option>
-                      <option value="Challenging">Challenging</option>
+                      <option value="Easy">✅ Easy</option>
+                      <option value="Moderate">⚡ Moderate</option>
+                      <option value="Challenging">🔥 Challenging</option>
                     </select>
                   </label>
                 </div>
@@ -665,10 +673,15 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
                 <button
                   type="submit"
                   className={styles.primaryBtn}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || totalImages === 0}
                 >
-                  {isSubmitting ? (isEdit ? 'Saving…' : 'Creating…') : isEdit ? 'Save Changes' : 'Create Package'}
+                  {isSubmitting ? (isEdit ? 'Uploading & Saving…' : 'Uploading & Creating…') : isEdit ? 'Save Changes' : 'Create Package'}
                 </button>
+                {totalImages === 0 && (
+                  <p className={styles.submitWarning}>
+                    ⚠️ Upload at least one image before submitting
+                  </p>
+                )}
               </div>
             </form>
           </section>
@@ -691,14 +704,24 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
               <div>
                 <span className={styles.previewHeading}>Package title</span>
                 <p className={styles.previewValue}>{formState.title.trim() || 'Untitled experience'}</p>
-                <p className={styles.previewMuted}>{formState.category.trim() || 'No category yet'}</p>
+                <p className={styles.previewMuted}>{formState.category.trim()}</p>
               </div>
 
               <div className={styles.previewImageFrame}>
                 {coverImage ? (
-                  <Image src={coverImage} alt="Cover preview" width={300} height={200} style={{ objectFit: 'cover' }} />
+                  <Image 
+                    src={coverImage} 
+                    alt="Cover preview" 
+                    width={300} 
+                    height={200} 
+                    style={{ objectFit: 'cover' }}
+                    unoptimized={true}
+                  />
                 ) : (
-                  'Cover image preview'
+                  <div className={styles.placeholderImage}>
+                    <div className={styles.placeholderIcon}>🖼️</div>
+                    <p className={styles.placeholderText}>Upload an image to see preview</p>
+                  </div>
                 )}
               </div>
 

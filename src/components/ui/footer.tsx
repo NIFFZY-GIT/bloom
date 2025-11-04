@@ -1,6 +1,6 @@
 "use client";
 
-import { FaFacebookF, FaInstagram, FaYoutube, FaTwitter, FaMapMarkerAlt, FaPhone, FaEnvelope } from "react-icons/fa";
+import { FaFacebookF, FaInstagram, FaYoutube, FaTwitter, FaMapMarkerAlt, FaPhone } from "react-icons/fa";
 import { motion } from "framer-motion";
 
 export default function Footer() {
@@ -33,12 +33,26 @@ export default function Footer() {
                 Discover the soul of Sri Lanka through authentic experiences. From pristine beaches to ancient heritage sites, we bring you closer to paradise.
               </p>
               <div className="social-links">
-                {[FaFacebookF, FaInstagram, FaYoutube, FaTwitter].map((Icon, index) => (
+                {[
+                  { Icon: FaFacebookF, color: '#1877f2', delay: 0 },
+                  { Icon: FaInstagram, color: '#e4405f', delay: 0.1 },
+                  { Icon: FaYoutube, color: '#ff0000', delay: 0.2 },
+                  { Icon: FaTwitter, color: '#1da1f2', delay: 0.3 }
+                ].map(({ Icon, color, delay }, index) => (
                   <motion.a
                     key={index}
                     href="#"
-                    whileHover={{ scale: 1.1, y: -2 }}
+                    initial={{ opacity: 0, scale: 0 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.4, delay }}
+                    whileHover={{ 
+                      scale: 1.2, 
+                      rotate: 360,
+                      transition: { duration: 0.4 }
+                    }}
+                    whileTap={{ scale: 0.9 }}
                     className="social-icon"
+                    style={{ '--hover-color': color } as React.CSSProperties}
                   >
                     <Icon className="icon" />
                   </motion.a>
@@ -58,13 +72,19 @@ export default function Footer() {
                 Navigation
               </h3>
               <ul className="links-list">
-                {['Home', 'Destinations', 'Tour Packages', 'Experiences', 'About Us'].map((item) => (
-                  <li key={item} className="link-item">
+                {['Home', 'Destinations', 'Tour Packages', 'Experiences', 'About Us'].map((item, index) => (
+                  <motion.li 
+                    key={item} 
+                    className="link-item"
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                  >
                     <a href="#" className="link">
                       <span className="link-bullet"></span>
                       {item}
                     </a>
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
             </motion.div>
@@ -88,13 +108,19 @@ export default function Footer() {
                   'Mirissa Beach',
                   'Yala National Park',
                   'Galle Fort'
-                ].map((destination) => (
-                  <li key={destination} className="link-item">
+                ].map((destination, index) => (
+                  <motion.li 
+                    key={destination} 
+                    className="link-item"
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                  >
                     <a href="#" className="destination-link">
                       <span className="destination-arrow">→</span>
                       {destination}
                     </a>
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
             </motion.div>
@@ -111,7 +137,11 @@ export default function Footer() {
                 Get In Touch
               </h3>
               <div className="contact-info">
-                <div className="contact-item">
+                <motion.div 
+                  className="contact-item"
+                  whileHover={{ x: 5 }}
+                  transition={{ duration: 0.2 }}
+                >
                   <div className="contact-icon">
                     <FaMapMarkerAlt className="icon" />
                   </div>
@@ -119,9 +149,13 @@ export default function Footer() {
                     <p className="contact-label">Location</p>
                     <p className="contact-detail">Colombo 03, Sri Lanka</p>
                   </div>
-                </div>
+                </motion.div>
                 
-                <div className="contact-item">
+                <motion.div 
+                  className="contact-item"
+                  whileHover={{ x: 5 }}
+                  transition={{ duration: 0.2 }}
+                >
                   <div className="contact-icon">
                     <FaPhone className="icon" />
                   </div>
@@ -129,17 +163,7 @@ export default function Footer() {
                     <p className="contact-label">Phone</p>
                     <p className="contact-detail">+94 77 123 4567</p>
                   </div>
-                </div>
-                
-                <div className="contact-item">
-                  <div className="contact-icon">
-                    <FaEnvelope className="icon" />
-                  </div>
-                  <div>
-                    <p className="contact-label">Email</p>
-                    <p className="contact-detail">hello@visitx.lk</p>
-                  </div>
-                </div>
+                </motion.div>
               </div>
             </motion.div>
           </div>
@@ -203,7 +227,7 @@ export default function Footer() {
                     className="developer-link"
                   >
                     <span className="developer-icon">⚡</span>
-                    <span className="developer-name">ZEVARONE & Co.</span>
+                    <span className="developer-name">XXXX </span>
                   </a>
                 </div>
               </div>
@@ -212,8 +236,42 @@ export default function Footer() {
         </div>
 
         {/* Floating Elements */}
-        <div className="floating-element amber"></div>
-        <div className="floating-element blue"></div>
+        <motion.div 
+          className="floating-element amber"
+          animate={{
+            y: [0, -20, 0],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div 
+          className="floating-element blue"
+          animate={{
+            y: [0, 20, 0],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 5,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div 
+          className="floating-element green"
+          animate={{
+            x: [0, 20, 0],
+            scale: [1, 1.15, 1],
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
       </footer>
 
       <style jsx>{`
@@ -331,15 +389,33 @@ export default function Footer() {
           color: #cbd5e1;
           border: 1px solid #334155;
           transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .social-icon::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: var(--hover-color, #f59e0b);
+          opacity: 0;
+          transition: opacity 0.3s ease;
         }
 
         .social-icon:hover {
-          color: #f59e0b;
-          background: #334155;
+          color: white;
+          border-color: var(--hover-color, #f59e0b);
+          box-shadow: 0 0 20px var(--hover-color, #f59e0b);
+        }
+
+        .social-icon:hover::before {
+          opacity: 0.2;
         }
 
         .icon {
           font-size: 0.875rem;
+          position: relative;
+          z-index: 1;
         }
 
         /* Links Sections */
@@ -359,9 +435,19 @@ export default function Footer() {
         .title-indicator {
           width: 0.25rem;
           height: 1rem;
-          background: #f59e0b;
+          background: linear-gradient(to bottom, #f59e0b, #fbbf24);
           margin-right: 0.75rem;
           border-radius: 9999px;
+          animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+          0%, 100% {
+            box-shadow: 0 0 5px rgba(245, 158, 11, 0.5);
+          }
+          50% {
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.8);
+          }
         }
 
         .links-list {
@@ -393,11 +479,13 @@ export default function Footer() {
           height: 0.375rem;
           background: #475569;
           border-radius: 9999px;
-          transition: background-color 0.3s ease;
+          transition: all 0.3s ease;
         }
 
         .link:hover .link-bullet {
           background: #f59e0b;
+          transform: scale(1.5);
+          box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
         }
 
         .destination-link {
@@ -416,11 +504,13 @@ export default function Footer() {
         .destination-arrow {
           color: #f59e0b;
           opacity: 0;
-          transition: opacity 0.3s ease;
+          transition: all 0.3s ease;
+          transform: translateX(-10px);
         }
 
         .destination-link:hover .destination-arrow {
           opacity: 1;
+          transform: translateX(0);
         }
 
         /* Contact Section */
@@ -447,13 +537,26 @@ export default function Footer() {
           border-radius: 0.5rem;
           display: flex;
           align-items: center;
-          justify-center: center;
+          justify-content: center;
+          flex-shrink: 0;
           margin-top: 0.125rem;
+          position: relative;
+          transition: all 0.3s ease;
+        }
+
+        .contact-item:hover .contact-icon {
+          background: rgba(245, 158, 11, 0.1);
+          transform: scale(1.1);
         }
 
         .contact-icon .icon {
           color: #f59e0b;
-          font-size: 0.75rem;
+          font-size: 0.875rem;
+          transition: transform 0.3s ease;
+        }
+
+        .contact-item:hover .contact-icon .icon {
+          transform: scale(1.1);
         }
 
         .contact-label {
@@ -703,23 +806,32 @@ export default function Footer() {
         .floating-element {
           position: absolute;
           border-radius: 9999px;
-          filter: blur(20px);
+          filter: blur(40px);
+          pointer-events: none;
         }
 
         .floating-element.amber {
-          bottom: 2.5rem;
-          right: 2.5rem;
-          width: 5rem;
-          height: 5rem;
-          background: rgba(245, 158, 11, 0.1);
+          bottom: 10%;
+          right: 10%;
+          width: 12rem;
+          height: 12rem;
+          background: radial-gradient(circle, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.1));
         }
 
         .floating-element.blue {
-          top: 2.5rem;
-          left: 2.5rem;
-          width: 4rem;
-          height: 4rem;
-          background: rgba(59, 130, 246, 0.1);
+          top: 20%;
+          left: 5%;
+          width: 10rem;
+          height: 10rem;
+          background: radial-gradient(circle, rgba(59, 130, 246, 0.25), rgba(37, 99, 235, 0.1));
+        }
+
+        .floating-element.green {
+          top: 50%;
+          right: 20%;
+          width: 8rem;
+          height: 8rem;
+          background: radial-gradient(circle, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.05));
         }
 
         /* Animations */
