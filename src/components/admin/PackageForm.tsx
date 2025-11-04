@@ -51,6 +51,8 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
   })();
 
   const [galleryImages, setGalleryImages] = useState<string[]>(initialGalleryImages);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   const [formState, setFormState] = useState<FormState>(() => ({
     title: initialData?.title ?? '',
@@ -69,11 +71,11 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
   const [newGalleryUrl, setNewGalleryUrl] = useState('');
   const [galleryUploadError, setGalleryUploadError] = useState<string | null>(null);
   const [galleryUploadSuccess, setGalleryUploadSuccess] = useState<string | null>(null);
-  const [galleryUploading, setGalleryUploading] = useState(false);
   const galleryFileInputRef = useRef<HTMLInputElement | null>(null);
 
   const isEdit = mode === 'edit';
-  const galleryLimitReached = galleryImages.length >= MAX_GALLERY_IMAGES;
+  const totalImages = galleryImages.length + pendingFiles.length;
+  const galleryLimitReached = totalImages >= MAX_GALLERY_IMAGES;
 
   const coverImage = formState.image_path.trim();
 
@@ -195,13 +197,14 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
     }
   };
 
-  const handleGalleryFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGalleryFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files?.length) {
       return;
     }
 
-    if (galleryImages.length >= MAX_GALLERY_IMAGES) {
+    const currentTotal = galleryImages.length + pendingFiles.length;
+    if (currentTotal >= MAX_GALLERY_IMAGES) {
       setGalleryUploadError(`You can add up to ${MAX_GALLERY_IMAGES} images.`);
       setGalleryUploadSuccess(null);
       if (galleryFileInputRef.current) {
@@ -213,59 +216,74 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
     setGalleryUploadError(null);
     setGalleryUploadSuccess(null);
     setSuccess(null);
-    setGalleryUploading(true);
 
-    try {
-      const remainingSlots = MAX_GALLERY_IMAGES - galleryImages.length;
-      const selectedFiles = Array.from(files).slice(0, remainingSlots);
+    const remainingSlots = MAX_GALLERY_IMAGES - currentTotal;
+    const selectedFiles = Array.from(files).slice(0, remainingSlots);
 
-      if (selectedFiles.length !== files.length) {
-        setGalleryUploadError(`Only ${remainingSlots} more image${remainingSlots === 1 ? '' : 's'} allowed.`);
+    if (selectedFiles.length !== files.length) {
+      setGalleryUploadError(`Only ${remainingSlots} more image${remainingSlots === 1 ? '' : 's'} allowed.`);
+    }
+
+    // Validate and create previews for files
+    const validFiles: File[] = [];
+    const newPreviews: string[] = [];
+
+    for (const file of selectedFiles) {
+      if (!file.type.startsWith('image/')) {
+        setGalleryUploadError('Only image files are allowed.');
+        continue;
       }
 
-      let successCount = 0;
-      for (const file of selectedFiles) {
-        try {
-          const uploadedUrl = await uploadImageToServer(file);
-          const added = appendGalleryImage(uploadedUrl, '');
-          if (added) {
-            successCount += 1;
-          }
-        } catch (uploadIssue) {
-          const message = uploadIssue instanceof Error ? uploadIssue.message : 'Failed to upload image';
-          setGalleryUploadError(message);
-        }
+      const maxBytes = 4 * 1024 * 1024;
+      if (file.size > maxBytes) {
+        setGalleryUploadError('Some images are too large. Maximum size is 4MB.');
+        continue;
       }
 
-      if (successCount > 0) {
-        setGalleryUploadSuccess(
-          `Added ${successCount} image${successCount === 1 ? '' : 's'} to the gallery.`,
-        );
-      }
-    } catch (uploadIssue) {
-      const message = uploadIssue instanceof Error ? uploadIssue.message : 'Failed to upload image';
-      setGalleryUploadError(message);
-      setGalleryUploadSuccess(null);
-    } finally {
-      if (galleryFileInputRef.current) {
-        galleryFileInputRef.current.value = '';
-      }
-      setGalleryUploading(false);
+      validFiles.push(file);
+      newPreviews.push(URL.createObjectURL(file));
+    }
+
+    if (validFiles.length > 0) {
+      setPendingFiles(prev => [...prev, ...validFiles]);
+      setPreviewUrls(prev => [...prev, ...newPreviews]);
+      setGalleryUploadSuccess(`${validFiles.length} file(s) ready to upload`);
+    }
+
+    if (galleryFileInputRef.current) {
+      galleryFileInputRef.current.value = '';
     }
   };
 
   const handleRemoveGalleryImage = (index: number) => {
-    setGalleryImages(prev => {
-      const next = prev.filter((_, idx) => idx !== index);
-      const removedUrl = prev[index];
-      setFormState(prevState => {
-        if (prevState.image_path.trim() === removedUrl) {
-          return { ...prevState, image_path: next[0] ?? '' };
-        }
-        return prevState;
+    const totalExisting = galleryImages.length;
+    
+    if (index < totalExisting) {
+      // Removing an existing uploaded image
+      setGalleryImages(prev => {
+        const next = prev.filter((_, idx) => idx !== index);
+        const removedUrl = prev[index];
+        setFormState(prevState => {
+          if (prevState.image_path.trim() === removedUrl) {
+            return { ...prevState, image_path: next[0] ?? previewUrls[0] ?? '' };
+          }
+          return prevState;
+        });
+        return next;
       });
-      return next;
-    });
+    } else {
+      // Removing a pending file
+      const pendingIndex = index - totalExisting;
+      
+      // Revoke the preview URL to free memory
+      if (previewUrls[pendingIndex]) {
+        URL.revokeObjectURL(previewUrls[pendingIndex]);
+      }
+      
+      setPendingFiles(prev => prev.filter((_, i) => i !== pendingIndex));
+      setPreviewUrls(prev => prev.filter((_, i) => i !== pendingIndex));
+    }
+    
     setGalleryUploadError(null);
     setGalleryUploadSuccess(null);
     setSuccess(null);
@@ -285,16 +303,33 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
     setIsSubmitting(true);
 
     try {
+      // Upload pending files first
+      const uploadedUrls: string[] = [];
+      for (const file of pendingFiles) {
+        try {
+          const url = await uploadImageToServer(file);
+          uploadedUrls.push(url);
+        } catch (err) {
+          const message = err instanceof Error ? err.message : 'Failed to upload images';
+          setError(message);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      // Combine existing images with newly uploaded ones
+      const allGalleryImages = [...galleryImages, ...uploadedUrls].map(image => image.trim()).filter(Boolean);
+
       const endpoint = isEdit && packageId ? `/api/packages/${packageId}` : '/api/packages';
       const method = isEdit ? 'PUT' : 'POST';
 
-      const trimmedImagePath = formState.image_path.trim();
+      const trimmedImagePath = formState.image_path.trim() || allGalleryImages[0] || null;
       const payload = {
         title: formState.title.trim(),
         description: formState.description.trim(),
         price: parseFloat(formState.price),
         duration: formState.duration.trim(),
-        image_path: trimmedImagePath.length > 0 ? trimmedImagePath : null,
+        image_path: trimmedImagePath,
         category: formState.category.trim(),
         difficulty: formState.difficulty,
         highlights: formState.highlights
@@ -305,7 +340,7 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
           .split(',')
           .map(entry => entry.trim())
           .filter(Boolean),
-        galleryImages: galleryImages.map(image => image.trim()).filter(Boolean),
+        galleryImages: allGalleryImages,
       };
 
       const response = await fetch(endpoint, {
@@ -506,29 +541,31 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
                       multiple
                       ref={galleryFileInputRef}
                       onChange={handleGalleryFileChange}
-                      disabled={galleryUploading || galleryLimitReached}
+                      disabled={isSubmitting || galleryLimitReached}
                       className={styles.hiddenFileInput}
                     />
                     <button
                       type="button"
                       className={styles.uploadBtn}
                       onClick={() => galleryFileInputRef.current?.click()}
-                      disabled={galleryUploading || galleryLimitReached}
+                      disabled={isSubmitting || galleryLimitReached}
                     >
-                      {galleryUploading ? 'Uploading…' : 'Upload Images'}
+                      Select Images
                     </button>
                   </div>
                   <span className={styles.fieldHelp}>
                     Upload or paste up to {MAX_GALLERY_IMAGES} images. Set one as the cover using the gallery below.
+                    {pendingFiles.length > 0 && ` (${pendingFiles.length} file(s) ready to upload)`}
                   </span>
                   {galleryUploadError && <p className={styles.fieldError}>{galleryUploadError}</p>}
                   {galleryUploadSuccess && <p className={styles.fieldSuccess}>{galleryUploadSuccess}</p>}
                 </div>
 
-                {galleryImages.length > 0 ? (
+                {(galleryImages.length > 0 || previewUrls.length > 0) ? (
                   <div className={styles.galleryGrid}>
-                    {galleryImages.map((url, index) => {
+                    {[...galleryImages, ...previewUrls].map((url, index) => {
                       const isCover = coverImage === url;
+                      const isPending = index >= galleryImages.length;
                       return (
                         <div
                           key={`${url}-${index}`}
@@ -536,18 +573,27 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
                         >
                           <div className={styles.galleryCardImage}>
                             {isCover && <span className={styles.coverBadge}>Cover image</span>}
-                            <Image src={url} alt={`Gallery asset ${index + 1}`} width={200} height={150} style={{ objectFit: 'cover' }} />
+                            {isPending && <span className={styles.pendingBadge}>Pending Upload</span>}
+                            <Image 
+                              src={url} 
+                              alt={`Gallery asset ${index + 1}`} 
+                              width={200} 
+                              height={150} 
+                              style={{ objectFit: 'cover' }}
+                              unoptimized={isPending || url.startsWith('/uploads/')}
+                            />
                           </div>
                           <div className={styles.galleryCardBody}>
                             <p className={styles.galleryUrl} title={url}>
-                              {url}
+                              {isPending ? 'Pending upload...' : url}
                             </p>
                             <div className={styles.galleryCardActions}>
-                              {!isCover && (
+                              {!isCover && !isPending && (
                                 <button
                                   type="button"
                                   className={styles.galleryActionBtn}
                                   onClick={() => handleSetCoverImage(url)}
+                                  disabled={isSubmitting}
                                 >
                                   Set as cover
                                 </button>
@@ -556,6 +602,7 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
                                 type="button"
                                 className={`${styles.galleryActionBtn} ${styles.galleryActionDanger}`}
                                 onClick={() => handleRemoveGalleryImage(index)}
+                                disabled={isSubmitting}
                               >
                                 Remove
                               </button>

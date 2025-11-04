@@ -41,9 +41,8 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
   });
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
-  const [createUploading, setCreateUploading] = useState(false);
-  const [createUploadError, setCreateUploadError] = useState<string | null>(null);
-  const [createUploadMessage, setCreateUploadMessage] = useState<string | null>(null);
+  const [createPendingFile, setCreatePendingFile] = useState<File | null>(null);
+  const [createPreviewUrl, setCreatePreviewUrl] = useState<string>('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -56,9 +55,8 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
   const [updating, setUpdating] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [editUploading, setEditUploading] = useState(false);
-  const [editUploadError, setEditUploadError] = useState<string | null>(null);
-  const [editUploadMessage, setEditUploadMessage] = useState<string | null>(null);
+  const [editPendingFile, setEditPendingFile] = useState<File | null>(null);
+  const [editPreviewUrl, setEditPreviewUrl] = useState<string>('');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const categories = useMemo(() => {
@@ -74,9 +72,12 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
   const resetCreateForm = useCallback(() => {
     setCreateState({ category: '', imagePath: '', title: '', description: '' });
     setCreateError(null);
-    setCreateUploadError(null);
-    setCreateUploadMessage(null);
-  }, []);
+    setCreatePendingFile(null);
+    if (createPreviewUrl) {
+      URL.revokeObjectURL(createPreviewUrl);
+    }
+    setCreatePreviewUrl('');
+  }, [createPreviewUrl]);
 
   const closeCreateModal = useCallback(() => {
     setIsCreateModalOpen(false);
@@ -92,62 +93,35 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
     openCreateModal,
   }), [openCreateModal]);
 
-  const uploadFile = async (
-    file: File,
-    options: {
-      onSuccess: (url: string) => void;
-      setUploading: (value: boolean) => void;
-      setError: (value: string | null) => void;
-      setMessage: (value: string | null) => void;
-    },
-  ) => {
-    const { onSuccess, setUploading, setError, setMessage } = options;
-    setUploading(true);
-    setError(null);
-    setMessage(null);
-
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('folder', 'gallery');
-
-      const response = await fetch('/api/uploads', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.message || 'Failed to upload file');
-      }
-
-      const uploadedUrl = data?.url;
-      if (!uploadedUrl || typeof uploadedUrl !== 'string') {
-        throw new Error('Upload did not return a file path');
-      }
-
-      onSuccess(uploadedUrl);
-      setMessage(`Uploaded as ${uploadedUrl}`);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to upload file';
-      setError(message);
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleCreateFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+  const handleCreateFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
       return;
     }
 
-    await uploadFile(file, {
-      onSuccess: url => setCreateState(prev => ({ ...prev, imagePath: url })),
-      setUploading: setCreateUploading,
-      setError: setCreateUploadError,
-      setMessage: setCreateUploadMessage,
-    });
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setCreateError('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setCreateError('File size must be less than 10MB');
+      return;
+    }
+
+    // Clean up previous preview URL
+    if (createPreviewUrl) {
+      URL.revokeObjectURL(createPreviewUrl);
+    }
+
+    // Create preview URL
+    const previewUrl = URL.createObjectURL(file);
+    setCreatePendingFile(file);
+    setCreatePreviewUrl(previewUrl);
+    setCreateError(null);
 
     event.target.value = '';
   };
@@ -158,10 +132,34 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
     setCreateError(null);
 
     try {
+      let imagePath = createState.imagePath;
+
+      // Upload pending file if exists
+      if (createPendingFile) {
+        const formData = new FormData();
+        formData.append('file', createPendingFile);
+        formData.append('folder', 'gallery');
+
+        const uploadResponse = await fetch('/api/uploads', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const uploadData = await uploadResponse.json();
+        if (!uploadResponse.ok) {
+          throw new Error(uploadData?.message || 'Failed to upload image');
+        }
+
+        imagePath = uploadData?.url;
+        if (!imagePath) {
+          throw new Error('Upload did not return a file path');
+        }
+      }
+
       const response = await fetch('/api/gallery-items', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(createState),
+        body: JSON.stringify({ ...createState, imagePath }),
       });
 
       const data = await response.json();
@@ -183,10 +181,13 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
     setEditingId(null);
     setEditState({ category: '', imagePath: '', title: '', description: '' });
     setUpdateError(null);
-    setEditUploadError(null);
-    setEditUploadMessage(null);
+    setEditPendingFile(null);
+    if (editPreviewUrl) {
+      URL.revokeObjectURL(editPreviewUrl);
+    }
+    setEditPreviewUrl('');
     setIsEditModalOpen(false);
-  }, []);
+  }, [editPreviewUrl]);
 
   const beginEdit = useCallback((item: GalleryItem) => {
     setEditingId(item.id);
@@ -197,8 +198,8 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
       description: toFormValue(item.description),
     });
     setUpdateError(null);
-    setEditUploadError(null);
-    setEditUploadMessage(null);
+    setEditPendingFile(null);
+    setEditPreviewUrl('');
     setIsEditModalOpen(true);
   }, []);
 
@@ -225,12 +226,12 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
         return;
       }
 
-      if (isEditModalOpen && !updating && !editUploading) {
+      if (isEditModalOpen && !updating) {
         cancelEdit();
         return;
       }
 
-      if (isCreateModalOpen && !creating && !createUploading) {
+      if (isCreateModalOpen && !creating) {
         closeCreateModal();
       }
     };
@@ -245,26 +246,24 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
     cancelEdit,
     closeCreateModal,
     creating,
-    createUploading,
-    editUploading,
     isCreateModalOpen,
     isEditModalOpen,
     updating,
   ]);
 
   const handleCreateModalBackdropClick = (event: ReactMouseEvent<HTMLDivElement>) => {
-    if (event.target === event.currentTarget && !creating && !createUploading) {
+    if (event.target === event.currentTarget && !creating) {
       closeCreateModal();
     }
   };
 
   const handleEditModalBackdropClick = (event: ReactMouseEvent<HTMLDivElement>) => {
-    if (event.target === event.currentTarget && !updating && !editUploading) {
+    if (event.target === event.currentTarget && !updating) {
       cancelEdit();
     }
   };
 
-  const handleEditFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+  const handleEditFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
       return;
@@ -274,12 +273,29 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
       return;
     }
 
-    await uploadFile(file, {
-      onSuccess: url => setEditState(prev => ({ ...prev, imagePath: url })),
-      setUploading: setEditUploading,
-      setError: setEditUploadError,
-      setMessage: setEditUploadMessage,
-    });
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setUpdateError('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setUpdateError('File size must be less than 10MB');
+      return;
+    }
+
+    // Clean up previous preview URL
+    if (editPreviewUrl) {
+      URL.revokeObjectURL(editPreviewUrl);
+    }
+
+    // Create preview URL
+    const previewUrl = URL.createObjectURL(file);
+    setEditPendingFile(file);
+    setEditPreviewUrl(previewUrl);
+    setUpdateError(null);
 
     event.target.value = '';
   };
@@ -294,10 +310,34 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
     setUpdateError(null);
 
     try {
+      let imagePath = editState.imagePath;
+
+      // Upload pending file if exists
+      if (editPendingFile) {
+        const formData = new FormData();
+        formData.append('file', editPendingFile);
+        formData.append('folder', 'gallery');
+
+        const uploadResponse = await fetch('/api/uploads', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const uploadData = await uploadResponse.json();
+        if (!uploadResponse.ok) {
+          throw new Error(uploadData?.message || 'Failed to upload image');
+        }
+
+        imagePath = uploadData?.url;
+        if (!imagePath) {
+          throw new Error('Upload did not return a file path');
+        }
+      }
+
       const response = await fetch(`/api/gallery-items/${editingId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editState),
+        body: JSON.stringify({ ...editState, imagePath }),
       });
 
       const data = await response.json();
@@ -429,7 +469,7 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
               className={styles.modalCloseBtn}
               aria-label="Close create dialog"
               onClick={closeCreateModal}
-              disabled={creating || createUploading}
+              disabled={creating}
             >
               X
             </button>
@@ -475,31 +515,43 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.formLabel} htmlFor="create-image-upload">Upload Image</label>
+                <label className={styles.formLabel} htmlFor="create-image-upload">Select Image</label>
                 <input
                   id="create-image-upload"
                   type="file"
                   accept="image/*"
                   className={styles.fileInput}
                   onChange={handleCreateFileChange}
-                  disabled={createUploading}
+                  disabled={creating}
                 />
-                <p className={styles.inputHint}>Select an image file to store it under <code>/public/uploads</code>.</p>
-                {createUploading && <span className={styles.uploadStatus}>Uploading…</span>}
-                {createUploadMessage && <span className={styles.uploadStatus}>{createUploadMessage}</span>}
-                {createUploadError && <span className={styles.uploadStatusError}>{createUploadError}</span>}
+                <p className={styles.inputHint}>
+                  Select an image file (preview only - will upload on submit)
+                  {createPendingFile && <span style={{color: '#3b82f6', fontWeight: 600}}> • File ready: {createPendingFile.name}</span>}
+                </p>
               </div>
 
+              {createPreviewUrl && (
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Image Preview</label>
+                  <div style={{position: 'relative', display: 'inline-block'}}>
+                    <img 
+                      src={createPreviewUrl} 
+                      alt="Preview" 
+                      style={{maxWidth: '200px', maxHeight: '200px', borderRadius: '8px'}}
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className={styles.formGroup}>
-                <label className={styles.formLabel} htmlFor="create-image-path">Stored Path</label>
+                <label className={styles.formLabel} htmlFor="create-image-path">Stored Path (after upload)</label>
                 <input
                   id="create-image-path"
                   name="imagePath"
                   className={styles.formInput}
                   value={createState.imagePath}
                   readOnly
-                  placeholder="Upload an image to generate the stored path"
-                  required
+                  placeholder="Will be set after image upload on submit"
                 />
               </div>
 
@@ -522,16 +574,16 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
                   className={styles.secondaryBtn}
                   type="button"
                   onClick={closeCreateModal}
-                  disabled={creating || createUploading}
+                  disabled={creating}
                 >
                   Cancel
                 </button>
                 <button
                   className={styles.submitBtn}
                   type="submit"
-                  disabled={creating || createUploading || !createState.imagePath}
+                  disabled={creating || (!createPendingFile && !createState.imagePath)}
                 >
-                  {creating ? 'Saving…' : 'Add Project'}
+                  {creating ? 'Uploading & Saving…' : 'Add Project'}
                 </button>
               </div>
             </form>
@@ -553,7 +605,7 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
               className={styles.modalCloseBtn}
               aria-label="Close edit dialog"
               onClick={cancelEdit}
-              disabled={updating || editUploading}
+              disabled={updating}
             >
               X
             </button>
@@ -594,22 +646,34 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
                   accept="image/*"
                   className={styles.fileInput}
                   onChange={handleEditFileChange}
-                  disabled={editUploading}
+                  disabled={updating}
                 />
-                <p className={styles.inputHint}>Upload a new image to replace the existing file.</p>
-                {editUploading && <span className={styles.uploadStatus}>Uploading…</span>}
-                {editUploadMessage && <span className={styles.uploadStatus}>{editUploadMessage}</span>}
-                {editUploadError && <span className={styles.uploadStatusError}>{editUploadError}</span>}
+                <p className={styles.inputHint}>
+                  Select a new image to replace (preview only - will upload on submit)
+                  {editPendingFile && <span style={{color: '#3b82f6', fontWeight: 600}}> • File ready: {editPendingFile.name}</span>}
+                </p>
               </div>
 
+              {editPreviewUrl && (
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>New Image Preview</label>
+                  <div style={{position: 'relative', display: 'inline-block'}}>
+                    <img 
+                      src={editPreviewUrl} 
+                      alt="Preview" 
+                      style={{maxWidth: '200px', maxHeight: '200px', borderRadius: '8px'}}
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className={styles.formGroup}>
-                <label className={styles.formLabel} htmlFor="edit-image-path">Stored Path</label>
+                <label className={styles.formLabel} htmlFor="edit-image-path">Current Stored Path</label>
                 <input
                   id="edit-image-path"
                   className={styles.formInput}
                   value={editState.imagePath}
                   readOnly
-                  placeholder="Upload an image to generate the stored path"
                   required
                 />
               </div>
@@ -631,16 +695,16 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
                   className={styles.secondaryBtn}
                   type="button"
                   onClick={cancelEdit}
-                  disabled={updating || editUploading}
+                  disabled={updating}
                 >
                   Cancel
                 </button>
                 <button
                   className={styles.submitBtn}
                   type="submit"
-                  disabled={updating || editUploading || !editState.imagePath}
+                  disabled={updating || !editState.imagePath}
                 >
-                  {updating ? 'Updating…' : 'Save Changes'}
+                  {updating ? 'Uploading & Updating…' : 'Save Changes'}
                 </button>
               </div>
             </form>
