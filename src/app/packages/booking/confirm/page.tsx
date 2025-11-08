@@ -216,7 +216,7 @@ export default function BookingConfirmationPage({ searchParams }: PageProps) {
     const maxBytes = 10 * 1024 * 1024;
     if (file.size > maxBytes) {
       setUploadStatus('error');
-      setUploadMessage('Receipts must be 10MB or smaller.');
+      setUploadMessage('Receipts must be 15MB or smaller.');
       setReceiptFile(null);
       setReceiptPreview(null);
       return;
@@ -541,7 +541,7 @@ export default function BookingConfirmationPage({ searchParams }: PageProps) {
                 <i className="fas fa-cloud-upload-alt" style={{ fontSize: '3rem', color: '#6366f1', marginBottom: '1rem' }}></i>
                 <strong>Click here to choose your receipt file</strong>
                 <span>or drag and drop it here</span>
-                <span style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Accepted: JPG, PNG, PDF (max 10MB)</span>
+                <span style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Accepted: JPG, PNG, PDF (max 15MB)</span>
                 <input
                   className={styles.fileInput}
                   type="file"

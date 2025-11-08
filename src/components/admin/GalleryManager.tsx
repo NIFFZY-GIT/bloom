@@ -105,10 +105,10 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
       return;
     }
 
-    // Validate file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024;
+    // Validate file size (max 15MB)
+    const maxSize = 15 * 1024 * 1024;
     if (file.size > maxSize) {
-      setCreateError('File size must be less than 10MB');
+      setCreateError('File size must be less than 15MB');
       return;
     }
 
@@ -279,10 +279,10 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
       return;
     }
 
-    // Validate file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024;
+    // Validate file size (max 15MB)
+    const maxSize = 15 * 1024 * 1024;
     if (file.size > maxSize) {
-      setUpdateError('File size must be less than 10MB');
+      setUpdateError('File size must be less than 15MB');
       return;
     }
 

@@ -654,10 +654,7 @@ const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
                     <div className="package-content">
                       <div className="package-header">
                         <h3>{pkg.title}</h3>
-                        <div className="package-rating">
-                          <div className="stars">{renderStars(pkg.rating)}</div>
-                          <span>({pkg.reviews})</span>
-                        </div>
+                    
                       </div>
                       <p className="package-description">{pkg.description}</p>
                       <div className="package-highlights">

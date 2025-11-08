@@ -28,10 +28,10 @@ export default function UploadQuotationButton({
       return;
     }
 
-    // Validate file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024;
+    // Validate file size (max 15MB)
+    const maxSize = 15 * 1024 * 1024;
     if (file.size > maxSize) {
-      setUploadError('PDF file is too large. Maximum size is 10MB.');
+      setUploadError('PDF file is too large. Maximum size is 15MB.');
       return;
     }
 

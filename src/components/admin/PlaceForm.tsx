@@ -98,7 +98,7 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
 
     const maxBytes = 10 * 1024 * 1024;
     if (file.size > maxBytes) {
-      throw new Error('Image is too large. Maximum size is 10MB.');
+      throw new Error('Image is too large. Maximum size is 15MB.');
     }
 
     const formData = new FormData();
@@ -134,9 +134,9 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
       return;
     }
 
-    const maxBytes = 10 * 1024 * 1024;
+    const maxBytes = 15 * 1024 * 1024;
     if (file.size > maxBytes) {
-      setError('Image is too large. Maximum size is 10MB.');
+      setError('Image is too large. Maximum size is 15MB.');
       return;
     }
 
