@@ -24,10 +24,10 @@ const nextConfig: NextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   
-  // 2. Set the API body size limit for file uploads
-  api: {
-    bodyParser: {
-      sizeLimit: '10mb', // Make sure this matches your Nginx setting
+  // 2. Experimental features for body size limit
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '15mb',
     },
   },
 };

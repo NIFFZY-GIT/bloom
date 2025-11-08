@@ -4,8 +4,9 @@ import path from 'path';
 import crypto from 'crypto';
 
 export const runtime = 'nodejs';
+export const maxDuration = 30; // Allow up to 30 seconds for upload
 
-const MAX_BYTES = 10 * 1024 * 1024;
+const MAX_BYTES = 15 * 1024 * 1024;
 const ALLOWED_MIME_TYPES = new Set([
   'image/jpeg',
   'image/png',
@@ -17,23 +18,41 @@ const ALLOWED_MIME_TYPES = new Set([
 
 export async function POST(request: Request) {
   try {
+    // Check content length before processing
+    const contentLength = request.headers.get('content-length');
+    if (contentLength && parseInt(contentLength) > MAX_BYTES) {
+      return NextResponse.json({ 
+        success: false,
+        message: 'File too large. Maximum size is 15MB.' 
+      }, { status: 413 });
+    }
+
     const formData = await request.formData();
     const file = formData.get('file');
 
     // Check if file exists and is a Blob/File-like object
     if (!file || typeof file === 'string') {
-      return NextResponse.json({ message: 'No file uploaded' }, { status: 400 });
+      return NextResponse.json({ 
+        success: false,
+        message: 'No file uploaded' 
+      }, { status: 400 });
     }
 
     // Type guard for file-like objects in Node.js environment
     const fileObj = file as Blob & { name?: string; type: string };
     
     if (!fileObj.arrayBuffer || !fileObj.type) {
-      return NextResponse.json({ message: 'Invalid file object' }, { status: 400 });
+      return NextResponse.json({ 
+        success: false,
+        message: 'Invalid file object' 
+      }, { status: 400 });
     }
 
     if (!ALLOWED_MIME_TYPES.has(fileObj.type)) {
-      return NextResponse.json({ message: 'Unsupported file type' }, { status: 400 });
+      return NextResponse.json({ 
+        success: false,
+        message: `Unsupported file type: ${fileObj.type}. Allowed types: JPEG, PNG, WEBP, GIF, PDF` 
+      }, { status: 400 });
     }
 
     const folderInput = formData.get('folder');
@@ -50,7 +69,10 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(bytes);
 
     if (buffer.length > MAX_BYTES) {
-      return NextResponse.json({ message: 'File too large. Max size is 10MB.' }, { status: 400 });
+      return NextResponse.json({ 
+        success: false,
+        message: `File too large (${(buffer.length / 1024 / 1024).toFixed(2)}MB). Maximum size is 15MB.` 
+      }, { status: 413 });
     }
 
   // Always store uploads under public/uploads to keep a single writable directory
@@ -82,6 +104,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, url: publicUrl }, { status: 201 });
   } catch (error) {
     console.error('Upload error:', error);
-    return NextResponse.json({ message: 'Failed to upload file' }, { status: 500 });
+    
+    // Ensure we always return JSON, even on unexpected errors
+    const errorMessage = error instanceof Error ? error.message : 'Failed to upload file';
+    
+    return NextResponse.json({ 
+      success: false,
+      message: errorMessage,
+      error: 'Upload failed'
+    }, { status: 500 });
   }
 }
