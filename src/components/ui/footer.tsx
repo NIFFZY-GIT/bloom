@@ -168,39 +168,6 @@ export default function Footer() {
             </motion.div>
           </div>
 
-          {/* Newsletter Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="newsletter-section"
-          >
-            <div className="newsletter-content">
-              <div className="newsletter-text">
-                <h3 className="newsletter-title">Stay Updated</h3>
-                <p className="newsletter-description">
-                  Get exclusive travel tips and destination updates delivered to your inbox.
-                </p>
-              </div>
-              <div className="newsletter-form">
-                <div className="form-container">
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    className="email-input"
-                  />
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="subscribe-button"
-                  >
-                    Subscribe
-                  </motion.button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
           {/* Bottom Bar */}
           <div className="bottom-bar">
             <div className="bottom-content">
@@ -571,96 +538,6 @@ export default function Footer() {
           font-size: 0.75rem;
         }
 
-        /* Newsletter Section */
-        .newsletter-section {
-          background: rgba(30, 41, 59, 0.5);
-          backdrop-filter: blur(8px);
-          border-radius: 1rem;
-          padding: 2rem;
-          margin-bottom: 2rem;
-          border: 1px solid #334155;
-        }
-
-        .newsletter-content {
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-        }
-
-        @media (min-width: 1024px) {
-          .newsletter-content {
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1.5rem;
-          }
-        }
-
-        .newsletter-text {
-          flex: 1;
-        }
-
-        .newsletter-title {
-          font-size: 1.25rem;
-          font-weight: bold;
-          color: white;
-          margin-bottom: 0.5rem;
-        }
-
-        .newsletter-description {
-          color: #cbd5e1;
-          font-size: 0.875rem;
-        }
-
-        .newsletter-form {
-          flex: 1;
-          width: 100%;
-          max-width: 28rem;
-        }
-
-        .form-container {
-          display: flex;
-          gap: 0.75rem;
-        }
-
-        .email-input {
-          flex: 1;
-          padding: 0.75rem 1rem;
-          background: #0f172a;
-          border: 1px solid #334155;
-          border-radius: 0.75rem;
-          color: white;
-          font-size: 0.875rem;
-          transition: all 0.3s ease;
-        }
-
-        .email-input:focus {
-          outline: none;
-          border-color: #f59e0b;
-          box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
-        }
-
-        .email-input::placeholder {
-          color: #94a3b8;
-        }
-
-        .subscribe-button {
-          padding: 0.75rem 1.5rem;
-          background: linear-gradient(to right, #f59e0b, #d97706);
-          color: white;
-          border-radius: 0.75rem;
-          font-weight: 600;
-          font-size: 0.875rem;
-          border: none;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-
-        .subscribe-button:hover {
-          background: linear-gradient(to right, #d97706, #b45309);
-        }
-
         /* Bottom Bar */
         .bottom-bar {
           border-top: 1px solid #1e293b;
@@ -861,3 +738,5 @@ export default function Footer() {
     </>
   );
 }
+
+/*hiiiiiiiiiiiiiii*/

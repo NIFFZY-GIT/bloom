@@ -3,48 +3,83 @@
   align-items: stretch;
   min-height: 100vh;
   margin-top: 5.5rem;
-  background: #f1f5f9;
+  background: #0f172a;
 }
 
 .sidebarWrapper {
   flex-shrink: 0;
   width: 260px;
-  position: relative;
-  top: 0;
+  position: sticky;
+  top: 5.5rem;
   display: flex;
   flex-direction: column;
-  height: auto;
-  min-height: calc(100vh - 5.5rem);
-  max-height: none;
+  height: calc(100vh - 5.5rem);
+  max-height: calc(100vh - 5.5rem);
   overflow-y: auto;
   z-index: 20;
 }
 
 .contentArea {
   flex: 1;
-  padding: 2.5rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
   min-height: calc(100vh - 5.5rem);
   overflow: visible;
 }
 
+/* Tablet and smaller desktop */
 @media (max-width: 1024px) {
   .adminLayout {
-    flex-direction: column;
-    margin-top: 5rem;
+    margin-top: 5.5rem;
     min-height: auto;
+    padding-left: 0;
   }
 
   .sidebarWrapper {
-    width: 100%;
-    position: relative;
-    min-height: auto;
-    max-height: none;
+    position: fixed;
     top: 0;
-    box-shadow: none;
+    left: 0;
+    width: auto;
+    height: 100vh;
+    z-index: 1000;
   }
 
   .contentArea {
-    padding: 2rem 1.5rem;
-    min-height: auto;
+    padding: clamp(1.5rem, 3vw, 2rem);
+    min-height: calc(100vh - 5.5rem);
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+/* Mobile devices */
+@media (max-width: 768px) {
+  .adminLayout {
+    margin-top: 5.5rem;
+  }
+  
+  .contentArea {
+    padding: 1.5rem 1rem;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .adminLayout {
+    margin-top: 5.5rem;
+  }
+  
+  .contentArea {
+    padding: 1.25rem 0.75rem;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+  .adminLayout {
+    margin-top: 5.5rem;
+  }
+  
+  .contentArea {
+    padding: 1rem 0.5rem;
   }
 }

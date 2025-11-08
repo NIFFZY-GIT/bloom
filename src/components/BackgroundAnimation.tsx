@@ -1,7 +1,3 @@
-//shape
-
-
-
 'use client';
 
 import { Category } from '../Types';
@@ -66,12 +62,30 @@ export default function BackgroundAnimation({ category }: BackgroundAnimationPro
           position: relative;
           transition: background 1.5s ease-in-out;
         }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+          .animated-bg * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
+
+        /* Mobile performance optimizations */
+        @media (max-width: 768px) {
+          .background-animation {
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            perspective: 1000;
+          }
+        }
       `}</style>
     </div>
   );
 }
 
-// Individual Animation Components
+// Individual Animation Components with responsive improvements
 const WavesAnimation = () => (
   <div className="waves-animation">
     <div className="wave wave-1"></div>
@@ -96,7 +110,7 @@ const WavesAnimation = () => (
         bottom: 0;
         left: 0;
         width: 200%;
-        height: 100px;
+        height: clamp(60px, 15vh, 160px);
         background: rgba(255, 255, 255, 0.1);
         border-radius: 40% 45% 40% 45%;
         animation: waveMove 8s linear infinite;
@@ -105,29 +119,29 @@ const WavesAnimation = () => (
       .wave-1 {
         animation-duration: 10s;
         opacity: 0.6;
-        height: 120px;
+        height: clamp(80px, 18vh, 180px);
       }
 
       .wave-2 {
         animation-duration: 12s;
         opacity: 0.4;
         animation-delay: -2s;
-        height: 140px;
+        height: clamp(100px, 20vh, 200px);
       }
 
       .wave-3 {
         animation-duration: 14s;
         opacity: 0.2;
         animation-delay: -4s;
-        height: 160px;
+        height: clamp(120px, 22vh, 220px);
       }
 
       .floating-boat {
         position: absolute;
-        bottom: 150px;
+        bottom: clamp(120px, 25vh, 200px);
         right: -100px;
-        width: 120px;
-        height: 60px;
+        width: clamp(80px, 10vw, 120px);
+        height: clamp(40px, 6vh, 60px);
         background: rgba(255, 255, 255, 0.8);
         border-radius: 50% 50% 0 0;
         animation: floatBoat 25s linear infinite;
@@ -136,27 +150,27 @@ const WavesAnimation = () => (
       .floating-boat::after {
         content: '';
         position: absolute;
-        top: -30px;
+        top: -20px;
         left: 50%;
         width: 2px;
-        height: 40px;
+        height: clamp(25px, 4vh, 40px);
         background: rgba(255, 255, 255, 0.6);
       }
 
       .floating-boat::before {
         content: '';
         position: absolute;
-        top: -25px;
+        top: -18px;
         left: 40%;
-        width: 30px;
-        height: 30px;
+        width: clamp(20px, 3vw, 30px);
+        height: clamp(20px, 3vh, 30px);
         background: rgba(255, 255, 255, 0.4);
         clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
       }
 
       .seagull {
         position: absolute;
-        font-size: 2rem;
+        font-size: clamp(1.5rem, 4vw, 2rem);
         color: rgba(255, 255, 255, 0.7);
         animation: fly 15s linear infinite;
       }
@@ -222,6 +236,40 @@ const WavesAnimation = () => (
           transform: translateX(100vw) translateY(0);
         }
       }
+
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        .wave {
+          height: clamp(40px, 12vh, 120px);
+        }
+
+        .wave-1 {
+          height: clamp(50px, 14vh, 140px);
+        }
+
+        .wave-2 {
+          height: clamp(60px, 16vh, 160px);
+        }
+
+        .wave-3 {
+          height: clamp(70px, 18vh, 180px);
+        }
+
+        .floating-boat {
+          bottom: clamp(100px, 20vh, 160px);
+          width: clamp(60px, 8vw, 100px);
+        }
+
+        .seagull {
+          font-size: clamp(1.25rem, 3vw, 1.75rem);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .seagull-2 {
+          display: none; /* Reduce elements on very small screens */
+        }
+      }
     `}</style>
   </div>
 );
@@ -249,20 +297,20 @@ const WildlifeAnimation = () => (
 
       .elephant {
         position: absolute;
-        font-size: 4rem;
+        font-size: clamp(2.5rem, 8vw, 4rem);
         animation: walkElephant 40s linear infinite;
         filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
       }
 
       .elephant-1 {
-        bottom: 100px;
+        bottom: clamp(80px, 15vh, 120px);
         left: -100px;
         animation-delay: 0s;
         animation-duration: 45s;
       }
 
       .elephant-2 {
-        bottom: 150px;
+        bottom: clamp(120px, 20vh, 160px);
         left: -200px;
         animation-delay: 10s;
         animation-duration: 50s;
@@ -270,7 +318,7 @@ const WildlifeAnimation = () => (
 
       .bird {
         position: absolute;
-        font-size: 2rem;
+        font-size: clamp(1.5rem, 4vw, 2rem);
         animation: flyBird 25s linear infinite;
       }
 
@@ -288,7 +336,7 @@ const WildlifeAnimation = () => (
 
       .tree {
         position: absolute;
-        font-size: 6rem;
+        font-size: clamp(4rem, 12vw, 6rem);
         bottom: 0;
         opacity: 0.3;
       }
@@ -308,7 +356,7 @@ const WildlifeAnimation = () => (
         position: absolute;
         bottom: 0;
         width: 100%;
-        height: 80px;
+        height: clamp(40px, 10vh, 80px);
         background: rgba(0, 0, 0, 0.1);
         animation: grassWave 6s ease-in-out infinite;
       }
@@ -318,7 +366,7 @@ const WildlifeAnimation = () => (
       }
 
       .grass-2 {
-        height: 60px;
+        height: clamp(30px, 8vh, 60px);
         animation-delay: -1s;
       }
 
@@ -375,6 +423,27 @@ const WildlifeAnimation = () => (
           transform: skewX(5deg);
         }
       }
+
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        .elephant {
+          font-size: clamp(2rem, 6vw, 3rem);
+        }
+
+        .tree {
+          font-size: clamp(3rem, 8vw, 5rem);
+        }
+
+        .elephant-2 {
+          display: none; /* Reduce elements on mobile */
+        }
+      }
+
+      @media (max-width: 480px) {
+        .bird-2 {
+          display: none; /* Further reduce on small screens */
+        }
+      }
     `}</style>
   </div>
 );
@@ -402,7 +471,7 @@ const ForestAnimation = () => (
 
       .leaf {
         position: absolute;
-        font-size: 2rem;
+        font-size: clamp(1.5rem, 4vw, 2rem);
         animation: fallLeaf 20s linear infinite;
         opacity: 0.6;
       }
@@ -439,7 +508,7 @@ const ForestAnimation = () => (
 
       .tree {
         position: absolute;
-        font-size: 8rem;
+        font-size: clamp(5rem, 15vw, 8rem);
         bottom: 0;
         opacity: 0.2;
         animation: swayTree 15s ease-in-out infinite;
@@ -485,6 +554,28 @@ const ForestAnimation = () => (
           transform: rotate(3deg);
         }
       }
+
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        .leaf {
+          font-size: clamp(1.25rem, 3vw, 1.75rem);
+        }
+
+        .tree {
+          font-size: clamp(3rem, 10vw, 6rem);
+        }
+
+        .leaf-4,
+        .leaf-5 {
+          display: none; /* Reduce leaf count on mobile */
+        }
+      }
+
+      @media (max-width: 480px) {
+        .tree-3 {
+          display: none; /* Reduce tree count on small screens */
+        }
+      }
     `}</style>
   </div>
 );
@@ -513,9 +604,9 @@ const MountainsAnimation = () => (
         bottom: 0;
         width: 0;
         height: 0;
-        border-left: 200px solid transparent;
-        border-right: 200px solid transparent;
-        border-bottom: 300px solid rgba(0, 0, 0, 0.1);
+        border-left: clamp(150px, 20vw, 200px) solid transparent;
+        border-right: clamp(150px, 20vw, 200px) solid transparent;
+        border-bottom: clamp(200px, 30vh, 300px) solid rgba(0, 0, 0, 0.1);
         animation: mountainGlow 10s ease-in-out infinite;
       }
 
@@ -526,19 +617,19 @@ const MountainsAnimation = () => (
 
       .mountain-2 {
         left: 150px;
-        border-bottom: 400px solid rgba(0, 0, 0, 0.08);
+        border-bottom: clamp(250px, 35vh, 400px) solid rgba(0, 0, 0, 0.08);
         animation-delay: -2s;
       }
 
       .mountain-3 {
         right: -100px;
-        border-bottom: 350px solid rgba(0, 0, 0, 0.12);
+        border-bottom: clamp(220px, 32vh, 350px) solid rgba(0, 0, 0, 0.12);
         animation-delay: -4s;
       }
 
       .cloud {
         position: absolute;
-        font-size: 4rem;
+        font-size: clamp(2.5rem, 8vw, 4rem);
         opacity: 0.3;
         animation: floatCloud 30s linear infinite;
       }
@@ -581,11 +672,28 @@ const MountainsAnimation = () => (
           transform: translateX(100vw) translateY(0);
         }
       }
+
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        .mountain {
+          border-left: clamp(100px, 15vw, 180px) solid transparent;
+          border-right: clamp(100px, 15vw, 180px) solid transparent;
+          border-bottom: clamp(150px, 25vh, 250px) solid rgba(0, 0, 0, 0.1);
+        }
+
+        .cloud {
+          font-size: clamp(2rem, 6vw, 3rem);
+        }
+
+        .cloud-3 {
+          display: none; /* Reduce cloud count on mobile */
+        }
+      }
     `}</style>
   </div>
 );
 
-// Add the missing animation components
+// Add the remaining animation components with similar responsive improvements
 const SpiritualAnimation = () => (
   <div className="spiritual-animation">
     <div className="lotus lotus-1">🪷</div>
@@ -608,7 +716,7 @@ const SpiritualAnimation = () => (
 
       .lotus {
         position: absolute;
-        font-size: 3rem;
+        font-size: clamp(2rem, 6vw, 3rem);
         opacity: 0.4;
         animation: float 8s ease-in-out infinite;
       }
@@ -627,7 +735,7 @@ const SpiritualAnimation = () => (
 
       .prayer {
         position: absolute;
-        font-size: 2rem;
+        font-size: clamp(1.5rem, 4vw, 2rem);
         opacity: 0.3;
         animation: float 12s ease-in-out infinite;
       }
@@ -646,7 +754,7 @@ const SpiritualAnimation = () => (
 
       .temple {
         position: absolute;
-        font-size: 8rem;
+        font-size: clamp(5rem, 15vw, 8rem);
         bottom: 10%;
         left: 50%;
         transform: translateX(-50%);
@@ -656,8 +764,8 @@ const SpiritualAnimation = () => (
 
       .light {
         position: absolute;
-        width: 100px;
-        height: 100px;
+        width: clamp(60px, 10vw, 100px);
+        height: clamp(60px, 10vw, 100px);
         background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
         border-radius: 50%;
         animation: lightPulse 4s ease-in-out infinite;
@@ -704,6 +812,17 @@ const SpiritualAnimation = () => (
           opacity: 0.2;
         }
       }
+
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        .temple {
+          font-size: clamp(3rem, 10vw, 6rem);
+        }
+
+        .prayer-2 {
+          display: none;
+        }
+      }
     `}</style>
   </div>
 );
@@ -730,7 +849,7 @@ const UrbanAnimation = () => (
 
       .building {
         position: absolute;
-        font-size: 6rem;
+        font-size: clamp(4rem, 12vw, 6rem);
         bottom: 0;
         opacity: 0.15;
         animation: buildingGlow 8s ease-in-out infinite;
@@ -753,8 +872,8 @@ const UrbanAnimation = () => (
 
       .car {
         position: absolute;
-        font-size: 2rem;
-        bottom: 100px;
+        font-size: clamp(1.5rem, 4vw, 2rem);
+        bottom: clamp(80px, 15vh, 130px);
         animation: driveCar 20s linear infinite;
         opacity: 0.4;
       }
@@ -767,15 +886,15 @@ const UrbanAnimation = () => (
 
       .car-2 {
         left: -80px;
-        bottom: 130px;
+        bottom: clamp(100px, 18vh, 150px);
         animation-delay: 5s;
         animation-duration: 30s;
       }
 
       .light {
         position: absolute;
-        width: 80px;
-        height: 80px;
+        width: clamp(50px, 8vw, 80px);
+        height: clamp(50px, 8vw, 80px);
         background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
         border-radius: 50%;
         animation: urbanLight 3s ease-in-out infinite;
@@ -820,6 +939,17 @@ const UrbanAnimation = () => (
           opacity: 0.2;
         }
       }
+
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        .building {
+          font-size: clamp(3rem, 8vw, 5rem);
+        }
+
+        .car-2 {
+          display: none;
+        }
+      }
     `}</style>
   </div>
 );
@@ -847,7 +977,7 @@ const WaterfallsAnimation = () => (
       .waterfall {
         position: absolute;
         top: 0;
-        width: 60px;
+        width: clamp(40px, 6vw, 60px);
         height: 100%;
         background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.3), transparent);
         animation: fallWater 3s linear infinite;
@@ -866,7 +996,7 @@ const WaterfallsAnimation = () => (
 
       .splash {
         position: absolute;
-        font-size: 1.5rem;
+        font-size: clamp(1rem, 3vw, 1.5rem);
         opacity: 0.5;
         animation: splash 2s ease-in infinite;
       }
@@ -891,8 +1021,8 @@ const WaterfallsAnimation = () => (
 
       .ripple {
         position: absolute;
-        width: 100px;
-        height: 100px;
+        width: clamp(60px, 10vw, 100px);
+        height: clamp(60px, 10vw, 100px);
         border: 2px solid rgba(255,255,255,0.2);
         border-radius: 50%;
         animation: rippleEffect 4s linear infinite;
@@ -941,6 +1071,17 @@ const WaterfallsAnimation = () => (
           opacity: 0;
         }
       }
+
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        .waterfall {
+          width: clamp(30px, 4vw, 50px);
+        }
+
+        .splash-3 {
+          display: none;
+        }
+      }
     `}</style>
   </div>
 );
@@ -966,8 +1107,8 @@ const AdventureAnimation = () => (
 
       .hiker {
         position: absolute;
-        font-size: 3rem;
-        bottom: 100px;
+        font-size: clamp(2rem, 6vw, 3rem);
+        bottom: clamp(80px, 15vh, 120px);
         animation: hike 30s linear infinite;
         opacity: 0.6;
       }
@@ -979,7 +1120,7 @@ const AdventureAnimation = () => (
 
       .mountain {
         position: absolute;
-        font-size: 8rem;
+        font-size: clamp(5rem, 15vw, 8rem);
         bottom: 0;
         opacity: 0.2;
         animation: mountainFloat 20s ease-in-out infinite;
@@ -997,7 +1138,7 @@ const AdventureAnimation = () => (
 
       .flag {
         position: absolute;
-        font-size: 2rem;
+        font-size: clamp(1.5rem, 4vw, 2rem);
         animation: waveFlag 3s ease-in-out infinite;
         opacity: 0.5;
       }
@@ -1010,7 +1151,7 @@ const AdventureAnimation = () => (
 
       .cloud {
         position: absolute;
-        font-size: 4rem;
+        font-size: clamp(2.5rem, 8vw, 4rem);
         opacity: 0.3;
         animation: floatCloud 40s linear infinite;
       }
@@ -1071,6 +1212,17 @@ const AdventureAnimation = () => (
           transform: translateX(100vw);
         }
       }
+
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        .mountain {
+          font-size: clamp(3rem, 10vw, 6rem);
+        }
+
+        .cloud-2 {
+          display: none;
+        }
+      }
     `}</style>
   </div>
 );
@@ -1097,7 +1249,7 @@ const VillageAnimation = () => (
 
       .hut {
         position: absolute;
-        font-size: 5rem;
+        font-size: clamp(3rem, 10vw, 5rem);
         bottom: 0;
         opacity: 0.2;
         animation: hutGlow 10s ease-in-out infinite;
@@ -1115,7 +1267,7 @@ const VillageAnimation = () => (
 
       .tree {
         position: absolute;
-        font-size: 6rem;
+        font-size: clamp(4rem, 12vw, 6rem);
         bottom: 0;
         opacity: 0.15;
         animation: swayTree 8s ease-in-out infinite;
@@ -1133,8 +1285,8 @@ const VillageAnimation = () => (
 
       .smoke {
         position: absolute;
-        width: 40px;
-        height: 40px;
+        width: clamp(25px, 5vw, 40px);
+        height: clamp(25px, 5vw, 40px);
         background: rgba(255,255,255,0.3);
         border-radius: 50%;
         animation: riseSmoke 6s ease-in infinite;
@@ -1142,21 +1294,21 @@ const VillageAnimation = () => (
       }
 
       .smoke-1 {
-        bottom: 80px;
+        bottom: clamp(60px, 12vh, 90px);
         left: 18%;
         animation-delay: 0s;
       }
 
       .smoke-2 {
-        bottom: 80px;
+        bottom: clamp(60px, 12vh, 90px);
         right: 23%;
         animation-delay: -3s;
       }
 
       .farmer {
         position: absolute;
-        font-size: 2rem;
-        bottom: 100px;
+        font-size: clamp(1.5rem, 4vw, 2rem);
+        bottom: clamp(80px, 15vh, 120px);
         left: -50px;
         animation: walkFarmer 40s linear infinite;
         opacity: 0.5;
@@ -1199,6 +1351,21 @@ const VillageAnimation = () => (
           transform: translateX(100vw);
         }
       }
+
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        .hut {
+          font-size: clamp(2.5rem, 8vw, 4rem);
+        }
+
+        .tree {
+          font-size: clamp(3rem, 8vw, 5rem);
+        }
+
+        .hut-2 {
+          display: none;
+        }
+      }
     `}</style>
   </div>
 );
@@ -1224,7 +1391,7 @@ const FortressesAnimation = () => (
 
       .fortress {
         position: absolute;
-        font-size: 8rem;
+        font-size: clamp(5rem, 15vw, 8rem);
         bottom: 0;
         opacity: 0.15;
         animation: fortressGlow 12s ease-in-out infinite;
@@ -1242,7 +1409,7 @@ const FortressesAnimation = () => (
 
       .flag {
         position: absolute;
-        font-size: 2rem;
+        font-size: clamp(1.5rem, 4vw, 2rem);
         animation: waveFlag 4s ease-in-out infinite;
         opacity: 0.4;
       }
@@ -1262,8 +1429,8 @@ const FortressesAnimation = () => (
       .wall {
         position: absolute;
         bottom: 0;
-        width: 300px;
-        height: 80px;
+        width: clamp(200px, 30vw, 300px);
+        height: clamp(50px, 8vh, 80px);
         background: rgba(0,0,0,0.1);
         animation: wallPulse 8s ease-in-out infinite;
       }
@@ -1304,6 +1471,17 @@ const FortressesAnimation = () => (
           opacity: 0.15;
         }
       }
+
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        .fortress {
+          font-size: clamp(3rem, 10vw, 6rem);
+        }
+
+        .flag-2 {
+          display: none;
+        }
+      }
     `}</style>
   </div>
 );
@@ -1328,7 +1506,7 @@ const HeritageAnimation = () => (
 
       .temple, .ancient, .scroll, .artifact {
         position: absolute;
-        font-size: 6rem;
+        font-size: clamp(4rem, 12vw, 6rem);
         opacity: 0.1;
         animation: float 20s ease-in-out infinite;
       }
@@ -1354,14 +1532,14 @@ const HeritageAnimation = () => (
       .scroll {
         top: 60%;
         right: 25%;
-        font-size: 4rem;
+        font-size: clamp(2.5rem, 8vw, 4rem);
         animation-delay: -15s;
       }
 
       .artifact {
         bottom: 30%;
         right: 30%;
-        font-size: 5rem;
+        font-size: clamp(3rem, 10vw, 5rem);
         animation-delay: -7s;
       }
 
@@ -1371,6 +1549,17 @@ const HeritageAnimation = () => (
         }
         50% {
           transform: translateY(-20px);
+        }
+      }
+
+      /* Mobile optimizations */
+      @media (max-width: 768px) {
+        .temple, .ancient, .scroll, .artifact {
+          font-size: clamp(2.5rem, 8vw, 5rem);
+        }
+
+        .ancient-2 {
+          display: none;
         }
       }
     `}</style>

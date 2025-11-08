@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 import styles from './AdminSidebar.module.css';
 
@@ -27,9 +28,48 @@ const NAV_ITEMS: NavItem[] = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isMobileMenuOpen]);
 
   return (
-    <aside className={styles.adminSidebar}>
+    <>
+      {/* Mobile hamburger button */}
+      <button
+        className={`${styles.hamburgerButton} ${isMobileMenuOpen ? styles.open : ''}`}
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+        aria-expanded={isMobileMenuOpen}
+      >
+        <div className={styles.hamburgerLine} />
+        <div className={styles.hamburgerLine} />
+        <div className={styles.hamburgerLine} />
+      </button>
+
+      {/* Mobile overlay */}
+      <div
+        className={`${styles.mobileOverlay} ${isMobileMenuOpen ? styles.visible : ''}`}
+        onClick={() => setIsMobileMenuOpen(false)}
+        aria-hidden="true"
+      />
+
+      {/* Sidebar */}
+      <aside className={`${styles.adminSidebar} ${isMobileMenuOpen ? styles.open : ''}`}>
       <div className={styles.sidebarHeader}>
         <div className={styles.logo}>
           <span className={styles.logoIcon}>🌴</span>
@@ -74,5 +114,6 @@ export default function AdminSidebar() {
         </Link>
       </div>
     </aside>
+    </>
   );
 }

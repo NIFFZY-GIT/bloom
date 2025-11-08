@@ -1,7 +1,7 @@
 .pageContainer {
   padding: 0;
   min-height: 100%;
-  background: #f9fafb;
+  background: #0f172a;
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -10,33 +10,37 @@
 .pageHeader {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
   gap: 1rem;
   margin-top: 0.5rem;
 }
 
 .pageTitle {
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 4vw, 2rem);
   font-weight: 700;
-  color: #111827;
+  color: #f1f5f9;
   margin: 0;
+  line-height: 1.2;
 }
 
 .pageSubtitle {
-  color: #6b7280;
+  color: #94a3b8;
   margin: 0.5rem 0 0;
+  font-size: clamp(0.875rem, 2vw, 1rem);
 }
 
 .primaryBtn {
   background: linear-gradient(135deg, #f59e0b, #d97706);
   color: #fff;
   font-weight: 600;
-  padding: 0.85rem 1.5rem;
+  padding: clamp(0.75rem, 2vw, 0.85rem) clamp(1.25rem, 2.5vw, 1.5rem);
   border-radius: 0.75rem;
   text-decoration: none;
   box-shadow: 0 10px 20px rgba(217, 119, 6, 0.25);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  white-space: nowrap;
 }
 
 .primaryBtn:hover {
@@ -45,10 +49,10 @@
 }
 
 .card {
-  background: #fff;
+  background: #1e293b;
   border-radius: 1.25rem;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  padding: clamp(1.25rem, 3vw, 2rem);
 }
 
 .cardHeader {
@@ -56,28 +60,31 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .cardHeading {
-  font-size: 1.25rem;
+  font-size: clamp(1.125rem, 3vw, 1.25rem);
   font-weight: 700;
-  color: #1f2937;
+  color: #f1f5f9;
   margin: 0;
 }
 
 .countBadge {
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
   font-weight: 600;
   background: rgba(245, 158, 11, 0.15);
   color: #b45309;
   padding: 0.4rem 1rem;
   border-radius: 9999px;
+  white-space: nowrap;
 }
 
 .emptyState {
   text-align: center;
-  padding: 3rem 1rem;
-  color: #6b7280;
+  padding: clamp(2rem, 5vw, 3rem) 1rem;
+  color: #94a3b8;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -85,14 +92,15 @@
 
 .secondaryBtn {
   align-self: center;
-  background: #fff7ed;
-  color: #d97706;
+  background: #334155;
+  color: #f59e0b;
   font-weight: 600;
-  padding: 0.75rem 1.5rem;
+  padding: clamp(0.625rem, 2vw, 0.75rem) clamp(1.25rem, 2.5vw, 1.5rem);
   border-radius: 0.75rem;
   text-decoration: none;
   border: 1px solid rgba(217, 119, 6, 0.3);
   transition: background 0.2s ease;
+  font-size: clamp(0.875rem, 2vw, 1rem);
 }
 
 .secondaryBtn:hover {
@@ -101,11 +109,13 @@
 
 .tableWrapper {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 600px;
 }
 
 .tableHeadRow {
@@ -113,14 +123,14 @@
 }
 
 .tableHeaderCell {
-  padding: 1rem;
+  padding: clamp(0.75rem, 2vw, 1rem);
   text-align: left;
-  border-bottom: 1px solid #e5e7eb;
-  font-size: 0.85rem;
+  border-bottom: 1px solid #334155;
+  font-size: clamp(0.75rem, 2vw, 0.85rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #6b7280;
+  color: #94a3b8;
 }
 
 .tableHeaderCellActions {
@@ -132,15 +142,15 @@
 }
 
 .tableCell {
-  padding: 1rem;
+  padding: clamp(0.75rem, 2vw, 1rem);
   text-align: left;
-  border-bottom: 1px solid #e5e7eb;
-  color: #1f2937;
-  font-size: 0.95rem;
+  border-bottom: 1px solid #334155;
+  color: #e2e8f0;
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
 }
 
 .tableRow:hover .tableCell {
-  background: #f9fafb;
+  background: #334155;
 }
 
 .actionsCell {
@@ -151,6 +161,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .editBtn,
@@ -160,11 +172,12 @@
   justify-content: center;
   border-radius: 0.6rem;
   font-weight: 600;
-  padding: 0.45rem 0.9rem;
-  font-size: 0.85rem;
+  padding: clamp(0.4rem, 1.5vw, 0.45rem) clamp(0.75rem, 2vw, 0.9rem);
+  font-size: clamp(0.75rem, 2vw, 0.85rem);
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .editBtn {
@@ -195,13 +208,78 @@
   cursor: not-allowed;
 }
 
+/* Enhanced mobile responsiveness */
 @media (max-width: 768px) {
-  .card {
-    padding: 1.5rem;
+  .pageContainer {
+    gap: 1.5rem;
   }
+  
+  .pageHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.25rem;
+  }
+  
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .actionsGroup {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .editBtn,
+  .deleteBtn {
+    flex: 1;
+    max-width: 48%;
+    text-align: center;
+    justify-content: center;
+  }
+}
 
-  .tableHeaderCell,
-  .tableCell {
-    padding: 0.75rem;
+@media (max-width: 480px) {
+  .pageContainer {
+    gap: 1rem;
+  }
+  
+  .card {
+    border-radius: 1rem;
+    padding: 1.25rem 1rem;
+  }
+  
+  .tableWrapper {
+    margin: 0 -1rem;
+    width: calc(100% + 2rem);
+  }
+  
+  .actionsGroup {
+    gap: 0.5rem;
+  }
+}
+
+/* For very small screens */
+@media (max-width: 360px) {
+  .card {
+    padding: 1rem 0.75rem;
+  }
+  
+  .primaryBtn,
+  .secondaryBtn {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .actionsGroup {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .editBtn,
+  .deleteBtn {
+    max-width: 100%;
+    width: 100%;
   }
 }

@@ -234,7 +234,7 @@ export default function LoginPage() {
 
         {/* Modern Login Card with Yellow Theme */}
         <div className="modern-login-card">
-          {/* Header with Dark Background */}
+          {/* Header with Dark Background - FIXED: Reduced top positioning */}
           <div className="login-card-header">
             <div className="logo-badge">
               <span className="logo-icon">🌴</span>
@@ -545,8 +545,10 @@ export default function LoginPage() {
           justify-content: space-between;
           max-width: 1400px;
           margin: 0 auto;
-          padding: 0 2rem;
-          padding-top: 80px;
+          padding: 0 1rem;
+          /* FIXED: Increased padding-top to prevent nav bar overlap */
+          padding-top: 120px;
+          gap: 2rem;
         }
 
         .hero-text {
@@ -556,7 +558,7 @@ export default function LoginPage() {
         }
 
         .hero-title {
-          font-size: 4.5rem;
+          font-size: 2.5rem;
           font-weight: 800;
           margin-bottom: 1.5rem;
           letter-spacing: -0.025em;
@@ -572,8 +574,8 @@ export default function LoginPage() {
         }
 
         .hero-subtitle {
-          font-size: 1.3rem;
-          margin-bottom: 3rem;
+          font-size: 1.1rem;
+          margin-bottom: 2rem;
           font-weight: 300;
           line-height: 1.6;
           text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
@@ -582,7 +584,7 @@ export default function LoginPage() {
 
         .hero-buttons {
           display: flex;
-          gap: 1.5rem;
+          gap: 1rem;
           flex-wrap: wrap;
         }
 
@@ -591,16 +593,18 @@ export default function LoginPage() {
           background: linear-gradient(135deg, #f59e0b, #d97706);
           color: white;
           border: none;
-          padding: 1.2rem 2.5rem;
-          font-size: 1.1rem;
+          padding: 1rem 2rem;
+          font-size: 1rem;
           font-weight: 600;
-          border-radius: 16px;
+          border-radius: 12px;
           cursor: pointer;
           transition: all 0.3s ease;
           box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
           letter-spacing: 0.05em;
           position: relative;
           overflow: hidden;
+          flex: 1;
+          min-width: 140px;
         }
 
         .explore-btn-yellow::before {
@@ -629,12 +633,14 @@ export default function LoginPage() {
           backdrop-filter: blur(10px);
           color: white;
           border: 1px solid rgba(255, 255, 255, 0.3);
-          padding: 1.2rem 2rem;
-          font-size: 1.1rem;
+          padding: 1rem 1.5rem;
+          font-size: 1rem;
           font-weight: 500;
-          border-radius: 16px;
+          border-radius: 12px;
           cursor: pointer;
           transition: all 0.3s ease;
+          flex: 1;
+          min-width: 120px;
         }
 
         .discover-btn:hover {
@@ -646,12 +652,14 @@ export default function LoginPage() {
           background: transparent;
           color: white;
           border: 2px solid white;
-          padding: 1.2rem 2rem;
-          font-size: 1.1rem;
+          padding: 1rem 1.5rem;
+          font-size: 1rem;
           font-weight: 500;
-          border-radius: 16px;
+          border-radius: 12px;
           cursor: pointer;
           transition: all 0.3s ease;
+          flex: 1;
+          min-width: 120px;
         }
 
         .know-more-btn:hover {
@@ -663,38 +671,42 @@ export default function LoginPage() {
         /* Modern Login Card Styles */
         .modern-login-card {
           background: white;
-          border-radius: 24px;
+          border-radius: 20px;
           padding: 0;
-          width: 420px;
+          width: 100%;
+          max-width: 420px;
           box-shadow: 
-            0 25px 50px rgba(0, 0, 0, 0.15),
-            0 15px 35px rgba(0, 0, 0, 0.1);
+            0 20px 40px rgba(0, 0, 0, 0.15),
+            0 10px 25px rgba(0, 0, 0, 0.1);
           overflow: hidden;
           animation: slideInRight 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+          /* FIXED: Added margin-top to ensure clearance from nav bar */
+          margin-top: 20px;
         }
 
         .login-card-header {
           background: linear-gradient(135deg, #1f2937, #374151);
-          padding: 2.5rem 2rem 2rem;
+          padding: 2rem 1.5rem 1.5rem;
           position: relative;
         }
 
         .logo-badge {
           position: absolute;
-          top: -20px;
-          left: 2rem;
+          /* FIXED: Reduced top position to prevent overlap with nav bar */
+          top: -10px;
+          left: 1.5rem;
           background: white;
-          width: 60px;
-          height: 60px;
-          border-radius: 16px;
+          width: 50px;
+          height: 50px;
+          border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
 
         .logo-icon {
-          font-size: 2rem;
+          font-size: 1.5rem;
           background: linear-gradient(135deg, #f59e0b, #d97706);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
@@ -703,20 +715,20 @@ export default function LoginPage() {
         }
 
         .login-header-text {
-          margin-top: 1rem;
+          margin-top: 0.5rem;
         }
 
         .login-header-text h3 {
-          font-size: 1rem;
+          font-size: 0.9rem;
           font-weight: 500;
           color: rgba(255, 255, 255, 0.9);
-          margin: 0 0 0.5rem 0;
+          margin: 0 0 0.25rem 0;
           letter-spacing: 0.05em;
           text-transform: uppercase;
         }
 
         .login-header-text h2 {
-          font-size: 2.2rem;
+          font-size: 1.8rem;
           font-weight: 700;
           color: white;
           margin: 0;
@@ -724,7 +736,7 @@ export default function LoginPage() {
         }
 
         .social-login {
-          padding: 2rem 2rem 1.5rem;
+          padding: 1.5rem 1.5rem 1rem;
         }
 
         /* Yellow Google Login Button */
@@ -732,9 +744,9 @@ export default function LoginPage() {
           width: 100%;
           background: white;
           border: 2px solid #f59e0b;
-          padding: 1.1rem 2rem;
-          border-radius: 16px;
-          font-size: 1rem;
+          padding: 1rem 1.5rem;
+          border-radius: 12px;
+          font-size: 0.95rem;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
@@ -743,7 +755,7 @@ export default function LoginPage() {
           justify-content: center;
           gap: 0.75rem;
           color: #f59e0b;
-          box-shadow: 0 2px 10px rgba(245, 158, 11, 0.1);
+          box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);
           position: relative;
           overflow: hidden;
         }
@@ -767,22 +779,22 @@ export default function LoginPage() {
           background: #f59e0b;
           color: white;
           transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+          box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
           border-color: #f59e0b;
         }
 
         .google-icon {
-          width: 20px;
-          height: 20px;
+          width: 18px;
+          height: 18px;
           flex-shrink: 0;
         }
 
         .modern-divider {
-          padding: 0 2rem;
+          padding: 0 1.5rem;
           display: flex;
           align-items: center;
-          gap: 1rem;
-          margin-bottom: 1.5rem;
+          gap: 0.75rem;
+          margin-bottom: 1rem;
         }
 
         .divider-line {
@@ -793,16 +805,16 @@ export default function LoginPage() {
 
         .divider-text {
           color: #6b7280;
-          font-size: 0.85rem;
+          font-size: 0.8rem;
           font-weight: 500;
           white-space: nowrap;
         }
 
         .modern-login-form {
-          padding: 0 2rem 2rem;
+          padding: 0 1.5rem 1.5rem;
           display: flex;
           flex-direction: column;
-          gap: 1.8rem;
+          gap: 1.5rem;
         }
 
         .input-group-modern {
@@ -839,17 +851,17 @@ export default function LoginPage() {
         }
 
         .password-toggle-btn i {
-          font-size: 1.1rem;
+          font-size: 1rem;
         }
 
         .modern-input {
           width: 100%;
           background: #f9fafb;
           border: 1px solid #e5e7eb;
-          border-radius: 12px;
-          padding: 1.2rem 1rem 0.8rem;
+          border-radius: 10px;
+          padding: 1.1rem 1rem 0.7rem;
           color: #1f2937;
-          font-size: 1rem;
+          font-size: 0.95rem;
           transition: all 0.3s ease;
         }
 
@@ -876,7 +888,7 @@ export default function LoginPage() {
           left: 1rem;
           transform: translateY(-50%);
           color: #6b7280;
-          font-size: 1rem;
+          font-size: 0.95rem;
           font-weight: 400;
           pointer-events: none;
           transition: all 0.3s ease;
@@ -884,20 +896,20 @@ export default function LoginPage() {
           padding: 0 0.2rem;
         }
 
-       
-
         .modern-form-options {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          font-size: 0.9rem;
+          font-size: 0.85rem;
           color: #6b7280;
+          flex-wrap: wrap;
+          gap: 0.5rem;
         }
 
         .modern-checkbox {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
+          gap: 0.5rem;
           cursor: pointer;
           transition: color 0.3s ease;
         }
@@ -911,8 +923,8 @@ export default function LoginPage() {
         }
 
         .checkbox-checkmark {
-          width: 18px;
-          height: 18px;
+          width: 16px;
+          height: 16px;
           border: 2px solid #d1d5db;
           border-radius: 4px;
           position: relative;
@@ -932,7 +944,7 @@ export default function LoginPage() {
           left: 50%;
           transform: translate(-50%, -50%);
           color: white;
-          font-size: 0.8rem;
+          font-size: 0.7rem;
           font-weight: bold;
         }
 
@@ -942,6 +954,7 @@ export default function LoginPage() {
           font-weight: 500;
           transition: all 0.3s ease;
           position: relative;
+          font-size: 0.85rem;
         }
 
         .modern-forgot-link::after {
@@ -968,13 +981,13 @@ export default function LoginPage() {
           background: linear-gradient(135deg, #f59e0b, #d97706);
           color: white;
           border: none;
-          border-radius: 16px;
-          padding: 1.2rem 2rem;
-          font-size: 1.1rem;
+          border-radius: 12px;
+          padding: 1.1rem 1.5rem;
+          font-size: 1rem;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
-          box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+          box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -999,7 +1012,7 @@ export default function LoginPage() {
 
         .modern-login-btn-yellow:hover {
           transform: translateY(-2px);
-          box-shadow: 0 12px 40px rgba(245, 158, 11, 0.4);
+          box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
           background: linear-gradient(135deg, #d97706, #b45309);
         }
 
@@ -1025,17 +1038,21 @@ export default function LoginPage() {
 
         .error-message {
           color: #ef4444;
-          font-size: 0.9rem;
+          font-size: 0.85rem;
           text-align: center;
           margin-top: -0.5rem;
+          padding: 0.5rem;
+          background: #fef2f2;
+          border-radius: 8px;
+          border-left: 3px solid #ef4444;
         }
 
         .success-message {
           background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
           color: #065f46;
-          padding: 0.875rem 1rem;
+          padding: 0.75rem 1rem;
           border-radius: 8px;
-          font-size: 0.875rem;
+          font-size: 0.85rem;
           text-align: center;
           margin-top: -0.25rem;
           border-left: 3px solid #10b981;
@@ -1046,9 +1063,9 @@ export default function LoginPage() {
         .info-message {
           background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
           color: #1e40af;
-          padding: 0.875rem 1rem;
+          padding: 0.75rem 1rem;
           border-radius: 8px;
-          font-size: 0.875rem;
+          font-size: 0.85rem;
           text-align: center;
           margin-top: -0.25rem;
           border-left: 3px solid #3b82f6;
@@ -1060,16 +1077,16 @@ export default function LoginPage() {
         }
 
         .info-message i {
-          font-size: 1rem;
+          font-size: 0.9rem;
           color: #3b82f6;
         }
 
         .modern-signup-section {
           text-align: center;
-          padding: 1.5rem 2rem;
+          padding: 1.25rem 1.5rem;
           border-top: 1px solid #f3f4f6;
           color: #6b7280;
-          font-size: 0.9rem;
+          font-size: 0.85rem;
         }
 
         .modern-signup-link {
@@ -1103,7 +1120,7 @@ export default function LoginPage() {
         @keyframes slideInRight {
           from {
             opacity: 0;
-            transform: translateX(60px) scale(0.95);
+            transform: translateX(40px) scale(0.95);
           }
           to {
             opacity: 1;
@@ -1123,7 +1140,7 @@ export default function LoginPage() {
         @keyframes slideUp {
           from {
             opacity: 0;
-            transform: translateY(30px) scale(0.95);
+            transform: translateY(20px) scale(0.95);
           }
           to {
             opacity: 1;
@@ -1150,27 +1167,27 @@ export default function LoginPage() {
 
         .modal-content {
           background: white;
-          border-radius: 24px;
-          padding: 2.5rem;
-          max-width: 500px;
+          border-radius: 20px;
+          padding: 2rem;
+          max-width: 450px;
           width: 100%;
           max-height: 90vh;
           overflow-y: auto;
           position: relative;
-          box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
           animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .modal-close {
           position: absolute;
-          top: 1.5rem;
-          right: 1.5rem;
+          top: 1rem;
+          right: 1rem;
           background: #f3f4f6;
           border: none;
-          width: 40px;
-          height: 40px;
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
-          font-size: 1.5rem;
+          font-size: 1.25rem;
           cursor: pointer;
           transition: all 0.3s ease;
           color: #6b7280;
@@ -1188,30 +1205,30 @@ export default function LoginPage() {
 
         .modal-header {
           text-align: center;
-          margin-bottom: 2rem;
+          margin-bottom: 1.5rem;
         }
 
         .modal-icon {
-          font-size: 3rem;
-          margin-bottom: 1rem;
+          font-size: 2.5rem;
+          margin-bottom: 0.75rem;
         }
 
         .modal-header h2 {
-          font-size: 1.8rem;
+          font-size: 1.5rem;
           color: #1f2937;
           margin-bottom: 0.5rem;
         }
 
         .modal-header p {
           color: #6b7280;
-          font-size: 0.95rem;
+          font-size: 0.9rem;
         }
 
         .alert {
-          padding: 1rem 1.5rem;
-          border-radius: 12px;
-          margin-bottom: 1.5rem;
-          font-size: 0.9rem;
+          padding: 0.875rem 1.25rem;
+          border-radius: 10px;
+          margin-bottom: 1.25rem;
+          font-size: 0.85rem;
           font-weight: 500;
         }
 
@@ -1236,7 +1253,7 @@ export default function LoginPage() {
         .modal-form {
           display: flex;
           flex-direction: column;
-          gap: 1.5rem;
+          gap: 1.25rem;
         }
 
         .form-group {
@@ -1248,15 +1265,15 @@ export default function LoginPage() {
         .form-group label {
           font-weight: 600;
           color: #1f2937;
-          font-size: 0.95rem;
+          font-size: 0.9rem;
         }
 
         .modal-input {
           width: 100%;
-          padding: 0.875rem 1rem;
+          padding: 0.75rem 1rem;
           border: 2px solid #e5e7eb;
-          border-radius: 12px;
-          font-size: 1rem;
+          border-radius: 10px;
+          font-size: 0.95rem;
           transition: all 0.3s ease;
           font-family: inherit;
         }
@@ -1290,7 +1307,7 @@ export default function LoginPage() {
         }
 
         .password-toggle-btn-modal i {
-          font-size: 1rem;
+          font-size: 0.9rem;
         }
 
         .modal-input:focus {
@@ -1301,7 +1318,7 @@ export default function LoginPage() {
 
         .form-group small {
           color: #6b7280;
-          font-size: 0.85rem;
+          font-size: 0.8rem;
         }
 
         .modal-btn {
@@ -1309,18 +1326,18 @@ export default function LoginPage() {
           background: linear-gradient(135deg, #f59e0b, #d97706);
           color: white;
           border: none;
-          border-radius: 12px;
-          padding: 1rem 2rem;
-          font-size: 1rem;
+          border-radius: 10px;
+          padding: 0.875rem 1.5rem;
+          font-size: 0.95rem;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
-          box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+          box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
         }
 
         .modal-btn:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 12px 30px rgba(245, 158, 11, 0.4);
+          box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
           background: linear-gradient(135deg, #d97706, #b45309);
         }
 
@@ -1334,9 +1351,9 @@ export default function LoginPage() {
           background: #f3f4f6;
           color: #6b7280;
           border: 2px solid #e5e7eb;
-          border-radius: 12px;
-          padding: 1rem 2rem;
-          font-size: 1rem;
+          border-radius: 10px;
+          padding: 0.875rem 1.5rem;
+          font-size: 0.95rem;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
@@ -1355,51 +1372,81 @@ export default function LoginPage() {
 
         .success-state {
           text-align: center;
-          padding: 2rem 1rem;
+          padding: 1.5rem 1rem;
         }
 
         .success-icon {
-          font-size: 4rem;
+          font-size: 3rem;
           margin-bottom: 1rem;
         }
 
         .success-state h3 {
-          font-size: 1.5rem;
+          font-size: 1.25rem;
           color: #065f46;
           margin-bottom: 0.5rem;
         }
 
         .success-state p {
           color: #6b7280;
-          font-size: 1rem;
+          font-size: 0.95rem;
         }
 
-        /* Responsive Design */
+        /* ===== RESPONSIVE DESIGN ===== */
+
+        /* Large Desktop */
+        @media (min-width: 1200px) {
+          .hero-content {
+            padding: 0 2rem;
+            padding-top: 120px;
+          }
+
+          .hero-title {
+            font-size: 4rem;
+          }
+
+          .hero-subtitle {
+            font-size: 1.25rem;
+          }
+
+          .hero-buttons {
+            gap: 1.5rem;
+          }
+
+          .explore-btn-yellow,
+          .discover-btn,
+          .know-more-btn {
+            padding: 1.2rem 2.5rem;
+            font-size: 1.1rem;
+          }
+        }
+
+        /* Desktop */
+        @media (min-width: 1024px) {
+          .hero-content {
+            flex-direction: row;
+            text-align: left;
+          }
+
+          .hero-buttons {
+            justify-content: flex-start;
+          }
+        }
+
+        /* Tablet and Below */
         @media (max-width: 1024px) {
           .hero-content {
             flex-direction: column;
             text-align: center;
             gap: 3rem;
-            padding-top: 100px;
+            padding-top: 140px;
           }
 
           .hero-text {
             max-width: 100%;
           }
 
-          .modern-login-card {
-            width: 100%;
-            max-width: 400px;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .hero-title {
-            font-size: 3.5rem;
-          }
-
           .hero-subtitle {
-            font-size: 1.1rem;
+            margin: 0 auto 2rem;
           }
 
           .hero-buttons {
@@ -1407,58 +1454,303 @@ export default function LoginPage() {
           }
 
           .modern-login-card {
-            padding: 0;
-          }
-
-          .login-card-header {
-            padding: 2rem 1.5rem 1.5rem;
-          }
-
-          .modern-login-form {
-            padding: 0 1.5rem 1.5rem;
-          }
-
-          .social-login {
-            padding: 1.5rem 1.5rem 1rem;
+            margin: 0 auto;
           }
         }
 
-        @media (max-width: 480px) {
+        /* Tablet */
+        @media (max-width: 768px) {
           .hero-content {
-            padding: 0 1rem;
-            padding-top: 100px;
+            padding-top: 130px;
           }
 
           .hero-title {
-            font-size: 2.8rem;
+            font-size: 3rem;
+          }
+
+          .hero-subtitle {
+            font-size: 1.1rem;
+          }
+
+          .hero-buttons {
+            gap: 1rem;
+          }
+
+          .explore-btn-yellow,
+          .discover-btn,
+          .know-more-btn {
+            min-width: 160px;
+            padding: 1.1rem 2rem;
+          }
+
+          .modal-content {
+            padding: 1.5rem;
+          }
+
+          .modal-header h2 {
+            font-size: 1.4rem;
+          }
+        }
+
+        /* Mobile */
+        @media (max-width: 640px) {
+          .hero-content {
+            padding: 0 0.75rem;
+            padding-top: 120px;
+            gap: 2rem;
+          }
+
+          .hero-title {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+          }
+
+          .hero-subtitle {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
           }
 
           .hero-buttons {
             flex-direction: column;
             align-items: center;
+            gap: 0.75rem;
           }
 
           .explore-btn-yellow,
           .discover-btn,
           .know-more-btn {
             width: 100%;
-            max-width: 250px;
+            max-width: 280px;
+            min-width: auto;
+          }
+
+          .modern-login-card {
+            border-radius: 16px;
+          }
+
+          .login-card-header {
+            padding: 1.5rem 1.25rem 1.25rem;
+          }
+
+          .logo-badge {
+            left: 1.25rem;
+            width: 45px;
+            height: 45px;
+            /* FIXED: Further reduced top for mobile */
+            top: -8px;
+          }
+
+          .logo-icon {
+            font-size: 1.25rem;
+          }
+
+          .login-header-text h2 {
+            font-size: 1.6rem;
+          }
+
+          .login-header-text h3 {
+            font-size: 0.85rem;
+          }
+
+          .social-login {
+            padding: 1.25rem 1.25rem 0.75rem;
+          }
+
+          .modern-divider {
+            padding: 0 1.25rem;
+            gap: 0.5rem;
+          }
+
+          .modern-login-form {
+            padding: 0 1.25rem 1.25rem;
+            gap: 1.25rem;
           }
 
           .modern-form-options {
             flex-direction: column;
-            gap: 1rem;
             align-items: flex-start;
+            gap: 0.75rem;
+          }
+
+          .modern-signup-section {
+            padding: 1rem 1.25rem;
+          }
+
+          .modal-content {
+            padding: 1.25rem;
+            border-radius: 16px;
+          }
+
+          .modal-header {
+            margin-bottom: 1.25rem;
+          }
+
+          .modal-header h2 {
+            font-size: 1.3rem;
+          }
+
+          .modal-icon {
+            font-size: 2rem;
+          }
+
+          .alert {
+            padding: 0.75rem 1rem;
+            font-size: 0.8rem;
+          }
+        }
+
+        /* Small Mobile */
+        @media (max-width: 480px) {
+          .hero-content {
+            padding-top: 110px;
+          }
+
+          .hero-title {
+            font-size: 1.8rem;
+          }
+
+          .hero-subtitle {
+            font-size: 0.9rem;
+          }
+
+          .modern-login-card {
+            border-radius: 14px;
+          }
+
+          .login-card-header {
+            padding: 1.25rem 1rem 1rem;
           }
 
           .logo-badge {
-            left: 1.5rem;
-            width: 50px;
-            height: 50px;
+            left: 1rem;
+            width: 40px;
+            height: 40px;
+            top: -6px;
           }
 
-          .logo-icon {
-            font-size: 1.5rem;
+          .login-header-text h2 {
+            font-size: 1.4rem;
+          }
+
+          .social-login {
+            padding: 1rem 1rem 0.5rem;
+          }
+
+          .google-login-btn-yellow {
+            padding: 0.875rem 1rem;
+            font-size: 0.9rem;
+          }
+
+          .modern-divider {
+            padding: 0 1rem;
+          }
+
+          .divider-text {
+            font-size: 0.75rem;
+          }
+
+          .modern-login-form {
+            padding: 0 1rem 1rem;
+          }
+
+          .modern-input {
+            padding: 1rem 0.875rem 0.6rem;
+            font-size: 0.9rem;
+          }
+
+          .modern-label {
+            font-size: 0.9rem;
+            left: 0.875rem;
+          }
+
+          .modern-login-btn-yellow {
+            padding: 1rem 1.25rem;
+            font-size: 0.95rem;
+          }
+
+          .modal-content {
+            padding: 1rem;
+          }
+
+          .modal-header h2 {
+            font-size: 1.2rem;
+          }
+
+          .modal-input {
+            padding: 0.675rem 0.875rem;
+            font-size: 0.9rem;
+          }
+
+          .modal-btn,
+          .modal-btn-secondary {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.9rem;
+          }
+        }
+
+        /* Extra Small Mobile */
+        @media (max-width: 360px) {
+          .hero-content {
+            padding: 0 0.5rem;
+            padding-top: 100px;
+          }
+
+          .hero-title {
+            font-size: 1.6rem;
+          }
+
+          .modern-login-card {
+            border-radius: 12px;
+          }
+
+          .login-card-header {
+            padding: 1rem 0.875rem 0.875rem;
+          }
+
+          .login-header-text h2 {
+            font-size: 1.3rem;
+          }
+
+          .modern-form-options {
+            font-size: 0.8rem;
+          }
+
+          .modern-forgot-link {
+            font-size: 0.8rem;
+          }
+        }
+
+        /* Height adjustments for very small screens */
+        @media (max-height: 700px) {
+          .hero-content {
+            padding-top: 100px;
+            min-height: calc(100vh - 70px);
+          }
+
+          .hero-title {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+          }
+
+          .hero-subtitle {
+            margin-bottom: 1.5rem;
+          }
+        }
+
+        /* Landscape mode for mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+          .hero-content {
+            padding-top: 80px;
+            min-height: auto;
+            padding-bottom: 2rem;
+          }
+
+          .hero-text {
+            display: none;
+          }
+
+          .modern-login-card {
+            max-width: 380px;
           }
         }
       `}</style>

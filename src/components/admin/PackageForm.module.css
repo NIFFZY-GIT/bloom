@@ -534,39 +534,214 @@
     gap: 2rem;
   }
 
+  .pageTitle {
+    font-size: 1.75rem;
+  }
+
   .layoutGrid {
     grid-template-columns: 1fr;
+    gap: 1.75rem;
   }
 
   .formCard {
     padding: 2rem;
   }
 
+  .sectionTitle {
+    font-size: 1.1rem;
+  }
+
   .fieldGrid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
   .actions {
     flex-direction: column-reverse;
     align-items: stretch;
+    gap: 1rem;
+  }
+
+  .primaryBtn,
+  .secondaryBtn {
+    padding: 0.75rem 1.25rem;
   }
 
   .galleryControls {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .galleryInput {
+    flex: 1 1 auto;
+  }
+
+  .galleryGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .galleryCardImage {
+    aspect-ratio: 16 / 9;
   }
 
   .galleryCardActions {
     flex-direction: column;
+    gap: 0.5rem;
   }
 
   .galleryActionBtn {
     width: 100%;
     text-align: center;
+    padding: 0.75rem 1rem;
   }
 
   .helperPanel {
     position: static;
+    order: -1;
+    margin-bottom: 1.5rem;
+  }
+
+  .helperCard {
+    padding: 1.5rem;
+  }
+
+  .previewValue {
+    font-size: 1rem;
+  }
+
+  .placeholderImage {
+    height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1.25rem 1rem 2.5rem;
+    gap: 1.5rem;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .pageSubtitle {
+    font-size: 0.9rem;
+  }
+
+  .formCard {
+    padding: 1.5rem;
+    border-radius: 1rem;
+  }
+
+  .form {
+    gap: 1.5rem;
+  }
+
+  .formSection {
+    gap: 1.25rem;
+  }
+
+  .sectionTitle {
+    font-size: 1rem;
+  }
+
+  .sectionDescription {
+    font-size: 0.875rem;
+  }
+
+  .input,
+  .textarea,
+  .select {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.95rem;
+  }
+
+  .fieldGrid {
+    gap: 1.25rem;
+  }
+
+  .galleryControls {
+    gap: 0.5rem;
+  }
+
+  .galleryInput {
+    padding: 0.65rem 0.875rem;
+  }
+
+  .galleryAddBtn {
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .galleryGrid {
+    gap: 0.875rem;
+  }
+
+  .galleryCardBody {
+    padding: 0.875rem 0.875rem 1rem;
+  }
+
+  .galleryUrl {
+    font-size: 0.8rem;
+  }
+
+  .helperCard {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .helperTitle {
+    font-size: 0.95rem;
+  }
+
+  .helperListItem {
+    font-size: 0.85rem;
+    gap: 0.5rem;
+  }
+
+  .helperIcon {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+
+  .primaryBtn,
+  .secondaryBtn {
+    padding: 0.65rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .uploadBtn {
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .coverBadge {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .pendingBadge {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.7rem;
+  }
+
+  .placeholderImage {
+    height: 120px;
+  }
+
+  .placeholderIcon {
+    font-size: 36px;
+  }
+
+  .placeholderText {
+    font-size: 12px;
+  }
+
+  .submitWarning {
+    font-size: 12px;
   }
 }
 
