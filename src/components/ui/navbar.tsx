@@ -1,4 +1,6 @@
 'use client';
+
+
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef, CSSProperties } from 'react';
@@ -16,6 +18,9 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isBookingsDropdownOpen, setIsBookingsDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  // Mobile accordion state to make it explicit that Packages/Create Package
+  // are children of Bookings in the mobile menu
+  const [isMobileBookingsOpen, setIsMobileBookingsOpen] = useState(false);
  
   // State for hover effects
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
@@ -68,12 +73,20 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
     }
     setIsBookingsDropdownOpen(false);
     setIsProfileDropdownOpen(false);
+    setIsMobileBookingsOpen(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
  
   // Effect to disable body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = isMenuOpen ? 'hidden' : 'auto';
+  }, [isMenuOpen]);
+
+  // Close mobile bookings submenu when mobile menu closes
+  useEffect(() => {
+    if (!isMenuOpen) {
+      setIsMobileBookingsOpen(false);
+    }
   }, [isMenuOpen]);
  
   // Close dropdowns when clicking outside
@@ -342,11 +355,92 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
       textAlign: 'center',
       padding: screenSize === 'xs' ? '0 1rem' : '0' 
     },
+    // Mobile-specific dropdown / accordion styles
+    mobileDropdownParent: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: '0.75rem',
+      color: '#2d3748',
+      fontSize: screenSize === 'xs' ? '1.15rem' : '1.35rem',
+      fontWeight: 600,
+      width: '100%',
+      background: 'transparent',
+      border: 'none',
+      cursor: 'pointer',
+      padding: '1rem 1.25rem',
+      borderRadius: '1rem',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      boxShadow: 'none',
+    },
+    mobileDropdownChevron: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '1.75rem',
+      height: '1.75rem',
+      borderRadius: '50%',
+      backgroundColor: 'rgba(0, 121, 107, 0.1)',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      fontSize: '0.75rem',
+      color: '#00796B',
+      fontWeight: 'bold',
+    },
+    mobileDropdownContainer: {
+      width: '100%',
+      borderRadius: '1.25rem',
+      padding: '0',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      border: '2px solid transparent',
+    },
+    mobileDropdownList: {
+      width: '100%',
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'stretch',
+      gap: '0.5rem',
+      transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+      maxHeight: 0,
+      opacity: 0,
+      marginTop: 0,
+      padding: '0',
+    },
+    mobileDropdownItem: {
+      width: '100%',
+      textAlign: 'left',
+      paddingLeft: '3rem',
+      paddingRight: '1.5rem',
+      paddingTop: '0.875rem',
+      paddingBottom: '0.875rem',
+      fontSize: screenSize === 'xs' ? '0.95rem' : '1.05rem',
+      fontWeight: 500,
+      color: '#4a5568',
+      textDecoration: 'none',
+      borderRadius: '0.75rem',
+      transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+      position: 'relative',
+      backgroundColor: 'rgba(255, 255, 255, 0.6)',
+      border: '1px solid rgba(226, 232, 240, 0.8)',
+      backdropFilter: 'blur(8px)',
+    },
+    mobileDropdownItemIcon: {
+      position: 'absolute',
+      left: '1.25rem',
+      top: '50%',
+      transform: 'translateY(-50%)',
+      fontSize: '1rem',
+      transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+    },
     mobileNavLink: { 
-      fontSize: screenSize === 'xs' ? '1.25rem' : '1.5rem', 
+      fontSize: screenSize === 'xs' ? '1.15rem' : '1.35rem', 
       fontWeight: 600, 
       color: '#2d3748', 
-      textDecoration: 'none' 
+      textDecoration: 'none',
+      padding: '1rem 1.25rem',
+      borderRadius: '1rem',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      display: 'inline-block',
     },
     mobileActionsContainer: { 
       width: '100%', 
@@ -501,20 +595,135 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
         <div style={styles.mobileMenuOverlay}>
             <div style={styles.mobileNavLinksContainer}>
                 {navItems.map((item) => (
-                     <div key={item.id} style={{textAlign: 'center'}}>
+                     <div key={item.id} style={{textAlign: 'center', width: '100%', maxWidth: '400px'}}>
                      {item.dropdown ? (
-                       <>
-                         <span style={combineStyles(styles.mobileNavLink, {color: '#a0aec0', fontSize: '1rem', textTransform: 'uppercase'})}>{item.label}</span>
-                         <div style={{marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem'}}>
-                           {item.dropdown.map(subItem => (
-                             <Link key={subItem.id} href={subItem.id} style={styles.mobileNavLink} onClick={() => setIsMenuOpen(false)}>
+                       <div style={combineStyles(
+                         styles.mobileDropdownContainer,
+                         isMobileBookingsOpen ? { 
+                           backgroundColor: 'rgba(240, 253, 244, 0.95)', 
+                           padding: '0.5rem',
+                           borderColor: 'rgba(0, 121, 107, 0.2)',
+                           boxShadow: '0 4px 16px rgba(0, 121, 107, 0.08)'
+                         } : {}
+                       )}>
+                         <button
+                           type="button"
+                           onClick={() => setIsMobileBookingsOpen(prev => !prev)}
+                           style={combineStyles(
+                             styles.mobileDropdownParent,
+                             isMobileBookingsOpen ? { 
+                               backgroundColor: 'rgba(0, 121, 107, 0.08)',
+                               color: '#00796B'
+                             } : {}
+                           )}
+                           aria-expanded={isMobileBookingsOpen}
+                           aria-label={`${item.label} menu, ${isMobileBookingsOpen ? 'expanded' : 'collapsed'}`}
+                         >
+                           <span style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                             <span style={{fontSize: '1.1rem'}}>📋</span>
+                             {item.label}
+                           </span>
+                           <span style={combineStyles(
+                             styles.mobileDropdownChevron, 
+                             isMobileBookingsOpen ? { 
+                               transform: 'rotate(180deg)',
+                               backgroundColor: '#00796B',
+                               color: '#ffffff'
+                             } : { transform: 'rotate(0)' }
+                           )}>▾</span>
+                         </button>
+                         <div style={combineStyles(
+                           styles.mobileDropdownList, 
+                           isMobileBookingsOpen ? { 
+                             maxHeight: '500px', 
+                             opacity: 1, 
+                             marginTop: '0.5rem',
+                             padding: '0.5rem',
+                             pointerEvents: 'auto' 
+                           } : { 
+                             maxHeight: 0, 
+                             opacity: 0, 
+                             marginTop: 0,
+                             padding: '0',
+                             pointerEvents: 'none' 
+                           }
+                         )}>
+                           {item.dropdown.map((subItem) => (
+                             <Link 
+                               key={subItem.id} 
+                               href={subItem.id} 
+                               style={combineStyles(
+                                 styles.mobileDropdownItem,
+                                 pathname === subItem.id ? { 
+                                   backgroundColor: '#00796B', 
+                                   color: '#ffffff',
+                                   fontWeight: 600,
+                                   borderColor: '#00796B',
+                                   boxShadow: '0 2px 8px rgba(0, 121, 107, 0.3)'
+                                 } : {}
+                               )}
+                               onClick={() => { setIsMenuOpen(false); setIsMobileBookingsOpen(false); }}
+                               onMouseEnter={(e) => {
+                                 if (pathname !== subItem.id) {
+                                   e.currentTarget.style.backgroundColor = 'rgba(0, 121, 107, 0.12)';
+                                   e.currentTarget.style.color = '#00796B';
+                                   e.currentTarget.style.borderColor = 'rgba(0, 121, 107, 0.3)';
+                                   e.currentTarget.style.transform = 'translateX(8px) scale(1.02)';
+                                   e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 121, 107, 0.15)';
+                                   const icon = e.currentTarget.querySelector('[data-icon]') as HTMLElement;
+                                   if (icon) icon.style.transform = 'translateY(-50%) scale(1.2)';
+                                 }
+                               }}
+                               onMouseLeave={(e) => {
+                                 if (pathname !== subItem.id) {
+                                   e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
+                                   e.currentTarget.style.color = '#4a5568';
+                                   e.currentTarget.style.borderColor = 'rgba(226, 232, 240, 0.8)';
+                                   e.currentTarget.style.transform = 'translateX(0) scale(1)';
+                                   e.currentTarget.style.boxShadow = 'none';
+                                   const icon = e.currentTarget.querySelector('[data-icon]') as HTMLElement;
+                                   if (icon) icon.style.transform = 'translateY(-50%) scale(1)';
+                                 }
+                               }}
+                             >
+                               <span 
+                                 data-icon
+                                 style={combineStyles(
+                                   styles.mobileDropdownItemIcon,
+                                   pathname === subItem.id ? { color: '#ffffff' } : { color: '#00796B' }
+                                 )}
+                               >
+                                 {subItem.label === 'Packages' ? '📦' : '✨'}
+                               </span>
                                {subItem.label}
                              </Link>
                            ))}
                          </div>
-                       </>
+                       </div>
                      ) : (
-                       <Link href={item.id} style={styles.mobileNavLink} onClick={() => setIsMenuOpen(false)}>
+                       <Link 
+                         href={item.id} 
+                         style={combineStyles(
+                           styles.mobileNavLink,
+                           pathname === item.id ? {
+                             backgroundColor: 'rgba(0, 121, 107, 0.08)',
+                             color: '#00796B'
+                           } : {}
+                         )}
+                         onClick={() => setIsMenuOpen(false)}
+                         onMouseEnter={(e) => {
+                           if (pathname !== item.id) {
+                             e.currentTarget.style.backgroundColor = 'rgba(0, 121, 107, 0.05)';
+                             e.currentTarget.style.color = '#00796B';
+                           }
+                         }}
+                         onMouseLeave={(e) => {
+                           if (pathname !== item.id) {
+                             e.currentTarget.style.backgroundColor = 'transparent';
+                             e.currentTarget.style.color = '#2d3748';
+                           }
+                         }}
+                       >
                          {item.label}
                        </Link>
                      )}
