@@ -320,8 +320,10 @@ export default function SignupPage() {
           justify-content: space-between;
           max-width: 1400px;
           margin: 0 auto;
-          padding: 0 2rem;
-          padding-top: 80px;
+          padding: 0 1rem;
+          /* FIXED: Increased padding-top to prevent nav bar overlap */
+          padding-top: 120px;
+          gap: 2rem;
         }
 
         .signup-text {
@@ -331,7 +333,7 @@ export default function SignupPage() {
         }
 
         .signup-title {
-          font-size: 4rem;
+          font-size: 2.5rem;
           font-weight: 800;
           margin-bottom: 1.5rem;
           letter-spacing: -0.025em;
@@ -347,8 +349,8 @@ export default function SignupPage() {
         }
 
         .signup-subtitle {
-          font-size: 1.3rem;
-          margin-bottom: 2.5rem;
+          font-size: 1.1rem;
+          margin-bottom: 2rem;
           font-weight: 300;
           line-height: 1.6;
           text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
@@ -365,59 +367,64 @@ export default function SignupPage() {
           display: flex;
           align-items: center;
           gap: 1rem;
-          font-size: 1.1rem;
+          font-size: 1rem;
           color: rgba(255, 255, 255, 0.9);
           text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .benefit-icon {
           background: linear-gradient(135deg, #f59e0b, #d97706);
-          width: 24px;
-          height: 24px;
+          width: 22px;
+          height: 22px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 0.9rem;
+          font-size: 0.8rem;
           font-weight: bold;
           color: white;
+          flex-shrink: 0;
         }
 
         /* Modern Signup Card Styles */
         .modern-signup-card {
           background: white;
-          border-radius: 24px;
+          border-radius: 20px;
           padding: 0;
-          width: 440px;
+          width: 100%;
+          max-width: 440px;
           box-shadow: 
-            0 25px 50px rgba(0, 0, 0, 0.15),
-            0 15px 35px rgba(0, 0, 0, 0.1);
+            0 20px 40px rgba(0, 0, 0, 0.15),
+            0 10px 25px rgba(0, 0, 0, 0.1);
           overflow: hidden;
           animation: slideInRight 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+          /* FIXED: Added margin-top to ensure clearance from nav bar */
+          margin-top: 20px;
         }
 
         .signup-card-header {
           background: linear-gradient(135deg, #1f2937, #374151);
-          padding: 2.5rem 2rem 2rem;
+          padding: 2rem 1.5rem 1.5rem;
           position: relative;
         }
 
         .logo-badge {
           position: absolute;
-          top: -20px;
-          left: 2rem;
+          /* FIXED: Reduced top position to prevent overlap with nav bar */
+          top: -10px;
+          left: 1.5rem;
           background: white;
-          width: 60px;
-          height: 60px;
-          border-radius: 16px;
+          width: 50px;
+          height: 50px;
+          border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
 
         .logo-icon {
-          font-size: 2rem;
+          font-size: 1.5rem;
           background: linear-gradient(135deg, #f59e0b, #d97706);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
@@ -426,20 +433,20 @@ export default function SignupPage() {
         }
 
         .signup-header-text {
-          margin-top: 1rem;
+          margin-top: 0.5rem;
         }
 
         .signup-header-text h3 {
-          font-size: 1rem;
+          font-size: 0.9rem;
           font-weight: 500;
           color: rgba(255, 255, 255, 0.9);
-          margin: 0 0 0.5rem 0;
+          margin: 0 0 0.25rem 0;
           letter-spacing: 0.05em;
           text-transform: uppercase;
         }
 
         .signup-header-text h2 {
-          font-size: 2.2rem;
+          font-size: 1.8rem;
           font-weight: 700;
           color: white;
           margin: 0;
@@ -448,7 +455,7 @@ export default function SignupPage() {
 
         /* Form Styles */
         .modern-signup-form {
-          padding: 2rem 2rem 1.5rem;
+          padding: 1.5rem 1.5rem 1rem;
           display: flex;
           flex-direction: column;
           gap: 1.5rem;
@@ -466,11 +473,15 @@ export default function SignupPage() {
           width: 100%;
           background: #f9fafb;
           border: 1px solid #e5e7eb;
-          border-radius: 12px;
-          padding: 1.2rem 1rem 0.8rem;
+          border-radius: 10px;
+          padding: 1.1rem 1rem 0.7rem;
           color: #1f2937;
-          font-size: 1rem;
+          font-size: 0.95rem;
           transition: all 0.3s ease;
+        }
+
+        .password-input-container .modern-input {
+          padding-right: 3rem;
         }
 
         .modern-input:focus {
@@ -492,7 +503,7 @@ export default function SignupPage() {
           left: 1rem;
           transform: translateY(-50%);
           color: #6b7280;
-          font-size: 1rem;
+          font-size: 0.95rem;
           font-weight: 400;
           pointer-events: none;
           transition: all 0.3s ease;
@@ -500,9 +511,7 @@ export default function SignupPage() {
           padding: 0 0.2rem;
         }
 
-     
-
-        .modern-form-options {
+        .terms-checkbox {
           margin: 0.5rem 0;
         }
 
@@ -510,7 +519,7 @@ export default function SignupPage() {
           display: flex;
           align-items: flex-start;
           gap: 0.75rem;
-          font-size: 0.9rem;
+          font-size: 0.85rem;
           color: #6b7280;
           line-height: 1.4;
           cursor: pointer;
@@ -521,8 +530,8 @@ export default function SignupPage() {
         }
 
         .checkbox-checkmark {
-          width: 18px;
-          height: 18px;
+          width: 16px;
+          height: 16px;
           border: 2px solid #d1d5db;
           border-radius: 4px;
           position: relative;
@@ -544,7 +553,7 @@ export default function SignupPage() {
           left: 50%;
           transform: translate(-50%, -50%);
           color: white;
-          font-size: 0.8rem;
+          font-size: 0.7rem;
           font-weight: bold;
         }
 
@@ -580,13 +589,13 @@ export default function SignupPage() {
           background: linear-gradient(135deg, #f59e0b, #d97706);
           color: white;
           border: none;
-          border-radius: 16px;
-          padding: 1.2rem 2rem;
-          font-size: 1.1rem;
+          border-radius: 12px;
+          padding: 1.1rem 1.5rem;
+          font-size: 1rem;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
-          box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+          box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -612,7 +621,7 @@ export default function SignupPage() {
 
         .modern-signup-btn-yellow:hover {
           transform: translateY(-2px);
-          box-shadow: 0 12px 40px rgba(245, 158, 11, 0.4);
+          box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
           background: linear-gradient(135deg, #d97706, #b45309);
         }
 
@@ -638,17 +647,21 @@ export default function SignupPage() {
 
         .error-message {
           color: #ef4444;
-          font-size: 0.9rem;
+          font-size: 0.85rem;
           text-align: center;
           margin-bottom: 1rem;
+          padding: 0.5rem;
+          background: #fef2f2;
+          border-radius: 8px;
+          border-left: 3px solid #ef4444;
         }
 
         .info-message {
           background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
           color: #1e40af;
-          padding: 0.875rem 1rem;
+          padding: 0.75rem 1rem;
           border-radius: 8px;
-          font-size: 0.875rem;
+          font-size: 0.85rem;
           text-align: center;
           margin-bottom: 1rem;
           border-left: 3px solid #3b82f6;
@@ -660,17 +673,17 @@ export default function SignupPage() {
         }
 
         .info-message i {
-          font-size: 1rem;
+          font-size: 0.9rem;
           color: #3b82f6;
         }
 
         /* Google Signup Section with Yellow */
         .modern-divider {
-          padding: 0 2rem;
+          padding: 0 1.5rem;
           display: flex;
           align-items: center;
-          gap: 1rem;
-          margin-bottom: 1.5rem;
+          gap: 0.75rem;
+          margin-bottom: 1rem;
         }
 
         .divider-line {
@@ -681,22 +694,22 @@ export default function SignupPage() {
 
         .divider-text {
           color: #6b7280;
-          font-size: 0.85rem;
+          font-size: 0.8rem;
           font-weight: 500;
           white-space: nowrap;
         }
 
         .social-signup {
-          padding: 0 2rem 2rem;
+          padding: 0 1.5rem 1.5rem;
         }
 
         .google-signup-btn-yellow {
           width: 100%;
           background: white;
           border: 2px solid #f59e0b;
-          padding: 1.1rem 2rem;
-          border-radius: 16px;
-          font-size: 1rem;
+          padding: 1rem 1.5rem;
+          border-radius: 12px;
+          font-size: 0.95rem;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
@@ -705,7 +718,7 @@ export default function SignupPage() {
           justify-content: center;
           gap: 0.75rem;
           color: #f59e0b;
-          box-shadow: 0 2px 10px rgba(245, 158, 11, 0.1);
+          box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);
           position: relative;
           overflow: hidden;
         }
@@ -729,22 +742,22 @@ export default function SignupPage() {
           background: #f59e0b;
           color: white;
           transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+          box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
           border-color: #f59e0b;
         }
 
         .google-icon {
-          width: 20px;
-          height: 20px;
+          width: 18px;
+          height: 18px;
           flex-shrink: 0;
         }
 
         .modern-login-section {
           text-align: center;
-          padding: 1.5rem 2rem;
+          padding: 1.25rem 1.5rem;
           border-top: 1px solid #f3f4f6;
           color: #6b7280;
-          font-size: 0.9rem;
+          font-size: 0.85rem;
         }
 
         .modern-login-link {
@@ -778,7 +791,7 @@ export default function SignupPage() {
         @keyframes slideInRight {
           from {
             opacity: 0;
-            transform: translateX(60px) scale(0.95);
+            transform: translateX(40px) scale(0.95);
           }
           to {
             opacity: 1;
@@ -786,28 +799,96 @@ export default function SignupPage() {
           }
         }
 
-        /* Responsive Design */
+        /* Password toggle button */
+        .password-input-container {
+          position: relative;
+        }
+
+        .password-toggle-btn {
+          position: absolute;
+          right: 1rem;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #64748b;
+          transition: color 0.2s ease;
+          z-index: 10;
+        }
+
+        .password-toggle-btn:hover {
+          color: #f59e0b;
+        }
+
+        .password-toggle-btn i {
+          font-size: 1rem;
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+
+        /* Large Desktop */
+        @media (min-width: 1200px) {
+          .signup-content {
+            padding: 0 2rem;
+            padding-top: 120px;
+          }
+
+          .signup-title {
+            font-size: 4rem;
+          }
+
+          .signup-subtitle {
+            font-size: 1.25rem;
+          }
+
+          .benefit-item {
+            font-size: 1.1rem;
+          }
+        }
+
+        /* Desktop */
+        @media (min-width: 1024px) {
+          .signup-content {
+            flex-direction: row;
+            text-align: left;
+          }
+        }
+
+        /* Tablet and Below */
         @media (max-width: 1024px) {
           .signup-content {
             flex-direction: column;
             text-align: center;
             gap: 3rem;
-            padding-top: 100px;
+            padding-top: 140px;
           }
 
           .signup-text {
             max-width: 100%;
           }
 
+          .signup-subtitle {
+            margin: 0 auto 2rem;
+          }
+
           .modern-signup-card {
-            width: 100%;
-            max-width: 400px;
+            margin: 0 auto;
           }
         }
 
+        /* Tablet */
         @media (max-width: 768px) {
+          .signup-content {
+            padding-top: 130px;
+          }
+
           .signup-title {
-            font-size: 3.2rem;
+            font-size: 3rem;
           }
 
           .signup-subtitle {
@@ -816,6 +897,7 @@ export default function SignupPage() {
 
           .benefit-item {
             font-size: 1rem;
+            justify-content: center;
           }
 
           .modern-signup-card {
@@ -839,63 +921,241 @@ export default function SignupPage() {
           }
         }
 
+        /* Mobile */
+        @media (max-width: 640px) {
+          .signup-content {
+            padding: 0 0.75rem;
+            padding-top: 120px;
+            gap: 2rem;
+          }
+
+          .signup-title {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+          }
+
+          .signup-subtitle {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+          }
+
+          .benefits {
+            gap: 0.75rem;
+          }
+
+          .benefit-item {
+            font-size: 0.95rem;
+            gap: 0.75rem;
+          }
+
+          .benefit-icon {
+            width: 20px;
+            height: 20px;
+          }
+
+          .modern-signup-card {
+            border-radius: 16px;
+          }
+
+          .signup-card-header {
+            padding: 1.5rem 1.25rem 1.25rem;
+          }
+
+          .logo-badge {
+            left: 1.25rem;
+            width: 45px;
+            height: 45px;
+            /* FIXED: Further reduced top for mobile */
+            top: -8px;
+          }
+
+          .logo-icon {
+            font-size: 1.25rem;
+          }
+
+          .signup-header-text h2 {
+            font-size: 1.6rem;
+          }
+
+          .signup-header-text h3 {
+            font-size: 0.85rem;
+          }
+
+          .modern-signup-form {
+            padding: 1.25rem 1.25rem 0.75rem;
+            gap: 1.25rem;
+          }
+
+          .modern-checkbox {
+            font-size: 0.8rem;
+          }
+
+          .modern-divider {
+            padding: 0 1.25rem;
+            gap: 0.5rem;
+          }
+
+          .social-signup {
+            padding: 0 1.25rem 1.25rem;
+          }
+
+          .modern-login-section {
+            padding: 1rem 1.25rem;
+          }
+        }
+
+        /* Small Mobile */
         @media (max-width: 480px) {
           .signup-content {
+            padding-top: 110px;
+          }
+
+          .signup-title {
+            font-size: 1.8rem;
+          }
+
+          .signup-subtitle {
+            font-size: 0.9rem;
+          }
+
+          .modern-signup-card {
+            border-radius: 14px;
+          }
+
+          .signup-card-header {
+            padding: 1.25rem 1rem 1rem;
+          }
+
+          .logo-badge {
+            left: 1rem;
+            width: 40px;
+            height: 40px;
+            top: -6px;
+          }
+
+          .signup-header-text h2 {
+            font-size: 1.4rem;
+          }
+
+          .social-signup {
+            padding: 0 1rem 1rem;
+          }
+
+          .google-signup-btn-yellow {
+            padding: 0.875rem 1rem;
+            font-size: 0.9rem;
+          }
+
+          .modern-divider {
             padding: 0 1rem;
+          }
+
+          .divider-text {
+            font-size: 0.75rem;
+          }
+
+          .modern-signup-form {
+            padding: 0 1rem 1rem;
+          }
+
+          .modern-input {
+            padding: 1rem 0.875rem 0.6rem;
+            font-size: 0.9rem;
+          }
+
+          .modern-label {
+            font-size: 0.9rem;
+            left: 0.875rem;
+          }
+
+          .modern-signup-btn-yellow {
+            padding: 1rem 1.25rem;
+            font-size: 0.95rem;
+          }
+
+          .modern-checkbox {
+            font-size: 0.75rem;
+          }
+        }
+
+        /* Extra Small Mobile */
+        @media (max-width: 360px) {
+          .signup-content {
+            padding: 0 0.5rem;
             padding-top: 100px;
           }
 
           .signup-title {
-            font-size: 2.5rem;
+            font-size: 1.6rem;
           }
 
           .modern-signup-card {
-            padding: 0;
+            border-radius: 12px;
           }
 
-          .logo-badge {
-            left: 1.5rem;
-            width: 50px;
-            height: 50px;
+          .signup-card-header {
+            padding: 1rem 0.875rem 0.875rem;
           }
 
-          .logo-icon {
-            font-size: 1.5rem;
+          .signup-header-text h2 {
+            font-size: 1.3rem;
           }
 
           .modern-checkbox {
-            font-size: 0.85rem;
+            font-size: 0.7rem;
+          }
+
+          .terms-link {
+            font-size: 0.7rem;
           }
         }
 
-        /* Password toggle button */
-        .password-input-container {
-          position: relative;
+        /* Height adjustments for very small screens */
+        @media (max-height: 700px) {
+          .signup-content {
+            padding-top: 100px;
+            min-height: calc(100vh - 70px);
+          }
+
+          .signup-title {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+          }
+
+          .signup-subtitle {
+            margin-bottom: 1.5rem;
+          }
         }
 
-        .password-toggle-btn {
-          position: absolute;
-          right: 10px;
-          top: 50%;
-          transform: translateY(-50%);
-          background: none;
-          border: none;
-          cursor: pointer;
-          padding: 5px 10px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #64748b;
-          transition: color 0.2s ease;
-          z-index: 10;
+        /* Landscape mode for mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+          .signup-content {
+            padding-top: 80px;
+            min-height: auto;
+            padding-bottom: 2rem;
+          }
+
+          .signup-text {
+            display: none;
+          }
+
+          .modern-signup-card {
+            max-width: 380px;
+          }
         }
 
-        .password-toggle-btn:hover {
-          color: #f59e0b;
-        }
+        /* Reduced motion support for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+          .modern-signup-card,
+          .modern-signup-btn-yellow,
+          .google-signup-btn-yellow {
+            animation: none;
+          }
 
-        .password-toggle-btn i {
-          font-size: 1.1rem;
+          .modern-signup-btn-yellow:hover,
+          .google-signup-btn-yellow:hover {
+            transform: none;
+          }
         }
       `}</style>
     </div>

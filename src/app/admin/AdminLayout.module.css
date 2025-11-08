@@ -22,11 +22,12 @@
 
 .contentArea {
   flex: 1;
-  padding: 2.5rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
   min-height: calc(100vh - 5.5rem);
   overflow: visible;
 }
 
+/* Tablet and smaller desktop */
 @media (max-width: 1024px) {
   .adminLayout {
     flex-direction: column;
@@ -44,7 +45,44 @@
   }
 
   .contentArea {
-    padding: 2rem 1.5rem;
+    padding: clamp(1.25rem, 2.5vw, 2rem) clamp(1rem, 2vw, 1.5rem);
     min-height: auto;
+  }
+}
+
+/* Mobile devices */
+@media (max-width: 768px) {
+  .adminLayout {
+    margin-top: 4.5rem;
+  }
+  
+  .contentArea {
+    padding: 1.25rem 1rem;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .adminLayout {
+    margin-top: 4rem;
+  }
+  
+  .contentArea {
+    padding: 1rem 0.75rem;
+  }
+  
+  .sidebarWrapper {
+    width: 100%;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+  .adminLayout {
+    margin-top: 3.5rem;
+  }
+  
+  .contentArea {
+    padding: 0.75rem 0.5rem;
   }
 }

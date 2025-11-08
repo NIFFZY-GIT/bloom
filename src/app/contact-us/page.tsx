@@ -88,8 +88,6 @@ export default function ContactPage() {
 
   return (
     <div className="contact-page">
-    
-      
       {/* Full Screen Hero Section */}
       <section className="fullscreen-hero">
         <div className="hero-background">
@@ -102,7 +100,6 @@ export default function ContactPage() {
               Ready to plan your perfect Sri Lankan adventure? Let&apos;s start the conversation.
             </p>
           </div>
-          {/* Login / Profile Button */}
        
           <div className="hero-scroll-indicator">
             <span>Scroll to connect</span>
@@ -130,28 +127,30 @@ export default function ContactPage() {
                 </div>
               ) : (
                 <form className="contact-form" onSubmit={handleSubmit}>
-                  <div className="form-group">
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      placeholder="Full Name"
-                    />
-                    <div className="input-underline"></div>
-                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                        placeholder="Full Name"
+                      />
+                      <div className="input-underline"></div>
+                    </div>
 
-                  <div className="form-group">
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      placeholder="Email Address"
-                    />
-                    <div className="input-underline"></div>
+                    <div className="form-group">
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                        placeholder="Email Address"
+                      />
+                      <div className="input-underline"></div>
+                    </div>
                   </div>
 
                   <div className="form-group">
@@ -232,27 +231,17 @@ export default function ContactPage() {
               <div className="map-section">
                 <h3>Find Us</h3>
                 <div className="map-container">
-                  <div className="map-placeholder">
-                    <div className="map-overlay">
-                      <div className="map-pin">📍</div>
-                      <p>Interactive Map Loading...</p>
-                      <small>Colombo, Sri Lanka</small>
-                    </div>
-                    <div className="map-frame">
-                     {/* Replace the map placeholder section with: */}
-<div className="map-frame">
-  <iframe
-    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.798467112139!2d79.85275541532638!3d6.92706619500827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae259130df8cb3d%3A0xcb2d5bceae83c41!2sColombo%2C%20Sri%20Lanka!5e0!3m2!1sen!2sus!4v1633021634345!5m2!1sen!2sus"
-    width="100%"
-    height="300"
-    style={{ border: 0, borderRadius: '12px' }}
-    allowFullScreen
-    loading="lazy"
-    referrerPolicy="no-referrer-when-downgrade"
-    title="Sri Lanka Tourism Office Location"
-  ></iframe>
-</div>
-                    </div>
+                  <div className="map-frame">
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.798467112139!2d79.85275541532638!3d6.92706619500827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae259130df8cb3d%3A0xcb2d5bceae83c41!2sColombo%2C%20Sri%20Lanka!5e0!3m2!1sen!2sus!4v1633021634345!5m2!1sen!2sus"
+                      width="100%"
+                      height="300"
+                      style={{ border: 0, borderRadius: '12px' }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="Sri Lanka Tourism Office Location"
+                    ></iframe>
                   </div>
                 </div>
               </div>
@@ -286,9 +275,17 @@ export default function ContactPage() {
           margin-top: 0;
         }
 
-        /* Full Screen Hero Section */
+        /* Container */
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 1rem;
+        }
+
+        /* Full Screen Hero Section - Mobile First */
         .fullscreen-hero {
           height: 100vh;
+          min-height: 600px;
           position: relative;
           display: flex;
           align-items: center;
@@ -297,7 +294,7 @@ export default function ContactPage() {
           color: white;
           overflow: hidden;
           margin-top: 0;
-          padding-top: 80px;
+          padding: 1rem;
         }
 
         .hero-background {
@@ -321,39 +318,47 @@ export default function ContactPage() {
         .hero-content {
           position: relative;
           z-index: 2;
+          width: 100%;
           max-width: 800px;
-          padding: 0 2rem;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           height: 100%;
-        }
-
-        .hero-text {
-          margin-bottom: 0;
           text-align: center;
         }
 
+        .hero-text {
+          margin-bottom: 2rem;
+          text-align: center;
+          width: 100%;
+        }
+
         .hero-title {
-          font-size: 4.5rem;
+          font-size: 2.5rem;
           font-weight: 800;
-          margin-bottom: 1.5rem;
+          margin-bottom: 1rem;
           text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
           line-height: 1.1;
           animation: fadeInUp 1s ease-out;
+          text-align: center;
+          width: 100%;
         }
 
         .hero-subtitle {
-          font-size: 1.6rem;
+          font-size: 1.1rem;
           font-weight: 300;
           opacity: 0.95;
-          margin-bottom: 3rem;
+          margin-bottom: 2rem;
           text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
           animation: fadeInUp 1s ease-out 0.2s both;
+          line-height: 1.5;
+          text-align: center;
+          width: 100%;
         }
 
-        .hero-scroll-indicator {
+        /* FIXED: Hero Scroll Indicator - Proper Centering */
+  .hero-scroll-indicator {
           position: absolute;
           bottom: 30px;
           left: 0;
@@ -368,67 +373,73 @@ export default function ContactPage() {
         }
 
         .hero-scroll-indicator span {
-          font-size: 0.9rem;
+          font-size: 0.8rem;
           opacity: 0.8;
           letter-spacing: 0.1em;
           text-transform: uppercase;
+          display: block;
+          text-align: center;
+          white-space: nowrap;
         }
 
         .scroll-arrow {
-          font-size: 1.5rem;
+          font-size: 1.2rem;
           animation: bounce 2s infinite;
+          display: flex;
+          justify-content: center;
+          width: 100%;
         }
 
         /* Contact Main Section */
         .contact-main-section {
-          padding: 6rem 0;
+          padding: 3rem 0;
           background: white;
           position: relative;
           z-index: 1;
         }
 
-        .container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 0 2rem;
-        }
-
         .contact-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 4rem;
-          margin-bottom: 6rem;
+          display: flex;
+          flex-direction: column;
+          gap: 3rem;
+          margin-bottom: 4rem;
         }
 
         .section-header {
           text-align: center;
-          margin-bottom: 3rem;
+          margin-bottom: 2rem;
         }
 
         .section-header h2 {
-          font-size: 2.5rem;
+          font-size: 1.8rem;
           font-weight: 700;
           color: #1f2937;
-          margin-bottom: 1rem;
+          margin-bottom: 0.5rem;
         }
 
         .section-header p {
-          font-size: 1.2rem;
+          font-size: 1rem;
           color: #6b7280;
         }
 
         /* Contact Form Section */
         .contact-form-section {
           background: #f8fafc;
-          border-radius: 20px;
-          padding: 3rem;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
         .contact-form {
           display: flex;
           flex-direction: column;
-          gap: 2rem;
+          gap: 1.5rem;
+        }
+
+        .form-row {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
         }
 
         .form-group {
@@ -474,13 +485,13 @@ export default function ContactPage() {
           width: 100%;
         }
 
-        /* Submit Button - Yellow Theme */
+        /* Submit Button */
         .submit-btn {
           background: #f59e0b;
           color: white;
           border: none;
-          padding: 1.2rem 2.5rem;
-          font-size: 1.1rem;
+          padding: 1.2rem 2rem;
+          font-size: 1rem;
           font-weight: 600;
           border-radius: 50px;
           cursor: pointer;
@@ -490,13 +501,14 @@ export default function ContactPage() {
           justify-content: center;
           gap: 0.5rem;
           margin-top: 1rem;
-          box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+          box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+          width: 100%;
         }
 
         .submit-btn:hover:not(:disabled) {
           background: #d97706;
           transform: translateY(-2px);
-          box-shadow: 0 12px 35px rgba(245, 158, 11, 0.4);
+          box-shadow: 0 12px 25px rgba(245, 158, 11, 0.4);
         }
 
         .submit-btn:disabled {
@@ -509,8 +521,8 @@ export default function ContactPage() {
         }
 
         .spinner {
-          width: 20px;
-          height: 20px;
+          width: 18px;
+          height: 18px;
           border: 2px solid transparent;
           border-top: 2px solid white;
           border-radius: 50%;
@@ -520,28 +532,33 @@ export default function ContactPage() {
         /* Success Message */
         .success-message {
           text-align: center;
-          padding: 3rem 2rem;
+          padding: 2.5rem 1.5rem;
           background: linear-gradient(135deg, #10b981, #059669);
-          border-radius: 20px;
+          border-radius: 16px;
           color: white;
         }
 
         .success-icon {
-          width: 80px;
-          height: 80px;
+          width: 70px;
+          height: 70px;
           background: rgba(255, 255, 255, 0.2);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 2.5rem;
+          font-size: 2rem;
           margin: 0 auto 1.5rem;
           animation: bounceIn 0.6s ease-out;
         }
 
         .success-message h3 {
-          font-size: 1.8rem;
+          font-size: 1.5rem;
           margin-bottom: 0.5rem;
+        }
+
+        .success-message p {
+          font-size: 1rem;
+          line-height: 1.5;
         }
 
         /* Contact Info Section */
@@ -553,22 +570,22 @@ export default function ContactPage() {
 
         .contact-info-card {
           background: #f8fafc;
-          border-radius: 20px;
-          padding: 2.5rem;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
         .contact-info-card h3 {
-          font-size: 1.8rem;
+          font-size: 1.5rem;
           color: #1f2937;
-          margin-bottom: 2rem;
+          margin-bottom: 1.5rem;
           text-align: center;
         }
 
         .contact-items {
           display: flex;
           flex-direction: column;
-          gap: 1.5rem;
+          gap: 1.25rem;
         }
 
         .contact-item {
@@ -586,11 +603,11 @@ export default function ContactPage() {
         }
 
         .contact-icon {
-          font-size: 1.5rem;
-          width: 50px;
-          height: 50px;
+          font-size: 1.25rem;
+          width: 45px;
+          height: 45px;
           background: linear-gradient(135deg, #f59e0b, #d97706);
-          border-radius: 12px;
+          border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -598,7 +615,7 @@ export default function ContactPage() {
         }
 
         .contact-details h4 {
-          font-size: 1.1rem;
+          font-size: 1rem;
           font-weight: 600;
           color: #1f2937;
           margin-bottom: 0.25rem;
@@ -607,165 +624,134 @@ export default function ContactPage() {
         .contact-details p {
           color: #6b7280;
           line-height: 1.5;
+          font-size: 0.9rem;
         }
 
         /* Social Links */
         .social-links {
-          margin-top: 2.5rem;
+          margin-top: 2rem;
           padding-top: 2rem;
           border-top: 1px solid #e5e7eb;
         }
 
         .social-links h4 {
           text-align: center;
-          margin-bottom: 1.5rem;
+          margin-bottom: 1.25rem;
           color: #374151;
+          font-size: 1.1rem;
         }
 
         .social-icons {
           display: flex;
           justify-content: center;
-          gap: 1rem;
+          gap: 0.75rem;
+          flex-wrap: wrap;
         }
 
         .social-icon {
-          width: 50px;
-          height: 50px;
+          width: 45px;
+          height: 45px;
           background: linear-gradient(135deg, #f59e0b, #d97706);
-          border-radius: 12px;
+          border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
           text-decoration: none;
           transition: all 0.3s ease;
+          font-size: 1.1rem;
         }
 
         .social-icon:hover {
           transform: translateY(-3px) scale(1.1);
-          box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+          box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);
         }
 
         /* Map Section */
         .map-section {
           background: #f8fafc;
-          border-radius: 20px;
+          border-radius: 16px;
           padding: 2rem;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
         .map-section h3 {
-          font-size: 1.5rem;
+          font-size: 1.3rem;
           color: #1f2937;
-          margin-bottom: 1.5rem;
+          margin-bottom: 1.25rem;
           text-align: center;
         }
 
         .map-container {
           border-radius: 12px;
           overflow: hidden;
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .map-placeholder {
-          position: relative;
-          height: 300px;
-          background: linear-gradient(135deg, #e5e7eb, #d1d5db);
-        }
-
-        .map-overlay {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          background: rgba(245, 158, 11, 0.1);
-          color: #1f2937;
-          z-index: 2;
-        }
-
-        .map-pin {
-          font-size: 3rem;
-          margin-bottom: 1rem;
-          animation: bounce 2s infinite;
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
         }
 
         .map-frame {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-        }
-
-        .map-image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          opacity: 0.7;
+          border-radius: 10px;
+          overflow: hidden;
         }
 
         /* Quick Contact Section */
         .quick-contact-section {
-          margin-top: 4rem;
+          margin-top: 3rem;
         }
 
         .quick-contact-grid {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 2rem;
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
         }
 
         .quick-card {
           background: #f8fafc;
-          border-radius: 20px;
-          padding: 2.5rem 2rem;
+          border-radius: 16px;
+          padding: 2rem 1.5rem;
           text-align: center;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
           transition: all 0.3s ease;
         }
 
         .quick-card:hover {
-          transform: translateY(-10px);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+          transform: translateY(-8px);
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
         }
 
         .card-icon {
-          font-size: 3rem;
-          margin-bottom: 1.5rem;
+          font-size: 2.5rem;
+          margin-bottom: 1.25rem;
         }
 
         .quick-card h4 {
-          font-size: 1.3rem;
+          font-size: 1.2rem;
           color: #1f2937;
-          margin-bottom: 1rem;
+          margin-bottom: 0.75rem;
         }
 
         .quick-card p {
           color: #6b7280;
           margin-bottom: 1.5rem;
           line-height: 1.5;
+          font-size: 0.95rem;
         }
 
         .card-btn {
           background: #f59e0b;
           color: white;
           border: none;
-          padding: 0.8rem 1.5rem;
+          padding: 0.75rem 1.25rem;
           border-radius: 25px;
           cursor: pointer;
           font-weight: 600;
           transition: all 0.3s ease;
           width: 100%;
+          font-size: 0.9rem;
         }
 
         .card-btn:hover {
           background: #d97706;
           transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+          box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);
         }
 
         /* Animations */
@@ -774,10 +760,10 @@ export default function ContactPage() {
             transform: translateY(0);
           }
           40% {
-            transform: translateY(-10px);
+            transform: translateY(-8px);
           }
           60% {
-            transform: translateY(-5px);
+            transform: translateY(-4px);
           }
         }
 
@@ -819,21 +805,14 @@ export default function ContactPage() {
           }
         }
 
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-          .contact-grid {
-            grid-template-columns: 1fr;
-            gap: 3rem;
+        /* Tablet Styles */
+        @media (min-width: 768px) {
+          .container {
+            padding: 0 2rem;
           }
 
-          .quick-contact-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
-
-        @media (max-width: 768px) {
           .fullscreen-hero {
-            padding-top: 70px;
+            padding: 2rem;
           }
 
           .hero-title {
@@ -844,32 +823,118 @@ export default function ContactPage() {
             font-size: 1.4rem;
           }
 
-          .contact-form-section,
-          .contact-info-card,
-          .map-section {
-            padding: 2rem;
+          .contact-main-section {
+            padding: 4rem 0;
           }
 
-          .quick-contact-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .container {
-            padding: 0 1rem;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .hero-title {
-            font-size: 2.8rem;
-          }
-
-          .hero-subtitle {
-            font-size: 1.2rem;
+          .contact-grid {
+            gap: 4rem;
+            margin-bottom: 5rem;
           }
 
           .section-header h2 {
-            font-size: 2rem;
+            font-size: 2.2rem;
+          }
+
+          .section-header p {
+            font-size: 1.1rem;
+          }
+
+          .contact-form-section {
+            padding: 2.5rem;
+          }
+
+          .form-row {
+            flex-direction: row;
+          }
+
+          .submit-btn {
+            width: auto;
+            padding: 1.2rem 2.5rem;
+          }
+
+          .contact-info-card,
+          .map-section {
+            padding: 2.5rem;
+          }
+
+          .quick-contact-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+          }
+
+          .quick-card {
+            padding: 2.5rem 2rem;
+          }
+        }
+
+        /* Desktop Styles */
+        @media (min-width: 1024px) {
+          .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 6rem;
+          }
+
+          .contact-main-section {
+            padding: 6rem 0;
+          }
+
+          .hero-title {
+            font-size: 4.5rem;
+          }
+
+          .hero-subtitle {
+            font-size: 1.6rem;
+          }
+
+          .contact-form-section {
+            padding: 3rem;
+          }
+
+          .contact-info-card,
+          .map-section {
+            padding: 2.5rem;
+          }
+
+          .quick-contact-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+          }
+
+          .quick-card {
+            padding: 2.5rem 2rem;
+          }
+
+          .card-icon {
+            font-size: 3rem;
+          }
+
+          .quick-card h4 {
+            font-size: 1.3rem;
+          }
+        }
+
+        /* Large Desktop Styles */
+        @media (min-width: 1280px) {
+          .container {
+            max-width: 1200px;
+          }
+
+          .hero-title {
+            font-size: 5rem;
+          }
+        }
+
+        /* Small Mobile Adjustments */
+        @media (max-width: 380px) {
+          .hero-title {
+            font-size: 2.2rem;
+          }
+
+          .hero-subtitle {
+            font-size: 1rem;
           }
 
           .contact-form-section,
@@ -882,11 +947,21 @@ export default function ContactPage() {
           .contact-item {
             flex-direction: column;
             text-align: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
+          }
+
+          .contact-icon {
+            margin: 0 auto;
           }
 
           .social-icons {
-            flex-wrap: wrap;
+            gap: 0.5rem;
+          }
+
+          .social-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
           }
         }
       `}</style>

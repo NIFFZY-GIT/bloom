@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #dbeafe 0%, #ffffff 50%, #e0e7ff 100%);
-  padding: 20px;
+  padding: 16px;
   position: relative;
   overflow: hidden;
 }
@@ -31,18 +31,20 @@
 
 .content {
   text-align: center;
+  width: 100%;
   max-width: 700px;
   position: relative;
   z-index: 1;
   background: white;
-  padding: 60px 40px;
-  border-radius: 24px;
-  box-shadow: 0 10px 40px rgba(59, 130, 246, 0.1);
+  padding: 40px 24px;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.1);
+  margin: 20px 0;
 }
 
 .icon {
-  font-size: 100px;
-  margin-bottom: 20px;
+  font-size: 80px;
+  margin-bottom: 16px;
   animation: rotate-tool 4s ease-in-out infinite;
 }
 
@@ -56,26 +58,28 @@
 }
 
 .title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   color: #1f2937;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   font-weight: 800;
+  line-height: 1.2;
 }
 
 .description {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #6b7280;
-  line-height: 1.8;
-  margin-bottom: 40px;
+  line-height: 1.6;
+  margin-bottom: 32px;
 }
 
 .illustration {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 30px;
-  margin: 40px 0;
-  font-size: 60px;
+  gap: 20px;
+  margin: 32px 0;
+  font-size: 50px;
+  flex-wrap: wrap;
 }
 
 .tools {
@@ -87,7 +91,7 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-20px);
+    transform: translateY(-15px);
   }
 }
 
@@ -108,25 +112,27 @@
   background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
   border: 2px solid #bfdbfe;
   border-radius: 12px;
-  padding: 25px;
-  margin: 30px 0;
+  padding: 20px;
+  margin: 24px 0;
 }
 
 .statusBox h3 {
   color: #1e40af;
-  font-size: 1.3rem;
-  margin-bottom: 12px;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
 }
 
 .statusBox p {
   color: #1e3a8a;
-  line-height: 1.7;
+  line-height: 1.6;
   margin: 0;
+  font-size: 0.95rem;
 }
 
 .timeline {
-  margin: 40px 0;
+  margin: 32px 0;
   text-align: left;
+  width: 100%;
   max-width: 500px;
   margin-left: auto;
   margin-right: auto;
@@ -135,8 +141,8 @@
 .timelineItem {
   display: flex;
   align-items: start;
-  gap: 20px;
-  margin-bottom: 25px;
+  gap: 16px;
+  margin-bottom: 20px;
   position: relative;
 }
 
@@ -144,15 +150,15 @@
   content: '';
   position: absolute;
   left: 11px;
-  top: 30px;
+  top: 28px;
   width: 2px;
-  height: calc(100% + 15px);
+  height: calc(100% + 12px);
   background: #e5e7eb;
 }
 
 .timelineDot {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
   border-radius: 50%;
   flex-shrink: 0;
@@ -165,32 +171,34 @@
     box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.2);
   }
 }
 
 .timelineContent h4 {
   color: #1f2937;
-  font-size: 1.1rem;
-  margin-bottom: 5px;
+  font-size: 1.05rem;
+  margin-bottom: 4px;
   font-weight: 700;
 }
 
 .timelineContent p {
   color: #6b7280;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   margin: 0;
+  line-height: 1.5;
 }
 
 .contact {
-  margin: 40px 0 30px;
-  padding-top: 30px;
+  margin: 32px 0 24px;
+  padding-top: 24px;
   border-top: 2px solid #e5e7eb;
 }
 
 .contact p {
   color: #6b7280;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
 }
 
 .email {
@@ -200,8 +208,9 @@
   color: #3b82f6;
   text-decoration: none;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   transition: color 0.3s ease;
+  word-break: break-word;
 }
 
 .email:hover {
@@ -215,7 +224,7 @@
   gap: 8px;
   background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
   color: white;
-  padding: 14px 32px;
+  padding: 14px 28px;
   border-radius: 12px;
   border: none;
   font-weight: 700;
@@ -223,6 +232,8 @@
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  width: 100%;
+  justify-content: center;
 }
 
 .refreshBtn:hover {
@@ -230,39 +241,240 @@
   box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) {
+  .container {
+    padding: 20px;
+  }
+
   .content {
-    padding: 40px 30px;
+    padding: 48px 32px;
+    border-radius: 22px;
   }
 
   .icon {
-    font-size: 80px;
+    font-size: 90px;
+    margin-bottom: 20px;
   }
 
   .title {
-    font-size: 2rem;
+    font-size: 2.2rem;
+    margin-bottom: 18px;
   }
 
   .description {
-    font-size: 1rem;
+    font-size: 1.05rem;
+    margin-bottom: 36px;
   }
 
   .illustration {
-    font-size: 50px;
-    gap: 20px;
+    font-size: 55px;
+    gap: 25px;
+    margin: 36px 0;
   }
 
   .statusBox {
-    padding: 20px;
+    padding: 22px;
+    margin: 28px 0;
+  }
+
+  .refreshBtn {
+    width: auto;
+    padding: 14px 32px;
+  }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+  .content {
+    padding: 60px 40px;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(59, 130, 246, 0.1);
+  }
+
+  .icon {
+    font-size: 100px;
+    margin-bottom: 20px;
+  }
+
+  .title {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+  }
+
+  .description {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 40px;
+  }
+
+  .illustration {
+    font-size: 60px;
+    gap: 30px;
+    margin: 40px 0;
+  }
+
+  .statusBox {
+    padding: 25px;
+    margin: 30px 0;
+  }
+
+  .statusBox h3 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+
+  .statusBox p {
+    font-size: 1rem;
+  }
+
+  .timeline {
+    margin: 40px 0;
+  }
+
+  .timelineItem {
+    gap: 20px;
+    margin-bottom: 25px;
+  }
+
+  .timelineItem:not(:last-child)::after {
+    top: 30px;
+    height: calc(100% + 15px);
+  }
+
+  .timelineDot {
+    width: 24px;
+    height: 24px;
+  }
+
+  .timelineContent h4 {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+  }
+
+  .timelineContent p {
+    font-size: 0.95rem;
+  }
+
+  .contact {
+    margin: 40px 0 30px;
+    padding-top: 30px;
+  }
+
+  .contact p {
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+
+  .email {
+    font-size: 1.1rem;
+  }
+
+  .refreshBtn {
+    padding: 14px 32px;
+  }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+  .container {
+    padding: 24px;
+  }
+
+  .content {
+    padding: 70px 50px;
+  }
+
+  .title {
+    font-size: 2.8rem;
+  }
+
+  .description {
+    font-size: 1.15rem;
+  }
+
+  .illustration {
+    font-size: 65px;
+  }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  .content {
+    padding: 80px 60px;
+    max-width: 800px;
+  }
+
+  .title {
+    font-size: 3rem;
+  }
+
+  .description {
+    font-size: 1.2rem;
+  }
+}
+
+/* Small mobile devices (max-width: 375px) */
+@media (max-width: 375px) {
+  .container {
+    padding: 12px;
+  }
+
+  .content {
+    padding: 32px 20px;
+    border-radius: 18px;
+    margin: 16px 0;
+  }
+
+  .icon {
+    font-size: 70px;
+    margin-bottom: 14px;
+  }
+
+  .title {
+    font-size: 1.8rem;
+    margin-bottom: 14px;
+  }
+
+  .description {
+    font-size: 0.95rem;
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+
+  .illustration {
+    font-size: 45px;
+    gap: 16px;
+    margin: 28px 0;
+  }
+
+  .statusBox {
+    padding: 18px;
+    margin: 20px 0;
   }
 
   .statusBox h3 {
     font-size: 1.1rem;
   }
 
+  .statusBox p {
+    font-size: 0.9rem;
+  }
+
   .timeline {
-    padding-left: 10px;
+    margin: 28px 0;
+  }
+
+  .timelineItem {
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .timelineDot {
+    width: 20px;
+    height: 20px;
   }
 
   .timelineContent h4 {
@@ -270,11 +482,184 @@
   }
 
   .timelineContent p {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+  }
+
+  .contact {
+    margin: 28px 0 20px;
+    padding-top: 20px;
+  }
+
+  .email {
+    font-size: 1rem;
   }
 
   .refreshBtn {
-    width: 100%;
-    justify-content: center;
+    padding: 12px 24px;
+    font-size: 15px;
+  }
+}
+
+/* Extra small devices (max-width: 320px) */
+@media (max-width: 320px) {
+  .container {
+    padding: 10px;
+  }
+
+  .content {
+    padding: 28px 16px;
+    border-radius: 16px;
+  }
+
+  .icon {
+    font-size: 60px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .description {
+    font-size: 0.9rem;
+  }
+
+  .illustration {
+    font-size: 40px;
+    gap: 12px;
+  }
+
+  .timelineItem {
+    gap: 12px;
+  }
+
+  .timelineDot {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Height-based media queries for landscape and short screens */
+@media (max-height: 600px) and (orientation: landscape) {
+  .container {
+    padding: 10px;
+    min-height: 120vh;
+  }
+
+  .content {
+    padding: 30px 24px;
+    margin: 10px 0;
+  }
+
+  .icon {
+    font-size: 60px;
+    margin-bottom: 12px;
+  }
+
+  .title {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+  }
+
+  .description {
+    margin-bottom: 24px;
+  }
+
+  .illustration {
+    margin: 24px 0;
+    font-size: 45px;
+  }
+
+  .statusBox {
+    margin: 20px 0;
+    padding: 16px;
+  }
+
+  .timeline {
+    margin: 24px 0;
+  }
+
+  .contact {
+    margin: 24px 0 16px;
+    padding-top: 16px;
+  }
+}
+
+/* Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .container::before,
+  .icon,
+  .tools,
+  .gear,
+  .timelineDot,
+  .refreshBtn {
+    animation: none;
+  }
+
+  .refreshBtn:hover {
+    transform: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .statusBox {
+    border: 3px solid #1e40af;
+  }
+
+  .timelineDot {
+    box-shadow: 0 0 0 3px #1e40af;
+  }
+
+  .refreshBtn {
+    border: 2px solid #1e40af;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .content {
+    background: #1f2937;
+    color: #f9fafb;
+  }
+
+  .title {
+    color: #f9fafb;
+  }
+
+  .description {
+    color: #d1d5db;
+  }
+
+  .statusBox {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border-color: #6b7280;
+  }
+
+  .statusBox h3 {
+    color: #60a5fa;
+  }
+
+  .statusBox p {
+    color: #e5e7eb;
+  }
+
+  .timelineContent h4 {
+    color: #f9fafb;
+  }
+
+  .timelineContent p {
+    color: #d1d5db;
+  }
+
+  .contact p {
+    color: #d1d5db;
+  }
+
+  .email {
+    color: #60a5fa;
+  }
+
+  .email:hover {
+    color: #3b82f6;
   }
 }

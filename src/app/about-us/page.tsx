@@ -1,9 +1,6 @@
-
 'use client';
 
 import { useState } from 'react';
-
-
 
 export default function AboutUs() {
   const [activeTab, setActiveTab] = useState('mission');
@@ -154,25 +151,33 @@ export default function AboutUs() {
       {/* Story Tabs Section */}
       <section className="story-section">
         <div className="container">
-          <div className="story-tabs">
-            <button 
-              className={`tab-button ${activeTab === 'mission' ? 'active' : ''}`}
-              onClick={() => setActiveTab('mission')}
-            >
-              Our Mission
-            </button>
-            <button 
-              className={`tab-button ${activeTab === 'vision' ? 'active' : ''}`}
-              onClick={() => setActiveTab('vision')}
-            >
-              Our Vision
-            </button>
-            <button 
-              className={`tab-button ${activeTab === 'approach' ? 'active' : ''}`}
-              onClick={() => setActiveTab('approach')}
-            >
-              Our Approach
-            </button>
+          <div className="story-tabs-container">
+            <div className="story-tabs">
+              <button 
+                className={`tab-button ${activeTab === 'mission' ? 'active' : ''}`}
+                onClick={() => setActiveTab('mission')}
+              >
+                <span className="tab-icon">🎯</span>
+                <span className="tab-text">Our Mission</span>
+                <div className="active-indicator"></div>
+              </button>
+              <button 
+                className={`tab-button ${activeTab === 'vision' ? 'active' : ''}`}
+                onClick={() => setActiveTab('vision')}
+              >
+                <span className="tab-icon">🔭</span>
+                <span className="tab-text">Our Vision</span>
+                <div className="active-indicator"></div>
+              </button>
+              <button 
+                className={`tab-button ${activeTab === 'approach' ? 'active' : ''}`}
+                onClick={() => setActiveTab('approach')}
+              >
+                <span className="tab-icon">🚀</span>
+                <span className="tab-text">Our Approach</span>
+                <div className="active-indicator"></div>
+              </button>
+            </div>
           </div>
 
           <div className="tab-content">
@@ -275,110 +280,110 @@ export default function AboutUs() {
       <style jsx>{`
         .about-us-page {
           min-height: 100vh;
-          margin-top: 0; /* Remove any margin that might cause overlap */
+          margin-top: 0;
         }
 
-       /* Full Screen Hero Section */
-.fullscreen-hero {
-  height: 100vh;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: white;
-  overflow: hidden;
-  margin-top: 0;
-  padding-top: 80px;
-}
+        /* Full Screen Hero Section */
+        .fullscreen-hero {
+          height: 100vh;
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          color: white;
+          overflow: hidden;
+          margin-top: 0;
+          padding-top: 80px;
+        }
 
-.hero-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url('/images/about-hero.jpg') center/cover no-repeat;
-}
+        .hero-background {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: url('/images/about-hero.jpg') center/cover no-repeat;
+        }
 
-.hero-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.6));
-}
+        .hero-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.6));
+        }
 
-/* Centered hero content */
-.hero-content {
-  position: relative;
-  z-index: 2;
-  max-width: 800px;
-  padding: 0 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
+        /* Centered hero content */
+        .hero-content {
+          position: relative;
+          z-index: 2;
+          max-width: 800px;
+          padding: 0 2rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+        }
 
-/* Hero text styling */
-.hero-text {
-  margin-bottom: 80px; /* Adds space above scroll text */
-}
+        /* Hero text styling */
+        .hero-text {
+          margin-bottom: 80px;
+        }
 
-.hero-title {
-  font-size: 4.5rem;
-  font-weight: 800;
-  margin-bottom: 1.5rem;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-  line-height: 1.1;
-  animation: fadeInUp 1s ease-out;
-}
+        .hero-title {
+          font-size: 4.5rem;
+          font-weight: 800;
+          margin-bottom: 1.5rem;
+          text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+          line-height: 1.1;
+          animation: fadeInUp 1s ease-out;
+        }
 
-.hero-subtitle {
-  font-size: 1.6rem;
-  font-weight: 300;
-  opacity: 0.95;
-  margin-bottom: 3rem;
-  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
-  animation: fadeInUp 1s ease-out 0.2s both;
-}
+        .hero-subtitle {
+          font-size: 1.6rem;
+          font-weight: 300;
+          opacity: 0.95;
+          margin-bottom: 3rem;
+          text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+          animation: fadeInUp 1s ease-out 0.2s both;
+        }
 
-/* Scroll indicator placed at bottom of hero */
-.hero-scroll-indicator {
-  position: absolute;
-  bottom: 30px;
-  left: 0%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 0.4rem;
-  width: 100%;
-  animation: fadeInUp 1s ease-out 0.4s both;
-}
+        /* Scroll indicator placed at bottom of hero */
+        .hero-scroll-indicator {
+          position: absolute;
+          bottom: 30px;
+          left: 0%;
+          transform: translateX(-50%);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          gap: 0.4rem;
+          width: 100%;
+          animation: fadeInUp 1s ease-out 0.4s both;
+        }
 
-.hero-scroll-indicator span {
-  font-size: 0.9rem;
-  opacity: 0.8;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  display: block;
-  width: 100%;
-  text-align: center;
-}
+        .hero-scroll-indicator span {
+          font-size: 0.9rem;
+          opacity: 0.8;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          display: block;
+          width: 100%;
+          text-align: center;
+        }
 
-.scroll-arrow {
-  font-size: 1.5rem;
-  animation: bounce 2s infinite;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
+        .scroll-arrow {
+          font-size: 1.5rem;
+          animation: bounce 2s infinite;
+          display: flex;
+          justify-content: center;
+          width: 100%;
+        }
 
         @keyframes bounce {
           0%, 20%, 50%, 80%, 100% {
@@ -397,7 +402,7 @@ export default function AboutUs() {
           padding: 6rem 0;
           background: white;
           position: relative;
-          z-index: 1; /* Ensure it's above the hero */
+          z-index: 1;
         }
 
         .container {
@@ -561,7 +566,7 @@ export default function AboutUs() {
           line-height: 1.6;
         }
 
-        /* Story Section */
+        /* Story Section - UPDATED TAB DESIGN */
         .story-section {
           padding: 6rem 0;
           background: linear-gradient(135deg, #f0fdf4, #dcfce7);
@@ -569,30 +574,83 @@ export default function AboutUs() {
           z-index: 1;
         }
 
-        .story-tabs {
+        .story-tabs-container {
           display: flex;
           justify-content: center;
           margin-bottom: 3rem;
+        }
+
+        .story-tabs {
+          display: flex;
           background: white;
-          border-radius: 50px;
+          border-radius: 16px;
           padding: 0.5rem;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+          border: 1px solid #e5e7eb;
+          position: relative;
+          overflow: hidden;
         }
 
         .tab-button {
-          padding: 1rem 2rem;
+          position: relative;
+          padding: 1.25rem 2rem;
           border: none;
           background: none;
-          border-radius: 25px;
+          border-radius: 12px;
           font-weight: 600;
           color: #6b7280;
           cursor: pointer;
           transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          min-width: 160px;
+          justify-content: center;
+          z-index: 1;
+        }
+
+        .tab-button:hover {
+          color: #059669;
+          transform: translateY(-2px);
         }
 
         .tab-button.active {
-          background: #059669;
           color: white;
+          transform: translateY(0);
+        }
+
+        .tab-button.active .active-indicator {
+          opacity: 1;
+          transform: scale(1);
+        }
+
+        .active-indicator {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, #059669, #10b981);
+          border-radius: 12px;
+          opacity: 0;
+          transform: scale(0.95);
+          transition: all 0.3s ease;
+          z-index: -1;
+        }
+
+        .tab-icon {
+          font-size: 1.25rem;
+          transition: transform 0.3s ease;
+        }
+
+        .tab-button.active .tab-icon {
+          transform: scale(1.1);
+        }
+
+        .tab-text {
+          font-size: 1rem;
+          font-weight: 600;
+          white-space: nowrap;
         }
 
         .tab-content {
@@ -787,11 +845,20 @@ export default function AboutUs() {
           .team-grid {
             grid-template-columns: repeat(2, 1fr);
           }
+
+          .story-tabs {
+            flex-wrap: wrap;
+          }
+
+          .tab-button {
+            min-width: 140px;
+            padding: 1rem 1.5rem;
+          }
         }
 
         @media (max-width: 768px) {
           .fullscreen-hero {
-            padding-top: 70px; /* Adjust for mobile navbar */
+            padding-top: 70px;
           }
 
           .hero-title {
@@ -812,12 +879,15 @@ export default function AboutUs() {
 
           .story-tabs {
             flex-direction: column;
-            border-radius: 15px;
+            border-radius: 12px;
+            padding: 0.25rem;
           }
 
           .tab-button {
-            border-radius: 10px;
-            margin-bottom: 0.5rem;
+            width: 100%;
+            min-width: auto;
+            padding: 1rem;
+            margin: 0.25rem 0;
           }
 
           .tab-content {
@@ -859,6 +929,22 @@ export default function AboutUs() {
 
           .value-card {
             padding: 2rem 1rem;
+          }
+
+          .story-tabs {
+            border-radius: 10px;
+          }
+
+          .tab-button {
+            padding: 0.875rem 1rem;
+          }
+
+          .tab-text {
+            font-size: 0.9rem;
+          }
+
+          .tab-icon {
+            font-size: 1.1rem;
           }
         }
       `}</style>

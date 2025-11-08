@@ -78,24 +78,24 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-blue-800">
-        <div className="text-white text-2xl font-semibold">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-blue-800 p-4">
+        <div className="text-white text-xl md:text-2xl font-semibold text-center">Loading...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-600 to-red-800">
-        <div className="text-white text-2xl font-semibold">{error}</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-600 to-red-800 p-4">
+        <div className="text-white text-xl md:text-2xl font-semibold text-center">{error}</div>
       </div>
     );
   }
 
   if (!selectedCategory) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-600 to-gray-800">
-        <div className="text-white text-2xl font-semibold">No categories available</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-600 to-gray-800 p-4">
+        <div className="text-white text-xl md:text-2xl font-semibold text-center">No categories available</div>
       </div>
     );
   }
@@ -105,18 +105,19 @@ export default function Home() {
       <BackgroundAnimation category={selectedCategory} />
       
       <div className="relative z-10">
-      
         <HeroCarousel />
         
         <main>
           <section className="journey-section">
-            <div className="container mx-auto px-4">
-              <h1 className="journey-title">What&apos;s your journey?</h1>
-              <CategorySelector 
-                categories={categories}
-                selectedCategory={selectedCategory}
-                onCategorySelect={setSelectedCategory}
-              />
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex flex-col items-center justify-center w-full">
+                <h1 className="journey-title text-center">What&apos;s your journey?</h1>
+                <CategorySelector 
+                  categories={categories}
+                  selectedCategory={selectedCategory}
+                  onCategorySelect={setSelectedCategory}
+                />
+              </div>
             </div>
           </section>
 
@@ -129,33 +130,72 @@ export default function Home() {
 
       <style jsx global>{`
         .journey-section {
-          padding: 4rem 0;
-          text-align: center;
+          padding: 2rem 0;
           position: relative;
           z-index: 2;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 40vh;
         }
 
         .journey-title {
-          font-size: 3.5rem;
+          font-size: 2rem;
           font-weight: 800;
           color: white;
-          margin-bottom: 3rem;
+          margin-bottom: 2rem;
           letter-spacing: -0.025em;
           text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+          line-height: 1.2;
+          width: 100%;
+          text-align: center;
         }
 
-        @media (max-width: 768px) {
+        /* Tablet styles */
+        @media (min-width: 768px) {
+          .journey-section {
+            padding: 3rem 0;
+            min-height: 50vh;
+          }
+
           .journey-title {
-            font-size: 2.5rem;
+            font-size: 3rem;
+            margin-bottom: 2.5rem;
           }
         }
 
-        @media (max-width: 480px) {
+        /* Desktop styles */
+        @media (min-width: 1024px) {
+          .journey-section {
+            padding: 4rem 0;
+            min-height: 60vh;
+          }
+
           .journey-title {
-            font-size: 2rem;
+            font-size: 3.5rem;
+            margin-bottom: 3rem;
           }
         }
+
+        /* Large desktop styles */
+        @media (min-width: 1280px) {
+          .journey-title {
+            font-size: 4rem;
+          }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 375px) {
+          .journey-title {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+          }
           
+          .journey-section {
+            padding: 1.5rem 0;
+            min-height: 35vh;
+          }
+        }
       `}</style>
     </div>
   );

@@ -22,6 +22,19 @@ export default function CategorySelector({
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     checkScroll();
@@ -66,7 +79,9 @@ export default function CategorySelector({
         }
       }
     });
-  }, [selectedCategory, categories]);  const checkScroll = () => {
+  }, [selectedCategory, categories]);
+
+  const checkScroll = () => {
     if (scrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
       setShowLeftArrow(scrollLeft > 0);
@@ -76,7 +91,7 @@ export default function CategorySelector({
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-      const scrollAmount = 300;
+      const scrollAmount = isMobile ? 200 : 300;
       const newScrollLeft = scrollContainerRef.current.scrollLeft + 
         (direction === 'left' ? -scrollAmount : scrollAmount);
       
@@ -91,6 +106,7 @@ export default function CategorySelector({
 
   // Drag to scroll functionality
   const handleMouseDown = (e: React.MouseEvent) => {
+    if (isMobile) return; // Disable drag on mobile
     setIsDragging(true);
     setStartX(e.pageX - scrollContainerRef.current!.offsetLeft);
     setScrollLeft(scrollContainerRef.current!.scrollLeft);
@@ -105,11 +121,30 @@ export default function CategorySelector({
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
+    if (!isDragging || isMobile) return;
     e.preventDefault();
     const x = e.pageX - scrollContainerRef.current!.offsetLeft;
     const walk = (x - startX) * 2;
     scrollContainerRef.current!.scrollLeft = scrollLeft - walk;
+  };
+
+  // Touch events for mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!isMobile) return;
+    setIsDragging(true);
+    setStartX(e.touches[0].pageX - scrollContainerRef.current!.offsetLeft);
+    setScrollLeft(scrollContainerRef.current!.scrollLeft);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || !isMobile) return;
+    const x = e.touches[0].pageX - scrollContainerRef.current!.offsetLeft;
+    const walk = (x - startX) * 2;
+    scrollContainerRef.current!.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
   };
 
   const handleCategoryClick = (category: Category, index: number) => {
@@ -132,7 +167,7 @@ export default function CategorySelector({
 
   return (
     <div className="category-selector-wrapper">
-      {showLeftArrow && (
+      {!isMobile && showLeftArrow && (
         <button 
           className="nav-arrow left-arrow"
           onClick={() => scroll('left')}
@@ -155,6 +190,9 @@ export default function CategorySelector({
         onMouseLeave={handleMouseLeave}
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         <div className="categories-track">
           {categories.map((category, index) => (
@@ -191,18 +229,20 @@ export default function CategorySelector({
                 </div>
 
                 {/* Hover Effect Elements */}
-                <div className="hover-sparkles">
-                  {Array.from({ length: 8 }).map((_, i) => (
-                    <div key={i} className="sparkle" style={{ '--i': i } as React.CSSProperties}></div>
-                  ))}
-                </div>
+                {!isMobile && (
+                  <div className="hover-sparkles">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <div key={i} className="sparkle" style={{ '--i': i } as React.CSSProperties}></div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {showRightArrow && (
+      {!isMobile && showRightArrow && (
         <button 
           className="nav-arrow right-arrow"
           onClick={() => scroll('right')}
@@ -233,7 +273,8 @@ export default function CategorySelector({
           position: relative;
           max-width: 1200px;
           margin: 0 auto;
-          padding: 0 20px;
+          padding: 0 clamp(0.5rem, 3vw, 2rem);
+          width: 100%;
         }
 
         .categories-scroll-container {
@@ -241,10 +282,11 @@ export default function CategorySelector({
           scroll-behavior: smooth;
           scrollbar-width: none;
           -ms-overflow-style: none;
-          padding: 60px 0 80px 0;
-          margin: 0 -20px;
+          padding: clamp(2rem, 6vh, 4rem) 0 clamp(3rem, 8vh, 5rem) 0;
+          margin: 0 clamp(-0.5rem, -3vw, -2rem);
           cursor: grab;
           position: relative;
+          -webkit-overflow-scrolling: touch;
         }
 
         .categories-scroll-container::-webkit-scrollbar {
@@ -257,17 +299,18 @@ export default function CategorySelector({
 
         .categories-track {
           display: flex;
-          gap: 2.5rem;
-          padding: 0 20px;
+          gap: clamp(1rem, 3vw, 2.5rem);
+          padding: 0 clamp(0.5rem, 3vw, 2rem);
           min-width: min-content;
-          justify-content: center;
+          justify-content: flex-start;
         }
 
         .category-card {
-          flex: 0 0 220px;
+          flex: 0 0 clamp(120px, 25vw, 220px);
           cursor: pointer;
           position: relative;
           transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+          touch-action: pan-y;
         }
 
         .card-inner {
@@ -285,12 +328,12 @@ export default function CategorySelector({
 
         .category-image-container {
           position: relative;
-          width: 220px;
-          height: 220px;
+          width: clamp(120px, 25vw, 220px);
+          height: clamp(120px, 25vw, 220px);
           border-radius: 50%;
           overflow: hidden;
           box-shadow: 
-            0 25px 50px rgba(0, 0, 0, 0.4),
+            0 15px 30px rgba(0, 0, 0, 0.3),
             0 0 0 1px rgba(255, 255, 255, 0.1);
           transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
           backdrop-filter: blur(20px);
@@ -298,9 +341,9 @@ export default function CategorySelector({
 
         .category-card.active .category-image-container {
           box-shadow: 
-            0 35px 70px rgba(0, 0, 0, 0.5),
-            0 0 0 3px rgba(255, 255, 255, 0.9),
-            0 0 50px var(--category-glow, rgba(255,255,255,0.4));
+            0 25px 50px rgba(0, 0, 0, 0.4),
+            0 0 0 2px rgba(255, 255, 255, 0.9),
+            0 0 30px var(--category-glow, rgba(255,255,255,0.4));
         }
 
         .category-image {
@@ -347,11 +390,11 @@ export default function CategorySelector({
 
         .selection-ring {
           position: absolute;
-          top: -8px;
-          left: -8px;
-          right: -8px;
-          bottom: -8px;
-          border: 3px solid transparent;
+          top: -6px;
+          left: -6px;
+          right: -6px;
+          bottom: -6px;
+          border: 2px solid transparent;
           border-radius: 50%;
           opacity: 0;
           transition: all 0.4s ease;
@@ -365,15 +408,15 @@ export default function CategorySelector({
 
         .energy-aura {
           position: absolute;
-          top: -15px;
-          left: -15px;
-          right: -15px;
-          bottom: -15px;
+          top: -10px;
+          left: -10px;
+          right: -10px;
+          bottom: -10px;
           border: 2px solid;
           border-radius: 50%;
           opacity: 0;
           transition: all 0.6s ease;
-          filter: blur(10px);
+          filter: blur(8px);
         }
 
         .category-card.active .energy-aura {
@@ -383,15 +426,15 @@ export default function CategorySelector({
 
         .category-content {
           text-align: center;
-          margin-top: 2rem;
+          margin-top: clamp(1rem, 3vh, 2rem);
           position: relative;
         }
 
         .category-name {
           color: white;
           font-weight: 700;
-          font-size: 1.2rem;
-          margin-bottom: 1rem;
+          font-size: clamp(0.8rem, 3vw, 1.2rem);
+          margin-bottom: clamp(0.5rem, 2vh, 1rem);
           text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
           line-height: 1.3;
           transition: all 0.3s ease;
@@ -399,6 +442,9 @@ export default function CategorySelector({
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          max-width: 100%;
         }
 
         .category-card.active .category-name {
@@ -408,7 +454,7 @@ export default function CategorySelector({
 
         .progress-indicator {
           width: 100%;
-          height: 4px;
+          height: 3px;
           background: rgba(255, 255, 255, 0.2);
           border-radius: 2px;
           overflow: hidden;
@@ -456,11 +502,11 @@ export default function CategorySelector({
 
         .sparkle {
           position: absolute;
-          width: 6px;
-          height: 6px;
+          width: 4px;
+          height: 4px;
           background: white;
           border-radius: 50%;
-          box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+          box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
           animation: sparkleFloat 3s ease-in-out infinite;
           animation-delay: calc(var(--i) * 0.3s);
           opacity: 0;
@@ -474,8 +520,8 @@ export default function CategorySelector({
           transform: translateY(-50%);
           background: rgba(255, 255, 255, 0.95);
           border: none;
-          width: 60px;
-          height: 60px;
+          width: clamp(44px, 8vw, 60px);
+          height: clamp(44px, 8vw, 60px);
           border-radius: 50%;
           cursor: pointer;
           display: flex;
@@ -483,7 +529,7 @@ export default function CategorySelector({
           justify-content: center;
           color: #1f2937;
           transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
           z-index: 20;
           backdrop-filter: blur(20px);
           position: relative;
@@ -493,7 +539,7 @@ export default function CategorySelector({
         .nav-arrow:hover {
           background: white;
           transform: translateY(-50%) scale(1.15);
-          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+          box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
         }
 
         .nav-arrow:hover .arrow-glow {
@@ -520,31 +566,41 @@ export default function CategorySelector({
           z-index: 2;
         }
 
+        .arrow-icon svg {
+          width: clamp(20px, 4vw, 28px);
+          height: clamp(20px, 4vw, 28px);
+        }
+
         .left-arrow {
-          left: 0;
+          left: clamp(0.25rem, 2vw, 1rem);
         }
 
         .right-arrow {
-          right: 0;
+          right: clamp(0.25rem, 2vw, 1rem);
         }
 
         .scroll-indicator {
           display: flex;
           justify-content: center;
-          margin-top: 2rem;
+          margin-top: clamp(1rem, 3vh, 2rem);
+          padding: 0 1rem;
         }
 
         .indicator-dots {
           display: flex;
-          gap: 0.5rem;
+          gap: 0.4rem;
+          flex-wrap: wrap;
+          justify-content: center;
+          max-width: 100%;
         }
 
         .dot {
-          width: 6px;
-          height: 6px;
+          width: 5px;
+          height: 5px;
           border-radius: 50%;
           background: rgba(255, 255, 255, 0.3);
           transition: all 0.3s ease;
+          flex-shrink: 0;
         }
 
         .dot.active {
@@ -588,69 +644,174 @@ export default function CategorySelector({
           }
           20% {
             opacity: 1;
-            transform: translate(-50%, -50%) rotate(calc(var(--i) * 45deg)) translateX(80px) scale(1);
+            transform: translate(-50%, -50%) rotate(calc(var(--i) * 45deg)) translateX(60px) scale(1);
           }
           80% {
             opacity: 1;
-            transform: translate(-50%, -50%) rotate(calc(var(--i) * 45deg + 180deg)) translateX(100px) scale(1);
+            transform: translate(-50%, -50%) rotate(calc(var(--i) * 45deg + 180deg)) translateX(80px) scale(1);
           }
           100% {
             opacity: 0;
-            transform: translate(-50%, -50%) rotate(calc(var(--i) * 45deg + 360deg)) translateX(120px) scale(0);
+            transform: translate(-50%, -50%) rotate(calc(var(--i) * 45deg + 360deg)) translateX(100px) scale(0);
           }
         }
 
-        @media (max-width: 768px) {
-          .category-selector-wrapper {
-            padding: 0 15px;
+        /* Small devices (landscape phones, 576px and up) */
+        @media (min-width: 576px) {
+          .categories-track {
+            justify-content: center;
+          }
+        }
+
+        /* Medium devices (tablets, 768px and up) */
+        @media (min-width: 768px) {
+          .category-card:hover .card-inner {
+            transform: translateY(-15px);
           }
 
+          .category-card.active .card-inner {
+            transform: translateY(-20px) scale(1.05);
+          }
+        }
+
+        /* Large devices (desktops, 992px and up) */
+        @media (min-width: 992px) {
+          .categories-track {
+            gap: 2.5rem;
+          }
+
+          .category-card {
+            flex: 0 0 220px;
+          }
+
+          .category-image-container {
+            width: 220px;
+            height: 220px;
+          }
+        }
+
+        /* Extra small devices (phones, less than 576px) */
+        @media (max-width: 480px) {
           .categories-scroll-container {
-            margin: 0 -15px;
-            padding: 50px 0 70px 0;
+            padding: 1.5rem 0 2.5rem 0;
           }
 
           .categories-track {
-            gap: 2rem;
-            padding: 0 15px;
+            gap: 0.75rem;
+            padding: 0 0.5rem;
           }
 
           .category-card {
-            flex: 0 0 180px;
+            flex: 0 0 100px;
           }
 
           .category-image-container {
-            width: 180px;
-            height: 180px;
+            width: 100px;
+            height: 100px;
+          }
+
+          .category-content {
+            margin-top: 0.75rem;
           }
 
           .category-name {
-            font-size: 1rem;
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
           }
 
-          .nav-arrow {
-            width: 50px;
-            height: 50px;
+          .progress-indicator {
+            height: 2px;
+          }
+
+          .selection-ring {
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+          }
+
+          .energy-aura {
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
           }
         }
 
-        @media (max-width: 480px) {
+        /* Support for very small screens */
+        @media (max-width: 375px) {
+          .categories-track {
+            gap: 0.6rem;
+          }
+
           .category-card {
-            flex: 0 0 150px;
+            flex: 0 0 90px;
           }
 
           .category-image-container {
-            width: 150px;
-            height: 150px;
+            width: 90px;
+            height: 90px;
           }
 
           .category-name {
-            font-size: 0.9rem;
+            font-size: 0.7rem;
+          }
+        }
+
+        /* Landscape mode for mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+          .categories-scroll-container {
+            padding: 1rem 0 1.5rem 0;
           }
 
-          .nav-arrow {
-            width: 44px;
-            height: 44px;
+          .category-content {
+            margin-top: 0.5rem;
+          }
+
+          .category-name {
+            font-size: 0.7rem;
+          }
+        }
+
+        /* High-density displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+          .category-image {
+            image-rendering: -webkit-optimize-contrast;
+          }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+          .category-details * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
+          
+          .card-inner,
+          .category-image,
+          .category-image-container,
+          .category-name {
+            transition: none;
+          }
+
+          .hover-sparkles,
+          .energy-aura,
+          .selection-ring {
+            display: none;
+          }
+        }
+
+        /* Safe area insets for notched devices */
+        @supports(padding: max(0px)) {
+          .category-selector-wrapper {
+            padding-left: max(0.5rem, env(safe-area-inset-left));
+            padding-right: max(0.5rem, env(safe-area-inset-right));
+          }
+
+          .categories-scroll-container {
+            margin-left: max(-0.5rem, calc(-1 * env(safe-area-inset-left)));
+            margin-right: max(-0.5rem, calc(-1 * env(safe-area-inset-right)));
           }
         }
       `}</style>
