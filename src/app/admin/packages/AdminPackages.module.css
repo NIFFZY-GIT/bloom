@@ -1,7 +1,7 @@
 .pageContainer {
   padding: 0;
   min-height: 100%;
-  background: #f9fafb;
+  background: #0f172a;
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -19,13 +19,13 @@
 .pageTitle {
   font-size: clamp(1.5rem, 4vw, 2rem);
   font-weight: 700;
-  color: #111827;
+  color: #f1f5f9;
   margin: 0;
   line-height: 1.2;
 }
 
 .pageSubtitle {
-  color: #6b7280;
+  color: #94a3b8;
   margin: 0.5rem 0 0;
   font-size: clamp(0.875rem, 2vw, 1rem);
 }
@@ -49,9 +49,9 @@
 }
 
 .card {
-  background: #fff;
+  background: #1e293b;
   border-radius: 1.25rem;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   padding: clamp(1.25rem, 3vw, 2rem);
 }
 
@@ -67,7 +67,7 @@
 .cardHeading {
   font-size: clamp(1.125rem, 3vw, 1.25rem);
   font-weight: 700;
-  color: #1f2937;
+  color: #f1f5f9;
   margin: 0;
 }
 
@@ -84,7 +84,7 @@
 .emptyState {
   text-align: center;
   padding: clamp(2rem, 5vw, 3rem) 1rem;
-  color: #6b7280;
+  color: #94a3b8;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -92,8 +92,8 @@
 
 .secondaryBtn {
   align-self: center;
-  background: #fff7ed;
-  color: #d97706;
+  background: #334155;
+  color: #f59e0b;
   font-weight: 600;
   padding: clamp(0.625rem, 2vw, 0.75rem) clamp(1.25rem, 2.5vw, 1.5rem);
   border-radius: 0.75rem;
@@ -125,12 +125,12 @@
 .tableHeaderCell {
   padding: clamp(0.75rem, 2vw, 1rem);
   text-align: left;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #334155;
   font-size: clamp(0.75rem, 2vw, 0.85rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #6b7280;
+  color: #94a3b8;
 }
 
 .tableHeaderCellActions {
@@ -144,13 +144,13 @@
 .tableCell {
   padding: clamp(0.75rem, 2vw, 1rem);
   text-align: left;
-  border-bottom: 1px solid #e5e7eb;
-  color: #1f2937;
+  border-bottom: 1px solid #334155;
+  color: #e2e8f0;
   font-size: clamp(0.85rem, 2vw, 0.95rem);
 }
 
 .tableRow:hover .tableCell {
-  background: #f9fafb;
+  background: #334155;
 }
 
 .actionsCell {

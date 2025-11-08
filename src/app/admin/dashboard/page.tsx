@@ -162,16 +162,16 @@ async function getRecentBookings(): Promise<BookingRow[]> {
     try {
       const fallback = await query(
         `SELECT 
-           b.booking_id AS id,
+           b.id,
            b.customer_name,
            b.preferred_date,
            NULL::date AS preferred_end_date,
-           NULL::timestamp AS created_at,
-           NULL::text AS status,
+           b.created_at,
+           b.status::text AS status,
            tp.title AS package_title
          FROM bookings b
          LEFT JOIN tour_packages tp ON b.package_id = tp.id
-         ORDER BY b.booking_id DESC
+         ORDER BY b.id DESC
          LIMIT 5`
       );
 

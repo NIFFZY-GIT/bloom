@@ -230,7 +230,7 @@ export default function AddPackageForm({ isOpen, onClose, onPackageAdded }: AddP
             </div>
 
             <div className="form-group">
-              <label htmlFor="includes">What's Included (comma-separated)</label>
+              <label htmlFor="includes">What&apos;s Included (comma-separated)</label>
               <input 
                 type="text" 
                 id="includes" 
