@@ -192,7 +192,6 @@ const CreatePackagePage: React.FC = () => {
       setSubmitError(null);
       setSubmitSuccess(null);
       
-      // Check authentication when trying to move from step 1 to step 2
       if (currentStep === 1) {
         const authenticated = await isAuthenticated();
         if (!authenticated) {
@@ -221,7 +220,6 @@ const CreatePackagePage: React.FC = () => {
     setSubmitError(null);
     setSubmitSuccess(null);
 
-    // Check if user is authenticated
     const authenticated = await isAuthenticated();
     if (!authenticated) {
       setSubmitError('Please log in to create a custom package. You will be redirected to the login page.');
@@ -405,6 +403,14 @@ const CreatePackagePage: React.FC = () => {
       : packageForm.startDate
     : 'Select dates';
 
+  // Stats data similar to AboutUs page
+  const stats = [
+    { number: `${availablePlaces.length}+`, label: 'Amazing Places' },
+    { number: '50K+', label: 'Happy Travelers' },
+    { number: '98%', label: 'Satisfaction Rate' },
+    { number: '24/7', label: 'Support' }
+  ];
+
   return (
     <div className="create-package-page">
       {/* Authentication Notice Banner */}
@@ -421,17 +427,37 @@ const CreatePackagePage: React.FC = () => {
         </div>
       )}
       
-      {/* Hero Section */}
-      <section className="create-package-hero">
-        <div className="hero-overlay"></div>
-        <div className="hero-content">
-          <h1>Create Your Dream Tour</h1>
-          <p>Build your perfect Brooklyn experience by selecting your favorite places and customizing every detail.</p>
-          <button className="cta-button">Start Building</button>
+      {/* Hero Section Only - Nav bar removed */}
+      <section className="hero-section">
+        <div className="hero-background">
+          <div className="hero-overlay"></div>
         </div>
-        <div className="scroll-indicator">
-          <span>Scroll Down</span>
-          <div className="arrow"></div>
+        <div className="hero-content">
+          <div className="hero-text-content">
+            <h1 className="hero-main-title">Create Your Dream Tour</h1>
+            <p className="hero-description">
+              Build your perfect Brooklyn experience by selecting your favorite places and customizing every detail
+            </p>
+          </div>
+          
+          <div className="scroll-indicator">
+            <span className="scroll-text">SCROLL TO EXPLORE</span>
+            <div className="scroll-arrow">↓</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="stats-section">
+        <div className="container">
+          <div className="stats-grid">
+            {stats.map((stat, index) => (
+              <div key={index} className="stat-card">
+                <div className="stat-number">{stat.number}</div>
+                <div className="stat-label">{stat.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -440,15 +466,15 @@ const CreatePackagePage: React.FC = () => {
         <div className="progress-steps">
           <div className={`step ${currentStep >= 1 ? 'active' : ''}`}>
             <div className="step-number">1</div>
-            <span>Choose Places</span>
+            <span className="step-label">Choose Places</span>
           </div>
           <div className={`step ${currentStep >= 2 ? 'active' : ''}`}>
             <div className="step-number">2</div>
-            <span>Customize</span>
+            <span className="step-label">Customize</span>
           </div>
           <div className={`step ${currentStep >= 3 ? 'active' : ''}`}>
             <div className="step-number">3</div>
-            <span>Submit</span>
+            <span className="step-label">Submit</span>
           </div>
         </div>
 
@@ -468,58 +494,65 @@ const CreatePackagePage: React.FC = () => {
               <p>Select the locations you want to visit by clicking the + button</p>
             </div>
 
-            <div className="places-filters">
-              <button 
-                className={`filter-btn ${activeCategory === 'all' ? 'active' : ''}`}
-                onClick={() => handleCategoryClick('all')}
-              >
-                All Places
-              </button>
-              <button 
-                className={`filter-btn ${activeCategory === 'landmark' ? 'active' : ''}`}
-                onClick={() => handleCategoryClick('landmark')}
-              >
-                Landmarks
-              </button>
-              <button 
-                className={`filter-btn ${activeCategory === 'cultural' ? 'active' : ''}`}
-                onClick={() => handleCategoryClick('cultural')}
-              >
-                Cultural
-              </button>
-              <button 
-                className={`filter-btn ${activeCategory === 'nature' ? 'active' : ''}`}
-                onClick={() => handleCategoryClick('nature')}
-              >
-                Nature
-              </button>
-              <button 
-                className={`filter-btn ${activeCategory === 'food' ? 'active' : ''}`}
-                onClick={() => handleCategoryClick('food')}
-              >
-                Food & Drink
-              </button>
-              <button 
-                className={`filter-btn ${activeCategory === 'entertainment' ? 'active' : ''}`}
-                onClick={() => handleCategoryClick('entertainment')}
-              >
-                Entertainment
-              </button>
+            {/* Category Filters */}
+            <div className="category-tabs-container">
+              <div className="category-tabs">
+                <button 
+                  className={`tab-button ${activeCategory === 'all' ? 'active' : ''}`}
+                  onClick={() => handleCategoryClick('all')}
+                >
+                  <span className="tab-icon">🏛️</span>
+                  <span className="tab-text">All Places</span>
+                  <div className="active-indicator"></div>
+                </button>
+                <button 
+                  className={`tab-button ${activeCategory === 'landmark' ? 'active' : ''}`}
+                  onClick={() => handleCategoryClick('landmark')}
+                >
+                  <span className="tab-icon">🗽</span>
+                  <span className="tab-text">Landmarks</span>
+                  <div className="active-indicator"></div>
+                </button>
+                <button 
+                  className={`tab-button ${activeCategory === 'cultural' ? 'active' : ''}`}
+                  onClick={() => handleCategoryClick('cultural')}
+                >
+                  <span className="tab-icon">🎭</span>
+                  <span className="tab-text">Cultural</span>
+                  <div className="active-indicator"></div>
+                </button>
+                <button 
+                  className={`tab-button ${activeCategory === 'nature' ? 'active' : ''}`}
+                  onClick={() => handleCategoryClick('nature')}
+                >
+                  <span className="tab-icon">🌳</span>
+                  <span className="tab-text">Nature</span>
+                  <div className="active-indicator"></div>
+                </button>
+                <button 
+                  className={`tab-button ${activeCategory === 'food' ? 'active' : ''}`}
+                  onClick={() => handleCategoryClick('food')}
+                >
+                  <span className="tab-icon">🍽️</span>
+                  <span className="tab-text">Food & Drink</span>
+                  <div className="active-indicator"></div>
+                </button>
+              </div>
             </div>
 
             <div className="selection-area">
               <div className="available-places">
                 <h3>Available Places ({filteredPlaces.length})</h3>
                 {isLoadingPlaces ? (
-                  <div style={{ textAlign: 'center', padding: '60px 20px', color: '#6b7280' }}>
-                    <i className="fas fa-spinner fa-spin" style={{ fontSize: '2rem', marginBottom: '16px' }}></i>
+                  <div className="loading-state">
+                    <i className="fas fa-spinner fa-spin"></i>
                     <p>Loading places...</p>
                   </div>
                 ) : filteredPlaces.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '60px 20px', color: '#6b7280' }}>
-                    <i className="fas fa-map-marked-alt" style={{ fontSize: '2rem', marginBottom: '16px' }}></i>
+                  <div className="empty-state">
+                    <i className="fas fa-map-marked-alt"></i>
                     <p>No places available</p>
-                    <span style={{ fontSize: '0.9rem' }}>Please check back later or contact us for custom options</span>
+                    <span>Please check back later or contact us for custom options</span>
                   </div>
                 ) : (
                   <div className="places-grid">
@@ -579,7 +612,22 @@ const CreatePackagePage: React.FC = () => {
               </div>
 
               <div className="selected-places">
-                <h3>Your Itinerary ({selectedPlaces.length})</h3>
+                <div className="selected-places-header">
+                  <h3>Your Itinerary ({selectedPlaces.length})</h3>
+                  {selectedPlaces.length > 0 && (
+                    <div className="itinerary-summary-card">
+                      <div className="summary-item">
+                        <span>Total Duration:</span>
+                        <span>{calculateTotalDuration()}</span>
+                      </div>
+                      <div className="summary-item">
+                        <span>Places:</span>
+                        <span>{selectedPlaces.length}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
                 {selectedPlaces.length === 0 ? (
                   <div className="empty-itinerary">
                     <i className="fas fa-map-marked-alt"></i>
@@ -620,17 +668,6 @@ const CreatePackagePage: React.FC = () => {
                       </div>
                     ))}
                     
-                    <div className="itinerary-summary">
-                      <div className="summary-item">
-                        <span>Total Duration:</span>
-                        <span>{calculateTotalDuration()}</span>
-                      </div>
-                      <div className="summary-item">
-                        <span>Places:</span>
-                        <span>{selectedPlaces.length}</span>
-                      </div>
-                    </div>
-
                     <button 
                       className="next-step-btn"
                       onClick={handleNextStep}
@@ -654,8 +691,11 @@ const CreatePackagePage: React.FC = () => {
             </div>
 
             <div className="customize-content">
-              <div className="package-details">
-                <h3>Package Details</h3>
+              <div className="package-details-card">
+                <div className="card-header">
+                  <div className="card-icon">📝</div>
+                  <h3>Package Details</h3>
+                </div>
                 <div className="form-group">
                   <label htmlFor="packageName">Tour Name *</label>
                   <input
@@ -682,8 +722,11 @@ const CreatePackagePage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="preferences">
-                <h3>Tour Information</h3>
+              <div className="preferences-card">
+                <div className="card-header">
+                  <div className="card-icon">⚙️</div>
+                  <h3>Tour Information</h3>
+                </div>
                 <div className="preferences-grid">
                   <div className="form-group">
                     <label htmlFor="guests">Number of Guests *</label>
@@ -792,7 +835,7 @@ const CreatePackagePage: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                  <div className="form-group full-width">
                     <label htmlFor="foodAndSpecialRequests">Food Preferences, Allergies & Additional Information</label>
                     <textarea
                       id="foodAndSpecialRequests"
@@ -802,12 +845,9 @@ const CreatePackagePage: React.FC = () => {
                       placeholder="Example: 2 guests are vegetarian, 1 guest is vegan, 1 guest has peanut allergy. Please mention any dietary requirements or food preferences..."
                       rows={4}
                     />
-                    <small style={{ display: 'block', marginTop: '8px', color: '#6b7280', fontSize: '0.875rem' }}>
-                      💡 Tip: Mention the count for each requirement (e.g., &quot;2 vegetarian, 1 has shellfish allergy&quot;)
-                    </small>
                   </div>
 
-                  <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                  <div className="form-group full-width">
                     <label htmlFor="additionalInfo">Additional Information</label>
                     <textarea
                       id="additionalInfo"
@@ -837,16 +877,12 @@ const CreatePackagePage: React.FC = () => {
         {currentStep === 3 && (
           <section className="submit-section">
             <div className="section-header">
-              <h2 style={{ fontSize: '2.5rem', fontWeight: '800', color: '#1f2937', marginBottom: '0.5rem' }}>
-                🎉 You&apos;re Almost There!
-              </h2>
-              <p style={{ fontSize: '1.15rem', color: '#6b7280', fontWeight: '500' }}>
-                Review your dream tour and submit your request
-              </p>
+              <h2>🎉 You&apos;re Almost There!</h2>
+              <p>Review your dream tour and submit your request</p>
             </div>
 
             <div className="submit-content">
-              <div className="package-summary">
+              <div className="package-summary-card">
                 <div className="summary-header">
                   <div className="summary-icon">
                     <i className="fas fa-map-marked-alt"></i>
@@ -890,7 +926,13 @@ const CreatePackagePage: React.FC = () => {
                       <i className="fas fa-calendar-check"></i>
                     </div>
                     <div className="stat-content">
-                      <span className="stat-value">{selectedDateLabel !== 'Select dates' ? (packageForm.endDate && packageForm.endDate !== packageForm.startDate ? `${Math.ceil((new Date(packageForm.endDate).getTime() - new Date(packageForm.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1} days` : '1 day') : 'TBD'}</span>
+                      <span className="stat-value">
+                        {selectedDateLabel !== 'Select dates' ? 
+                          (packageForm.endDate && packageForm.endDate !== packageForm.startDate ? 
+                            `${Math.ceil((new Date(packageForm.endDate).getTime() - new Date(packageForm.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1} days` : '1 day') : 
+                          'TBD'
+                        }
+                      </span>
                       <span className="stat-label">Travel Dates</span>
                     </div>
                   </div>
@@ -999,7 +1041,7 @@ const CreatePackagePage: React.FC = () => {
                       </li>
                       <li>
                         <i className="fas fa-check-circle"></i>
-                        <span>You&apos;ll receive pricing and availability via email and in My Trips</span>
+                        <span>You&apos;ll receive pricing and availability via email</span>
                       </li>
                       <li>
                         <i className="fas fa-check-circle"></i>
@@ -1049,6 +1091,23 @@ const CreatePackagePage: React.FC = () => {
           </section>
         )}
       </div>
+
+      {/* CTA Section */}
+      <section className="cta-section">
+        <div className="container">
+          <div className="cta-content">
+            <h2>Ready to Begin Your Journey?</h2>
+            <p>
+              Let us craft your perfect Brooklyn adventure. Share your dreams, 
+              and we&apos;ll make them a reality.
+            </p>
+            <div className="cta-buttons">
+              <button className="explore-button">Explore Packages</button>
+              <button className="contact-button">Contact Us</button>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
