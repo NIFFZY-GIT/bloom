@@ -73,14 +73,34 @@ const CreatePackagePage: React.FC = () => {
     fetchPlaces();
   }, []);
 
-  // Check authentication status
+  // Check authentication status and fetch user data
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuthAndFetchUser = async () => {
       const authenticated = await isAuthenticated();
       setIsUserAuthenticated(authenticated);
+      
+      // If authenticated, fetch user details and pre-fill the form
+      if (authenticated) {
+        try {
+          const response = await fetch('/api/auth/check');
+          const data = await response.json();
+          const apiAuthenticated = typeof data.isAuthenticated === 'boolean' ? data.isAuthenticated : data.authenticated;
+
+          if (apiAuthenticated && data.user) {
+            setPackageForm(prev => ({
+              ...prev,
+              contactEmail: data.user.email || prev.contactEmail,
+              // Pre-fill name from username or email if available
+              name: prev.name || data.user.name || data.user.username || '',
+            }));
+          }
+        } catch (error) {
+          console.error('Failed to fetch user data:', error);
+        }
+      }
     };
 
-    checkAuth();
+    checkAuthAndFetchUser();
   }, []);
 
   const filteredPlaces = activeCategory === 'all' 
@@ -253,6 +273,8 @@ const CreatePackagePage: React.FC = () => {
     setIsSubmittingPackage(true);
 
     try {
+      console.log('[CreatePackage] Submitting custom package with email:', packageForm.contactEmail);
+      
       const response = await fetch('/api/custom-packages', {
         method: 'POST',
         headers: {
@@ -268,22 +290,64 @@ const CreatePackagePage: React.FC = () => {
         throw new Error(message);
       }
 
+      console.log('[CreatePackage] Custom package submitted successfully. Package ID:', data.packageId);
+      
       setSubmitSuccess('🎉 Thank you! Your custom tour request has been submitted successfully. Our team will review your itinerary and send you a detailed quotation within 24 hours. Check your email and "My Trips" in your profile for updates!');
-      setSelectedPlaces([]);
-      setCurrentStep(1);
-      setPackageForm({
-        name: '',
-        description: '',
-        guests: 2,
-        contactEmail: '',
-        contactPhone: '',
-        startDate: '',
-        endDate: '',
-        foodAndSpecialRequests: '',
-        additionalInfo: '',
-      });
+      
+      // Delay before resetting to allow user to see success message
+      setTimeout(() => {
+        setSelectedPlaces([]);
+        setCurrentStep(1);
+        
+        // Re-fetch user data to pre-fill email again
+        fetch('/api/auth/check')
+          .then(res => res.json())
+          .then(data => {
+            const apiAuthenticated = typeof data.isAuthenticated === 'boolean' ? data.isAuthenticated : data.authenticated;
+
+            if (apiAuthenticated && data.user) {
+              setPackageForm({
+                name: '',
+                description: '',
+                guests: 2,
+                contactEmail: data.user.email || '',
+                contactPhone: '',
+                startDate: '',
+                endDate: '',
+                foodAndSpecialRequests: '',
+                additionalInfo: '',
+              });
+            } else {
+              setPackageForm({
+                name: '',
+                description: '',
+                guests: 2,
+                contactEmail: '',
+                contactPhone: '',
+                startDate: '',
+                endDate: '',
+                foodAndSpecialRequests: '',
+                additionalInfo: '',
+              });
+            }
+          })
+          .catch(() => {
+            setPackageForm({
+              name: '',
+              description: '',
+              guests: 2,
+              contactEmail: '',
+              contactPhone: '',
+              startDate: '',
+              endDate: '',
+              foodAndSpecialRequests: '',
+              additionalInfo: '',
+            });
+          });
+      }, 1500);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to submit custom package';
+      console.error('[CreatePackage] Submission error:', message);
       setSubmitError(message);
     } finally {
       setIsSubmittingPackage(false);
@@ -646,7 +710,18 @@ const CreatePackagePage: React.FC = () => {
                       onChange={handleFormChange}
                       placeholder="your.email@example.com"
                       required
+                      readOnly={isUserAuthenticated && packageForm.contactEmail !== ''}
+                      style={isUserAuthenticated && packageForm.contactEmail !== '' ? { 
+                        backgroundColor: '#f3f4f6', 
+                        cursor: 'not-allowed',
+                        opacity: 0.7 
+                      } : {}}
                     />
+                    {isUserAuthenticated && packageForm.contactEmail !== '' && (
+                      <small style={{ display: 'block', marginTop: '4px', color: '#6b7280', fontSize: '0.875rem' }}>
+                        📧 This email is from your account and cannot be changed
+                      </small>
+                    )}
                   </div>
 
                   <div className="form-group">

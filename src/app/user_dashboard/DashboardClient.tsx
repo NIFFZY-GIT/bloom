@@ -69,6 +69,17 @@ export default function DashboardClient({ initialBookings, initialQuotations, in
     amount: 0,
   });
 
+  // Debug logging
+  useEffect(() => {
+    console.log('[DashboardClient] Initial custom trips:', initialCustomTrips);
+    console.log('[DashboardClient] Custom trips count:', initialCustomTrips.length);
+  }, [initialCustomTrips]);
+
+  useEffect(() => {
+    console.log('[DashboardClient] Custom trips state updated:', customTrips);
+    console.log('[DashboardClient] Custom trips state count:', customTrips.length);
+  }, [customTrips]);
+
   // Password reset states
   const [resetStep, setResetStep] = useState<'idle' | 'code-sent' | 'resetting'>('idle');
   const [resetCode, setResetCode] = useState('');
@@ -1306,176 +1317,250 @@ export default function DashboardClient({ initialBookings, initialQuotations, in
         }
 
         .custom-trips-section {
-          display: flex;
-          flex-direction: column;
-          gap: 2rem;
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 2.5rem;
         }
 
         .custom-trip-card {
-          background: linear-gradient(135deg, #fff9f6 0%, #ffffff 100%);
-          border: 2px solid #ffe8de;
-          border-radius: 20px;
-          padding: 2rem;
+          background: white;
+          border: 2px solid #e5e7eb;
+          border-radius: 24px;
+          padding: 3rem;
           transition: all 0.3s ease;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .custom-trip-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 15px 40px rgba(255, 107, 53, 0.15);
+          transform: translateY(-6px);
+          box-shadow: 0 20px 50px rgba(245, 158, 11, 0.2);
+          border-color: #f59e0b;
         }
 
         .trip-header {
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
-          margin-bottom: 1.5rem;
+          margin-bottom: 2rem;
+          padding-bottom: 2rem;
+          border-bottom: 3px solid #f59e0b;
           flex-wrap: wrap;
-          gap: 1rem;
+          gap: 1.5rem;
         }
 
         .trip-title-section {
           flex: 1;
+          min-width: 250px;
         }
 
         .trip-title-section h3 {
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: #1f2937;
-          margin-bottom: 0.75rem;
+          font-size: 2rem;
+          font-weight: 800;
+          color: #111827;
+          margin-bottom: 1rem;
+          letter-spacing: -0.02em;
+          line-height: 1.2;
         }
 
         .trip-status-badge {
           display: inline-flex;
           align-items: center;
-          gap: 0.5rem;
-          padding: 0.5rem 1rem;
-          border-radius: 25px;
-          font-size: 0.9rem;
-          font-weight: 600;
+          gap: 0.625rem;
+          padding: 0.75rem 1.5rem;
+          border-radius: 30px;
+          font-size: 1rem;
+          font-weight: 700;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          letter-spacing: 0.02em;
         }
 
         .trip-status-badge.pending {
-          background: #fef3c7;
+          background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
           color: #92400e;
+          border: 2px solid #fbbf24;
         }
 
         .trip-status-badge.approved {
-          background: #d1fae5;
+          background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
           color: #065f46;
+          border: 2px solid #10b981;
         }
 
         .trip-status-badge.rejected {
-          background: #fee2e2;
+          background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
           color: #991b1b;
+          border: 2px solid #ef4444;
         }
 
         .trip-meta {
-          text-align: right;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 0.5rem;
         }
 
         .trip-date {
           color: #6b7280;
-          font-size: 0.9rem;
+          font-size: 0.95rem;
+          font-weight: 500;
         }
 
         .trip-description {
           color: #4b5563;
-          line-height: 1.6;
-          margin-bottom: 1.5rem;
-          font-size: 1rem;
+          line-height: 1.7;
+          margin-bottom: 2rem;
+          font-size: 1.125rem;
+          font-weight: 400;
         }
 
         .trip-details {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-          gap: 1rem;
-          margin-bottom: 1.5rem;
-          padding: 1.5rem;
-          background: white;
-          border-radius: 12px;
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          gap: 1.5rem;
+          margin-bottom: 2rem;
+          padding: 2rem;
+          background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+          border-radius: 16px;
+          border: 2px solid #e5e7eb;
         }
 
         .trip-detail-item {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
+          gap: 0.875rem;
+          padding: 1rem;
+          background: white;
+          border-radius: 12px;
+          border: 2px solid #e5e7eb;
+          transition: all 0.3s ease;
+        }
+
+        .trip-detail-item:hover {
+          border-color: #f59e0b;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
         }
 
         .detail-icon {
-          font-size: 1.2rem;
+          font-size: 1.75rem;
+          flex-shrink: 0;
         }
 
         .detail-text {
-          color: #374151;
-          font-weight: 500;
-          font-size: 0.95rem;
+          color: #111827;
+          font-weight: 600;
+          font-size: 1.05rem;
         }
 
         .trip-places {
-          margin-bottom: 1.5rem;
+          margin-bottom: 2rem;
         }
 
         .trip-places h4 {
-          font-size: 1.1rem;
-          font-weight: 600;
-          color: #1f2937;
-          margin-bottom: 1rem;
+          font-size: 1.5rem;
+          font-weight: 800;
+          color: #111827;
+          margin-bottom: 1.5rem;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          letter-spacing: -0.01em;
+        }
+
+        .trip-places h4::before {
+          content: '📍';
+          font-size: 1.75rem;
         }
 
         .places-list {
           display: flex;
           flex-direction: column;
-          gap: 0.75rem;
-          background: white;
-          padding: 1.5rem;
-          border-radius: 12px;
+          gap: 1rem;
+          background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+          padding: 2rem;
+          border-radius: 16px;
+          border: 2px solid #e5e7eb;
+          position: relative;
+        }
+
+        .places-list::before {
+          content: '';
+          position: absolute;
+          left: 32px;
+          top: 50px;
+          bottom: 50px;
+          width: 3px;
+          background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+          border-radius: 10px;
         }
 
         .place-item {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
-          font-size: 0.95rem;
+          gap: 1.25rem;
+          font-size: 1.05rem;
+          padding: 1.25rem;
+          background: white;
+          border-radius: 12px;
+          border: 2px solid #e5e7eb;
+          transition: all 0.3s ease;
+          position: relative;
+        }
+
+        .place-item:hover {
+          border-color: #f59e0b;
+          transform: translateX(8px);
+          box-shadow: 0 6px 20px rgba(245, 158, 11, 0.15);
         }
 
         .place-number {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 28px;
-          height: 28px;
-          background: #ff6b35;
+          width: 36px;
+          height: 36px;
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
           color: white;
           border-radius: 50%;
-          font-weight: 700;
-          font-size: 0.85rem;
+          font-weight: 800;
+          font-size: 1rem;
           flex-shrink: 0;
+          box-shadow: 0 6px 15px rgba(245, 158, 11, 0.4);
+          border: 3px solid white;
         }
 
         .place-name {
-          color: #1f2937;
-          font-weight: 600;
+          color: #111827;
+          font-weight: 700;
           flex: 1;
+          font-size: 1.125rem;
         }
 
         .place-duration {
           color: #6b7280;
-          font-size: 0.85rem;
+          font-size: 0.95rem;
+          font-weight: 600;
+          padding: 0.375rem 0.875rem;
+          background: #f3f4f6;
+          border-radius: 20px;
         }
 
         .trip-quotation-section {
-          border-top: 2px solid #ffe8de;
-          padding-top: 1.5rem;
+          border-top: 3px solid #f59e0b;
+          padding-top: 2rem;
+          margin-top: 2rem;
         }
 
         .quotation-available {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          gap: 1.5rem;
+          gap: 2rem;
           background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-          padding: 1.5rem;
-          border-radius: 12px;
+          padding: 2.5rem;
+          border-radius: 18px;
+          border: 3px solid #10b981;
+          box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
         }
 
         .quotation-info {
@@ -1484,27 +1569,32 @@ export default function DashboardClient({ initialBookings, initialQuotations, in
 
         .quotation-label {
           display: block;
-          font-weight: 700;
+          font-weight: 800;
           color: #065f46;
-          font-size: 1.1rem;
-          margin-bottom: 0.5rem;
+          font-size: 1.5rem;
+          margin-bottom: 0.75rem;
+          letter-spacing: -0.01em;
         }
 
         .quotation-text {
           color: #047857;
-          font-size: 0.9rem;
+          font-size: 1.05rem;
+          font-weight: 500;
+          line-height: 1.5;
         }
 
         .quotation-buttons {
           display: flex;
-          gap: 0.75rem;
+          flex-direction: column;
+          gap: 1rem;
         }
 
         .quotation-btn {
-          padding: 0.75rem 1.5rem;
+          padding: 1.125rem 2.5rem;
           border: none;
-          border-radius: 8px;
-          font-weight: 600;
+          border-radius: 12px;
+          font-weight: 700;
+          font-size: 1.05rem;
           cursor: pointer;
           transition: all 0.3s ease;
           text-decoration: none;
@@ -1512,64 +1602,92 @@ export default function DashboardClient({ initialBookings, initialQuotations, in
           align-items: center;
           justify-content: center;
           white-space: nowrap;
+          letter-spacing: 0.01em;
         }
 
         .quotation-btn.view {
           background: white;
           color: #065f46;
-          border: 2px solid #065f46;
+          border: 2px solid #10b981;
         }
 
         .quotation-btn.view:hover {
           background: #f0fdf4;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 15px rgba(16, 185, 129, 0.2);
         }
 
         .quotation-btn.download {
-          background: #ff6b35;
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
           color: white;
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
         }
 
         .quotation-btn.download:hover {
-          background: #ff8c5a;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
         }
 
         .quotation-pending {
           display: flex;
           align-items: center;
-          gap: 1.5rem;
-          background: #fef3c7;
-          padding: 1.5rem;
-          border-radius: 12px;
+          gap: 2rem;
+          background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+          padding: 2.5rem;
+          border-radius: 18px;
+          border: 3px solid #fbbf24;
+          box-shadow: 0 8px 25px rgba(251, 191, 36, 0.2);
         }
 
         .pending-icon {
-          font-size: 2.5rem;
+          font-size: 3.5rem;
           flex-shrink: 0;
         }
 
         .pending-text strong {
           display: block;
           color: #92400e;
-          font-size: 1.1rem;
-          margin-bottom: 0.5rem;
+          font-size: 1.5rem;
+          margin-bottom: 0.75rem;
+          font-weight: 800;
+          letter-spacing: -0.01em;
         }
 
         .pending-text p {
           color: #78350f;
-          font-size: 0.9rem;
+          font-size: 1.05rem;
           margin: 0;
-          line-height: 1.5;
+          line-height: 1.6;
+          font-weight: 500;
         }
 
         .create-trip-btn {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          padding: 1rem 2rem;
-          background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
+          gap: 0.75rem;
+          padding: 1.25rem 2.5rem;
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
           color: white;
           border: none;
-          border-radius: 12px;
+          border-radius: 14px;
+          font-size: 1.125rem;
+          font-weight: 700;
+          text-decoration: none;
+          transition: all 0.3s ease;
+          box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+          letter-spacing: 0.01em;
+        }
+
+        .create-trip-btn:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 10px 30px rgba(245, 158, 11, 0.5);
+        }
+
+        .create-trip-btn::before {
+          content: '✨';
+          font-size: 1.5rem;
+        }
           font-weight: 700;
           font-size: 1rem;
           cursor: pointer;

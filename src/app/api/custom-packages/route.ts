@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import db, { query } from '@/lib/db';
 import { notifyAdminCustomPackage, sendCustomPackageAcknowledgment } from '@/lib/email';
+import { auth } from '@/lib/auth';
+import { cookies } from 'next/headers';
+import jwt from 'jsonwebtoken';
 
 interface PlacePayload {
   id: number | null;
@@ -116,10 +119,61 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Contact email is required' }, { status: 400 });
   }
 
+  let userId: number | null = null;
+
+  try {
+    const session = await auth();
+    if (session?.user?.id) {
+      const parsedUserId = Number.parseInt(session.user.id, 10);
+      if (Number.isInteger(parsedUserId)) {
+        userId = parsedUserId;
+        console.log('[CustomPackages API] User authenticated via NextAuth:', userId);
+      }
+    }
+
+    if (userId === null) {
+      const cookieStore = await cookies();
+      const token = cookieStore.get('auth_token')?.value;
+      if (token) {
+        try {
+          const secret = process.env.JWT_SECRET || 'dev-secret';
+          const payload = jwt.verify(token, secret) as { sub?: string | number };
+          if (payload?.sub !== undefined) {
+            const parsed = typeof payload.sub === 'number' ? payload.sub : Number.parseInt(String(payload.sub), 10);
+            if (Number.isInteger(parsed)) {
+              userId = parsed;
+              console.log('[CustomPackages API] User authenticated via legacy JWT:', userId);
+            }
+          }
+        } catch (error) {
+          console.log('[CustomPackages API] Legacy JWT verification failed:', error);
+        }
+      }
+    }
+  } catch (error) {
+    console.error('[CustomPackages API] Failed to resolve authenticated user:', error);
+    // Continue as guest - userId remains null
+  }
+
   const client = await db.pool.connect();
+
+  let hasUserIdColumn = false;
+  try {
+    const columnCheck = await client.query(
+      `SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'custom_packages' AND column_name = 'user_id'`
+    );
+  hasUserIdColumn = (columnCheck.rowCount ?? 0) > 0;
+    if (!hasUserIdColumn) {
+      console.warn('[CustomPackages API] user_id column not present on custom_packages table');
+    }
+  } catch (metadataError) {
+    console.warn('[CustomPackages API] Failed to inspect custom_packages schema:', metadataError);
+  }
 
   try {
     await client.query('BEGIN');
+
+    console.log('[CustomPackages API] Starting to insert custom package for email:', contactEmail);
 
     // Insert or get places from the places table
     const placeIds: number[] = [];
@@ -180,8 +234,25 @@ export async function POST(request: Request) {
     }
 
     // Insert custom package
-    const packageResult = await client.query(
-      `INSERT INTO custom_packages (
+    const insertWithUserId = `INSERT INTO custom_packages (
+         name,
+         description,
+         total_duration_minutes,
+         total_duration_label,
+         guests,
+         contact_email,
+         user_id,
+         contact_phone,
+         start_date,
+         end_date,
+         food_and_special_requests,
+         additional_info,
+         status
+       )
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+       RETURNING id`;
+
+    const insertWithoutUserId = `INSERT INTO custom_packages (
          name,
          description,
          total_duration_minutes,
@@ -196,24 +267,47 @@ export async function POST(request: Request) {
          status
        )
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-       RETURNING id`,
-      [
-        name,
-        description,
-        totalDurationMinutes,
-        totalDurationLabel,
-        guests,
-        contactEmail,
-        contactPhone,
-        startDate,
-        endDate,
-        foodAndSpecialRequests,
-        additionalInfo,
-        'pending',
-      ],
-    );
+       RETURNING id`;
+
+    const valuesWithUserId = [
+      name,
+      description,
+      totalDurationMinutes,
+      totalDurationLabel,
+      guests,
+      contactEmail,
+      userId,
+      contactPhone,
+      startDate,
+      endDate,
+      foodAndSpecialRequests,
+      additionalInfo,
+      'pending',
+    ];
+
+    const valuesWithoutUserId = [
+      name,
+      description,
+      totalDurationMinutes,
+      totalDurationLabel,
+      guests,
+      contactEmail,
+      contactPhone,
+      startDate,
+      endDate,
+      foodAndSpecialRequests,
+      additionalInfo,
+      'pending',
+    ];
+
+    const packageResult = hasUserIdColumn && userId !== null
+      ? await client.query(insertWithUserId, valuesWithUserId)
+      : await client.query(insertWithoutUserId, valuesWithoutUserId);
 
     const packageId = packageResult.rows[0].id;
+
+    console.log('[CustomPackages API] Created custom package with ID:', packageId, 'for user:', userId);
+    console.log('[CustomPackages API] Package contact email:', contactEmail);
 
     // Link places to custom package
     for (let i = 0; i < placeIds.length; i++) {
@@ -225,6 +319,8 @@ export async function POST(request: Request) {
     }
 
     await client.query('COMMIT');
+
+    console.log('[CustomPackages API] Successfully committed custom package transaction. Package ID:', packageId);
 
     // Send email notifications to customer and all admins
     try {

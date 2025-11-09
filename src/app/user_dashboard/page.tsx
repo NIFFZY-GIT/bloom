@@ -366,6 +366,49 @@ async function fetchReceiptsForUser(user: AuthenticatedUser, bookings: Booking[]
 }
 
 async function fetchCustomTripsForUser(user: AuthenticatedUser): Promise<CustomTrip[]> {
+  console.log('[Dashboard] Fetching custom trips for user:', { id: user.id, email: user.email });
+
+  const mapCustomTripRow = (row: Record<string, any>): CustomTrip => {
+    const rawPlaces = row.places;
+    let places: Array<{ name: string; duration: string }> = [];
+
+    if (Array.isArray(rawPlaces)) {
+      places = rawPlaces;
+    } else if (typeof rawPlaces === 'string') {
+      try {
+        const parsed = JSON.parse(rawPlaces);
+        if (Array.isArray(parsed)) {
+          places = parsed;
+        }
+      } catch (parseError) {
+        console.warn('[Dashboard] Failed to parse custom trip places JSON:', parseError);
+      }
+    }
+
+    const normalizedPlaces = places
+      .filter((item) => item && typeof item.name === 'string')
+      .map((item) => ({
+        name: item.name,
+        duration: typeof item.duration === 'string' && item.duration.trim().length > 0
+          ? item.duration
+          : 'Duration TBD',
+      }));
+
+    return {
+      id: String(row.id),
+      name: row.name,
+      description: row.description,
+      duration: row.total_duration_label ?? 'Duration TBD',
+      guests: row.guests,
+      status: row.status === 'approved' ? 'approved' : row.status === 'rejected' ? 'rejected' : 'pending',
+      quotationPdfPath: row.quotation_pdf_path,
+      dateRange: formatDateRange(row.start_date, row.end_date, 'Dates TBD'),
+      placesCount: normalizedPlaces.length,
+      places: normalizedPlaces,
+      createdAt: formatDate(row.created_at, 'Recently'),
+    };
+  };
+
   try {
     const result = await query(
       `SELECT
@@ -378,6 +421,7 @@ async function fetchCustomTripsForUser(user: AuthenticatedUser): Promise<CustomT
          cp.quotation_pdf_path,
          cp.start_date,
          cp.end_date,
+         cp.contact_email,
          cp.created_at,
          COALESCE(
            json_agg(
@@ -393,27 +437,70 @@ async function fetchCustomTripsForUser(user: AuthenticatedUser): Promise<CustomT
        FROM custom_packages cp
        LEFT JOIN custom_package_places cpp ON cpp.custom_package_id = cp.id
        LEFT JOIN places p ON p.id = cpp.place_id
-       WHERE LOWER(cp.contact_email) = LOWER($1)
+       WHERE (cp.user_id = $1)
+          OR (cp.user_id IS NULL AND LOWER(cp.contact_email) = LOWER($2))
        GROUP BY cp.id
        ORDER BY cp.created_at DESC`,
-      [user.email],
+      [user.id, user.email],
     );
 
-    return result.rows.map((row) => ({
-      id: String(row.id),
-      name: row.name,
-      description: row.description,
-      duration: row.total_duration_label ?? 'Duration TBD',
-      guests: row.guests,
-      status: row.status === 'approved' ? 'approved' : row.status === 'rejected' ? 'rejected' : 'pending',
-      quotationPdfPath: row.quotation_pdf_path,
-      dateRange: formatDateRange(row.start_date, row.end_date, 'Dates TBD'),
-      placesCount: Array.isArray(row.places) ? row.places.length : 0,
-      places: Array.isArray(row.places) ? row.places : [],
-      createdAt: formatDate(row.created_at, 'Recently'),
-    }));
+    console.log(`[Dashboard] Found ${result.rows.length} custom trips linked to user ${user.id}`);
+
+    if (result.rows.length > 0) {
+      console.log('[Dashboard] Custom trips emails:', result.rows.map((r) => r.contact_email));
+    }
+
+    return result.rows.map(mapCustomTripRow);
   } catch (error) {
-    console.error('Failed to fetch custom trips:', error);
+    const pgCode = typeof error === 'object' && error && 'code' in error
+      ? (error as { code?: string }).code
+      : undefined;
+
+    if (pgCode === '42703') {
+      console.warn('[Dashboard] custom_packages.user_id column missing, falling back to email lookup');
+      try {
+        const fallbackResult = await query(
+          `SELECT
+             cp.id,
+             cp.name,
+             cp.description,
+             cp.total_duration_label,
+             cp.guests,
+             cp.status,
+             cp.quotation_pdf_path,
+             cp.start_date,
+             cp.end_date,
+             cp.contact_email,
+             cp.created_at,
+             COALESCE(
+               json_agg(
+                 json_build_object(
+                   'name', p.name,
+                   'duration', p.duration
+                 )
+                 ORDER BY cpp.display_order
+               )
+               FILTER (WHERE p.id IS NOT NULL),
+               '[]'
+             ) AS places
+           FROM custom_packages cp
+           LEFT JOIN custom_package_places cpp ON cpp.custom_package_id = cp.id
+           LEFT JOIN places p ON p.id = cpp.place_id
+           WHERE LOWER(cp.contact_email) = LOWER($1)
+           GROUP BY cp.id
+           ORDER BY cp.created_at DESC`,
+          [user.email],
+        );
+
+        console.log(`[Dashboard] Found ${fallbackResult.rows.length} custom trips via email fallback for ${user.email}`);
+        return fallbackResult.rows.map(mapCustomTripRow);
+      } catch (fallbackError) {
+        console.error('[Dashboard] Email fallback query failed:', fallbackError);
+        return [];
+      }
+    }
+
+    console.error('[Dashboard] Failed to fetch custom trips:', error);
     return [];
   }
 }

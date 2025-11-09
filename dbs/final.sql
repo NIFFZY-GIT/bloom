@@ -9,6 +9,15 @@
 
 -- Started on 2025-11-09 00:27:04
 
+
+--
+-- TOC entry 5178 (class 0 OID 0)
+-- Dependencies: 237
+-- Name: idx_custom_packages_user_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_custom_packages_user_id ON public.custom_packages USING btree (user_id);
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -354,6 +363,7 @@ CREATE TABLE public.custom_packages (
     total_duration_label character varying(50),
     guests integer DEFAULT 1 NOT NULL,
     contact_email character varying(255) NOT NULL,
+    user_id integer,
     contact_phone character varying(50),
     start_date date,
     end_date date,
@@ -825,6 +835,14 @@ ALTER TABLE ONLY public.custom_packages
 
 
 --
+-- Name: custom_packages custom_packages_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.custom_packages
+    ADD CONSTRAINT custom_packages_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE SET NULL;
+
+
+--
 -- TOC entry 4980 (class 2606 OID 17984)
 -- Name: custom_places custom_places_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
@@ -1048,6 +1066,22 @@ ALTER TABLE ONLY public.tour_package_images
     ADD CONSTRAINT tour_package_images_package_id_fkey FOREIGN KEY (package_id) REFERENCES public.tour_packages(id) ON DELETE CASCADE;
 
 
+ALTER TABLE users 
+ADD COLUMN IF NOT EXISTS google_id VARCHAR(255) UNIQUE,
+ADD COLUMN IF NOT EXISTS avatar VARCHAR(500),
+ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE;
+
+-- Create index for faster Google ID lookups
+CREATE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id);
+
+-- Allow password_hash to be empty for OAuth users
+ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
+
+-- Verify the changes
+SELECT column_name, data_type, is_nullable 
+FROM information_schema.columns 
+WHERE table_name = 'users' 
+ORDER BY ordinal_position;
 -- Completed on 2025-11-09 00:27:04
 
 --
