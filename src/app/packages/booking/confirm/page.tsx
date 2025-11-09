@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect, ChangeEvent } from 'react';
+import { useMemo, useState, useEffect, ChangeEvent, use } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from './ConfirmPage.module.css';
@@ -8,7 +8,7 @@ import styles from './ConfirmPage.module.css';
 type UploadStatus = 'idle' | 'uploading' | 'success' | 'error';
 
 interface PageProps {
-  searchParams: Record<string, string | string[] | undefined>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 const BANK_DETAILS: Array<{ label: string; value: string }> = [
@@ -22,7 +22,7 @@ const BANK_DETAILS: Array<{ label: string; value: string }> = [
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 
-const getParam = (params: PageProps['searchParams'], key: string) => {
+const getParam = (params: Record<string, string | string[] | undefined>, key: string) => {
   const raw = params[key];
   if (!raw) return '';
   return Array.isArray(raw) ? raw[0] ?? '' : raw;
@@ -54,36 +54,39 @@ const formatDateRangeLabel = (startIso: string, endIso: string, fallback: string
 };
 
 export default function BookingConfirmationPage({ searchParams }: PageProps) {
+  // Unwrap the searchParams Promise
+  const params = use(searchParams);
+  
   const bookingData = useMemo(() => {
-    const totalPrice = Number(getParam(searchParams, 'totalPrice')) || 0;
-    const startDateParam = getParam(searchParams, 'startDate');
-    const endDateParam = getParam(searchParams, 'endDate');
-    const rangeParam = getParam(searchParams, 'dateRange');
+    const totalPrice = Number(getParam(params, 'totalPrice')) || 0;
+    const startDateParam = getParam(params, 'startDate');
+    const endDateParam = getParam(params, 'endDate');
+    const rangeParam = getParam(params, 'dateRange');
     const [rangeStart, rangeEnd] = rangeParam.includes(':') ? rangeParam.split(':') : ['', ''];
-    const fallbackDate = getParam(searchParams, 'date');
+    const fallbackDate = getParam(params, 'date');
     const startIso = startDateParam || rangeStart || fallbackDate;
     const endIso = endDateParam || rangeEnd || startIso;
     const dateDisplay = formatDateRangeLabel(startIso, endIso, fallbackDate);
     return {
-      bookingId: Number(getParam(searchParams, 'bookingId')) || null,
-      packageId: getParam(searchParams, 'packageId'),
-      packageTitle: getParam(searchParams, 'packageTitle'),
-      category: getParam(searchParams, 'category'),
-      duration: getParam(searchParams, 'duration'),
-      difficulty: getParam(searchParams, 'difficulty'),
-      pricePerPerson: Number(getParam(searchParams, 'pricePerPerson')) || 0,
+      bookingId: Number(getParam(params, 'bookingId')) || null,
+      packageId: getParam(params, 'packageId'),
+      packageTitle: getParam(params, 'packageTitle'),
+      category: getParam(params, 'category'),
+      duration: getParam(params, 'duration'),
+      difficulty: getParam(params, 'difficulty'),
+      pricePerPerson: Number(getParam(params, 'pricePerPerson')) || 0,
       totalPrice,
-      name: getParam(searchParams, 'name'),
-      email: getParam(searchParams, 'email'),
-      phone: getParam(searchParams, 'phone'),
+      name: getParam(params, 'name'),
+      email: getParam(params, 'email'),
+      phone: getParam(params, 'phone'),
       startDate: startIso,
       endDate: endIso,
       dateDisplay,
-      guests: Number(getParam(searchParams, 'guests')) || 1,
-      message: getParam(searchParams, 'message'),
-      reference: getParam(searchParams, 'reference'),
+      guests: Number(getParam(params, 'guests')) || 1,
+      message: getParam(params, 'message'),
+      reference: getParam(params, 'reference'),
     };
-  }, [searchParams]);
+  }, [params]);
 
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
@@ -156,7 +159,7 @@ export default function BookingConfirmationPage({ searchParams }: PageProps) {
   ];
   
   // Get food and special requirements from URL params
-  const foodAndSpecialRequests = getParam(searchParams, 'foodAndSpecialRequests') || '';
+  const foodAndSpecialRequests = getParam(params, 'foodAndSpecialRequests') || '';
   
   const tourDetails = [
     { label: 'Tour package', value: bookingData.packageTitle, icon: 'fas fa-map-marked-alt' },

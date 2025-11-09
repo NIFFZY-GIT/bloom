@@ -4,6 +4,8 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef, CSSProperties } from 'react';
+import { signOut } from 'next-auth/react';
+
 // --- Helper function to combine styles ---
 const combineStyles = (...styleObjects: CSSProperties[]): CSSProperties => {
   return Object.assign({}, ...styleObjects);
@@ -116,6 +118,10 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
  
   const handleLogout = async () => {
     try {
+      // Sign out from NextAuth (this handles NextAuth sessions)
+      await signOut({ redirect: false });
+      
+      // Also clear legacy auth token via API
       const response = await fetch('/api/logout', { method: 'POST' });
       if (!response.ok) {
         throw new Error(`Logout failed with status ${response.status}`);

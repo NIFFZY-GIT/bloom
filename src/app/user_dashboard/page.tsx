@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import jwt from 'jsonwebtoken';
 
 import { query } from '@/lib/db';
+import { auth } from '@/lib/auth';
 import DashboardClient, { Booking, Quotation, CustomTrip } from './DashboardClient';
 
 const DASHBOARD_ROUTE = '/user_dashboard';
@@ -162,6 +163,37 @@ function computeAmount(price: string | number | null | undefined, guests: number
 }
 
 async function getAuthenticatedUser(): Promise<AuthenticatedUser> {
+  // First check NextAuth session
+  const session = await auth();
+  
+  if (session?.user) {
+    // User authenticated via NextAuth (Google OAuth)
+    const userId = parseNumericId(session.user.id);
+    
+    const result = await query(
+      'SELECT user_id, username, email, role FROM users WHERE user_id = $1',
+      [userId],
+    );
+
+    const row = result.rows[0] as { user_id: number; username: string | null; email: string; role: string | null } | undefined;
+
+    if (!row) {
+      console.error('[Dashboard] User not found in database for session:', session.user);
+      throw new Error('Authenticated user not found');
+    }
+
+    // Use Google name if username is not set in database
+    const displayUsername = row.username || session.user.name || row.email;
+
+    return {
+      id: row.user_id,
+      email: row.email,
+      username: displayUsername,
+      role: row.role ?? session.user.role ?? null,
+    };
+  }
+
+  // Fallback to legacy JWT token
   const cookieStore = await cookies();
   const token = cookieStore.get('auth_token')?.value;
 
@@ -198,6 +230,8 @@ async function getAuthenticatedUser(): Promise<AuthenticatedUser> {
 }
 
 async function fetchBookingsForUser(user: AuthenticatedUser): Promise<Booking[]> {
+  console.log(`[Dashboard] Fetching bookings for user:`, { id: user.id, email: user.email });
+  
   const result = await query(
     `SELECT
       b.id,
@@ -232,6 +266,8 @@ async function fetchBookingsForUser(user: AuthenticatedUser): Promise<Booking[]>
     ORDER BY b.created_at DESC NULLS LAST, b.id DESC`,
     [user.id, user.email],
   );
+
+  console.log(`[Dashboard] Found ${result.rows.length} bookings for user ${user.id}`);
 
   return (result.rows as DbBookingRow[]).map((row) => {
     const paymentStatus = toPaymentStatus(row.payment_status);

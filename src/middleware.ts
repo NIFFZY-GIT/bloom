@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { auth } from '@/lib/auth';
+
+// Force middleware to use Node.js runtime instead of Edge
+export const runtime = 'nodejs';
 
 // Simple JWT decode without verification (for middleware)
 // Full verification should be done in API routes
@@ -15,7 +19,7 @@ function decodeJWT(token: string): { sub: string; email: string; role: string } 
   }
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Rewrite /uploads/* to API route for serving files
@@ -26,7 +30,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Protected routes that require authentication
-  const protectedRoutes = ['/profile', '/bookings'];
+  const protectedRoutes = ['/profile', '/bookings', '/user_dashboard'];
   
   // Admin routes that require admin role
   const adminRoutes = ['/admin'];
@@ -35,7 +39,34 @@ export function middleware(request: NextRequest) {
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
   const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route));
 
-  // Get token from cookie or header
+  // First check NextAuth session
+  const session = await auth();
+  
+  if (session?.user) {
+    // User is authenticated via NextAuth
+    const userRole = session.user.role || 'USER';
+    
+    // Check if admin route requires admin role
+    if (isAdminRoute && userRole !== 'ADMIN') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/unauthorized';
+      return NextResponse.redirect(url);
+    }
+
+    // Add user info to request headers for use in API routes
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-user-id', session.user.id);
+    requestHeaders.set('x-user-email', session.user.email || '');
+    requestHeaders.set('x-user-role', userRole);
+
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
+  }
+
+  // Fallback to legacy JWT token check
   const token = request.cookies.get('auth_token')?.value || 
                 request.headers.get('authorization')?.replace('Bearer ', '');
 
@@ -63,7 +94,7 @@ export function middleware(request: NextRequest) {
       // Check if admin route requires admin role
       if (isAdminRoute && decoded.role !== 'ADMIN') {
         const url = request.nextUrl.clone();
-        url.pathname = '/';
+        url.pathname = '/unauthorized';
         return NextResponse.redirect(url);
       }
 

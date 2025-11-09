@@ -1,13 +1,31 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
+import { auth } from '@/lib/auth';
 
 export async function GET() {
   try {
+    // First check NextAuth session
+    const session = await auth();
+    
+    if (session?.user) {
+      console.log('[Auth Check API] NextAuth session found:', session.user);
+      return NextResponse.json({ 
+        authenticated: true,
+        user: {
+          email: session.user.email,
+          name: session.user.name,
+          role: session.user.role,
+          avatar: session.user.avatar,
+        }
+      }, { status: 200 });
+    }
+
+    // Fallback to legacy JWT token check
     const cookieStore = await cookies();
     const token = cookieStore.get('auth_token')?.value;
 
-    console.log('[Auth Check API] Token exists:', !!token);
+    console.log('[Auth Check API] Legacy token exists:', !!token);
 
     if (!token) {
       console.log('[Auth Check API] No token found - returning false');
@@ -18,7 +36,7 @@ export async function GET() {
     
     try {
       const decoded = jwt.verify(token, secret);
-      console.log('[Auth Check API] Token verified successfully for user:', decoded);
+      console.log('[Auth Check API] Legacy token verified successfully for user:', decoded);
       return NextResponse.json({ authenticated: true }, { status: 200 });
     } catch (error) {
       // Token is invalid or expired

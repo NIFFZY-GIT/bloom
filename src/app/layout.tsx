@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken';
 import './globals.css';
 import Navbar from '../components/ui/navbar';
 import Footer from '../components/ui/footer';
+import { AuthProvider } from '../components/AuthProvider';
+import { auth } from '@/lib/auth';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -14,6 +16,17 @@ type AuthState = {
 };
 
 async function resolveAuthState(): Promise<AuthState> {
+  // First check NextAuth session
+  const session = await auth();
+  
+  if (session?.user) {
+    return {
+      isAuthenticated: true,
+      role: session.user.role || 'USER',
+    };
+  }
+
+  // Fallback to legacy JWT token
   const cookieStore = await cookies();
   const token = cookieStore.get('auth_token')?.value;
 
@@ -58,9 +71,11 @@ export default async function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <Navbar isAuthenticated={isAuthenticated} userRole={role} />
-        {children}
-        <Footer />
+        <AuthProvider>
+          <Navbar isAuthenticated={isAuthenticated} userRole={role} />
+          {children}
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
