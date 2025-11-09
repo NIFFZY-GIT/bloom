@@ -2,21 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict O7VGsOYfZMgNQlA6KmFs9kEVA1ty5ZbJERM3vVhmwIsZbg3fmA3liQzhzqogQho
+\restrict t4n4bzbM2mNEOjj3MfQ7xs0oAp87CC1gEzHDYLLdczPDfQrEyXwkXUKRcX1gGne
 
 -- Dumped from database version 18.0
 -- Dumped by pg_dump version 18.0
 
--- Started on 2025-11-09 00:27:04
-
-
---
--- TOC entry 5178 (class 0 OID 0)
--- Dependencies: 237
--- Name: idx_custom_packages_user_id; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX idx_custom_packages_user_id ON public.custom_packages USING btree (user_id);
+-- Started on 2025-11-09 20:33:13
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -31,7 +22,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 890 (class 1247 OID 17926)
+-- TOC entry 892 (class 1247 OID 17926)
 -- Name: booking_status; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -45,7 +36,7 @@ CREATE TYPE public.booking_status AS ENUM (
 ALTER TYPE public.booking_status OWNER TO postgres;
 
 --
--- TOC entry 884 (class 1247 OID 17894)
+-- TOC entry 886 (class 1247 OID 17894)
 -- Name: tour_difficulty; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -60,7 +51,7 @@ CREATE TYPE public.tour_difficulty AS ENUM (
 ALTER TYPE public.tour_difficulty OWNER TO postgres;
 
 --
--- TOC entry 878 (class 1247 OID 17868)
+-- TOC entry 880 (class 1247 OID 17868)
 -- Name: user_role; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -73,7 +64,7 @@ CREATE TYPE public.user_role AS ENUM (
 ALTER TYPE public.user_role OWNER TO postgres;
 
 --
--- TOC entry 244 (class 1255 OID 17967)
+-- TOC entry 246 (class 1255 OID 17967)
 -- Name: set_bookings_updated_at(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -90,7 +81,7 @@ $$;
 ALTER FUNCTION public.set_bookings_updated_at() OWNER TO postgres;
 
 --
--- TOC entry 245 (class 1255 OID 18066)
+-- TOC entry 247 (class 1255 OID 18066)
 -- Name: set_updated_at_custom_packages(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -107,7 +98,7 @@ $$;
 ALTER FUNCTION public.set_updated_at_custom_packages() OWNER TO postgres;
 
 --
--- TOC entry 243 (class 1255 OID 17923)
+-- TOC entry 245 (class 1255 OID 17923)
 -- Name: update_updated_at_column(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -162,7 +153,7 @@ CREATE SEQUENCE public."Category_id_seq"
 ALTER SEQUENCE public."Category_id_seq" OWNER TO postgres;
 
 --
--- TOC entry 5164 (class 0 OID 0)
+-- TOC entry 5181 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: Category_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -203,7 +194,7 @@ CREATE SEQUENCE public."Place_id_seq"
 ALTER SEQUENCE public."Place_id_seq" OWNER TO postgres;
 
 --
--- TOC entry 5165 (class 0 OID 0)
+-- TOC entry 5182 (class 0 OID 0)
 -- Dependencies: 241
 -- Name: Place_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -245,7 +236,7 @@ CREATE SEQUENCE public.booking_receipts_id_seq
 ALTER SEQUENCE public.booking_receipts_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5166 (class 0 OID 0)
+-- TOC entry 5183 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: booking_receipts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -285,7 +276,7 @@ CREATE TABLE public.bookings (
 ALTER TABLE public.bookings OWNER TO postgres;
 
 --
--- TOC entry 5167 (class 0 OID 0)
+-- TOC entry 5184 (class 0 OID 0)
 -- Dependencies: 224
 -- Name: COLUMN bookings.special_requests; Type: COMMENT; Schema: public; Owner: postgres
 --
@@ -294,7 +285,7 @@ COMMENT ON COLUMN public.bookings.special_requests IS 'Any other special require
 
 
 --
--- TOC entry 5168 (class 0 OID 0)
+-- TOC entry 5185 (class 0 OID 0)
 -- Dependencies: 224
 -- Name: COLUMN bookings.dietary_preferences; Type: COMMENT; Schema: public; Owner: postgres
 --
@@ -303,7 +294,7 @@ COMMENT ON COLUMN public.bookings.dietary_preferences IS 'Dietary preferences (e
 
 
 --
--- TOC entry 5169 (class 0 OID 0)
+-- TOC entry 5186 (class 0 OID 0)
 -- Dependencies: 224
 -- Name: COLUMN bookings.food_allergies; Type: COMMENT; Schema: public; Owner: postgres
 --
@@ -328,7 +319,7 @@ CREATE SEQUENCE public.bookings_id_seq
 ALTER SEQUENCE public.bookings_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5170 (class 0 OID 0)
+-- TOC entry 5187 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: bookings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -363,7 +354,6 @@ CREATE TABLE public.custom_packages (
     total_duration_label character varying(50),
     guests integer DEFAULT 1 NOT NULL,
     contact_email character varying(255) NOT NULL,
-    user_id integer,
     contact_phone character varying(50),
     start_date date,
     end_date date,
@@ -418,7 +408,7 @@ CREATE SEQUENCE public.custom_places_id_seq
 ALTER SEQUENCE public.custom_places_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5171 (class 0 OID 0)
+-- TOC entry 5188 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: custom_places_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -459,12 +449,55 @@ CREATE SEQUENCE public.gallery_items_id_seq
 ALTER SEQUENCE public.gallery_items_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5172 (class 0 OID 0)
+-- TOC entry 5189 (class 0 OID 0)
 -- Dependencies: 231
 -- Name: gallery_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.gallery_items_id_seq OWNED BY public.gallery_items.id;
+
+
+--
+-- TOC entry 244 (class 1259 OID 19050)
+-- Name: password_reset_tokens; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.password_reset_tokens (
+    id integer NOT NULL,
+    user_id integer,
+    email character varying(255) NOT NULL,
+    code character varying(10) NOT NULL,
+    expires_at timestamp with time zone NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.password_reset_tokens OWNER TO postgres;
+
+--
+-- TOC entry 243 (class 1259 OID 19049)
+-- Name: password_reset_tokens_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.password_reset_tokens_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.password_reset_tokens_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5190 (class 0 OID 0)
+-- Dependencies: 243
+-- Name: password_reset_tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.password_reset_tokens_id_seq OWNED BY public.password_reset_tokens.id;
 
 
 --
@@ -507,7 +540,7 @@ CREATE SEQUENCE public.places_id_seq
 ALTER SEQUENCE public.places_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5173 (class 0 OID 0)
+-- TOC entry 5191 (class 0 OID 0)
 -- Dependencies: 235
 -- Name: places_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -550,7 +583,7 @@ CREATE SEQUENCE public.reviews_id_seq
 ALTER SEQUENCE public.reviews_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5174 (class 0 OID 0)
+-- TOC entry 5192 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: reviews_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -592,7 +625,7 @@ CREATE SEQUENCE public.tour_package_images_id_seq
 ALTER SEQUENCE public.tour_package_images_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5175 (class 0 OID 0)
+-- TOC entry 5193 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: tour_package_images_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -642,7 +675,7 @@ CREATE SEQUENCE public.tour_packages_id_seq
 ALTER SEQUENCE public.tour_packages_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5176 (class 0 OID 0)
+-- TOC entry 5194 (class 0 OID 0)
 -- Dependencies: 221
 -- Name: tour_packages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -659,9 +692,12 @@ CREATE TABLE public.users (
     user_id integer NOT NULL,
     username character varying(255) NOT NULL,
     email character varying(255) NOT NULL,
-    password_hash character varying(255) NOT NULL,
+    password_hash character varying(255),
     role public.user_role DEFAULT 'USER'::public.user_role NOT NULL,
-    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    google_id character varying(255),
+    avatar character varying(500),
+    email_verified boolean DEFAULT false
 );
 
 
@@ -684,7 +720,7 @@ CREATE SEQUENCE public.users_user_id_seq
 ALTER SEQUENCE public.users_user_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5177 (class 0 OID 0)
+-- TOC entry 5195 (class 0 OID 0)
 -- Dependencies: 219
 -- Name: users_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -693,7 +729,7 @@ ALTER SEQUENCE public.users_user_id_seq OWNED BY public.users.user_id;
 
 
 --
--- TOC entry 4959 (class 2604 OID 18243)
+-- TOC entry 4965 (class 2604 OID 18243)
 -- Name: Category id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -701,7 +737,7 @@ ALTER TABLE ONLY public."Category" ALTER COLUMN id SET DEFAULT nextval('public."
 
 
 --
--- TOC entry 4960 (class 2604 OID 18259)
+-- TOC entry 4966 (class 2604 OID 18259)
 -- Name: Place id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -709,7 +745,7 @@ ALTER TABLE ONLY public."Place" ALTER COLUMN id SET DEFAULT nextval('public."Pla
 
 
 --
--- TOC entry 4945 (class 2604 OID 18098)
+-- TOC entry 4951 (class 2604 OID 18098)
 -- Name: booking_receipts id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -717,7 +753,7 @@ ALTER TABLE ONLY public.booking_receipts ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 4934 (class 2604 OID 17937)
+-- TOC entry 4940 (class 2604 OID 17937)
 -- Name: bookings id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -725,7 +761,7 @@ ALTER TABLE ONLY public.bookings ALTER COLUMN id SET DEFAULT nextval('public.boo
 
 
 --
--- TOC entry 4939 (class 2604 OID 17973)
+-- TOC entry 4945 (class 2604 OID 17973)
 -- Name: custom_places id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -733,7 +769,7 @@ ALTER TABLE ONLY public.custom_places ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 4947 (class 2604 OID 18119)
+-- TOC entry 4953 (class 2604 OID 18119)
 -- Name: gallery_items id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -741,7 +777,15 @@ ALTER TABLE ONLY public.gallery_items ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 4949 (class 2604 OID 18190)
+-- TOC entry 4967 (class 2604 OID 19053)
+-- Name: password_reset_tokens id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.password_reset_tokens ALTER COLUMN id SET DEFAULT nextval('public.password_reset_tokens_id_seq'::regclass);
+
+
+--
+-- TOC entry 4955 (class 2604 OID 18190)
 -- Name: places id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -749,7 +793,7 @@ ALTER TABLE ONLY public.places ALTER COLUMN id SET DEFAULT nextval('public.place
 
 
 --
--- TOC entry 4948 (class 2604 OID 18132)
+-- TOC entry 4954 (class 2604 OID 18132)
 -- Name: reviews id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -757,7 +801,7 @@ ALTER TABLE ONLY public.reviews ALTER COLUMN id SET DEFAULT nextval('public.revi
 
 
 --
--- TOC entry 4942 (class 2604 OID 18074)
+-- TOC entry 4948 (class 2604 OID 18074)
 -- Name: tour_package_images id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -765,7 +809,7 @@ ALTER TABLE ONLY public.tour_package_images ALTER COLUMN id SET DEFAULT nextval(
 
 
 --
--- TOC entry 4929 (class 2604 OID 17907)
+-- TOC entry 4935 (class 2604 OID 17907)
 -- Name: tour_packages id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -773,7 +817,7 @@ ALTER TABLE ONLY public.tour_packages ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 4926 (class 2604 OID 17877)
+-- TOC entry 4931 (class 2604 OID 17877)
 -- Name: users user_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -781,7 +825,7 @@ ALTER TABLE ONLY public.users ALTER COLUMN user_id SET DEFAULT nextval('public.u
 
 
 --
--- TOC entry 5000 (class 2606 OID 18254)
+-- TOC entry 5012 (class 2606 OID 18254)
 -- Name: Category Category_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -790,7 +834,7 @@ ALTER TABLE ONLY public."Category"
 
 
 --
--- TOC entry 5002 (class 2606 OID 18268)
+-- TOC entry 5014 (class 2606 OID 18268)
 -- Name: Place Place_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -799,7 +843,7 @@ ALTER TABLE ONLY public."Place"
 
 
 --
--- TOC entry 4986 (class 2606 OID 18107)
+-- TOC entry 4998 (class 2606 OID 18107)
 -- Name: booking_receipts booking_receipts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -808,7 +852,7 @@ ALTER TABLE ONLY public.booking_receipts
 
 
 --
--- TOC entry 4975 (class 2606 OID 17953)
+-- TOC entry 4987 (class 2606 OID 17953)
 -- Name: bookings bookings_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -817,7 +861,7 @@ ALTER TABLE ONLY public.bookings
 
 
 --
--- TOC entry 4997 (class 2606 OID 18225)
+-- TOC entry 5009 (class 2606 OID 18225)
 -- Name: custom_package_places custom_package_places_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -826,7 +870,7 @@ ALTER TABLE ONLY public.custom_package_places
 
 
 --
--- TOC entry 4994 (class 2606 OID 18217)
+-- TOC entry 5006 (class 2606 OID 18217)
 -- Name: custom_packages custom_packages_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -835,15 +879,7 @@ ALTER TABLE ONLY public.custom_packages
 
 
 --
--- Name: custom_packages custom_packages_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.custom_packages
-    ADD CONSTRAINT custom_packages_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE SET NULL;
-
-
---
--- TOC entry 4980 (class 2606 OID 17984)
+-- TOC entry 4992 (class 2606 OID 17984)
 -- Name: custom_places custom_places_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -852,7 +888,7 @@ ALTER TABLE ONLY public.custom_places
 
 
 --
--- TOC entry 4988 (class 2606 OID 18127)
+-- TOC entry 5000 (class 2606 OID 18127)
 -- Name: gallery_items gallery_items_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -861,7 +897,16 @@ ALTER TABLE ONLY public.gallery_items
 
 
 --
--- TOC entry 4992 (class 2606 OID 18200)
+-- TOC entry 5018 (class 2606 OID 19063)
+-- Name: password_reset_tokens password_reset_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.password_reset_tokens
+    ADD CONSTRAINT password_reset_tokens_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 5004 (class 2606 OID 18200)
 -- Name: places places_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -870,7 +915,7 @@ ALTER TABLE ONLY public.places
 
 
 --
--- TOC entry 4990 (class 2606 OID 18140)
+-- TOC entry 5002 (class 2606 OID 18140)
 -- Name: reviews reviews_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -879,7 +924,7 @@ ALTER TABLE ONLY public.reviews
 
 
 --
--- TOC entry 4983 (class 2606 OID 18084)
+-- TOC entry 4995 (class 2606 OID 18084)
 -- Name: tour_package_images tour_package_images_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -888,7 +933,7 @@ ALTER TABLE ONLY public.tour_package_images
 
 
 --
--- TOC entry 4972 (class 2606 OID 17922)
+-- TOC entry 4984 (class 2606 OID 17922)
 -- Name: tour_packages tour_packages_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -897,7 +942,7 @@ ALTER TABLE ONLY public.tour_packages
 
 
 --
--- TOC entry 4966 (class 2606 OID 17892)
+-- TOC entry 4976 (class 2606 OID 17892)
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -906,7 +951,16 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 4968 (class 2606 OID 17888)
+-- TOC entry 4978 (class 2606 OID 19047)
+-- Name: users users_google_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_google_id_key UNIQUE (google_id);
+
+
+--
+-- TOC entry 4980 (class 2606 OID 17888)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -915,7 +969,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 4970 (class 2606 OID 17890)
+-- TOC entry 4982 (class 2606 OID 17890)
 -- Name: users users_username_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -924,7 +978,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 4984 (class 1259 OID 18113)
+-- TOC entry 4996 (class 1259 OID 18113)
 -- Name: booking_receipts_booking_id_idx; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -932,7 +986,7 @@ CREATE INDEX booking_receipts_booking_id_idx ON public.booking_receipts USING bt
 
 
 --
--- TOC entry 4973 (class 1259 OID 18093)
+-- TOC entry 4985 (class 1259 OID 18093)
 -- Name: bookings_booking_reference_uq; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -940,7 +994,7 @@ CREATE UNIQUE INDEX bookings_booking_reference_uq ON public.bookings USING btree
 
 
 --
--- TOC entry 4995 (class 1259 OID 18236)
+-- TOC entry 5007 (class 1259 OID 18236)
 -- Name: custom_package_places_custom_package_id_idx; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -948,7 +1002,7 @@ CREATE INDEX custom_package_places_custom_package_id_idx ON public.custom_packag
 
 
 --
--- TOC entry 4998 (class 1259 OID 18237)
+-- TOC entry 5010 (class 1259 OID 18237)
 -- Name: custom_package_places_place_id_idx; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -956,7 +1010,7 @@ CREATE INDEX custom_package_places_place_id_idx ON public.custom_package_places 
 
 
 --
--- TOC entry 4976 (class 1259 OID 17964)
+-- TOC entry 4988 (class 1259 OID 17964)
 -- Name: idx_bookings_package_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -964,7 +1018,7 @@ CREATE INDEX idx_bookings_package_id ON public.bookings USING btree (package_id)
 
 
 --
--- TOC entry 4977 (class 1259 OID 17966)
+-- TOC entry 4989 (class 1259 OID 17966)
 -- Name: idx_bookings_status; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -972,7 +1026,7 @@ CREATE INDEX idx_bookings_status ON public.bookings USING btree (status);
 
 
 --
--- TOC entry 4978 (class 1259 OID 17965)
+-- TOC entry 4990 (class 1259 OID 17965)
 -- Name: idx_bookings_user_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -980,7 +1034,23 @@ CREATE INDEX idx_bookings_user_id ON public.bookings USING btree (user_id);
 
 
 --
--- TOC entry 4981 (class 1259 OID 18090)
+-- TOC entry 5015 (class 1259 OID 19069)
+-- Name: idx_password_reset_tokens_email; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX idx_password_reset_tokens_email ON public.password_reset_tokens USING btree (email);
+
+
+--
+-- TOC entry 5016 (class 1259 OID 19070)
+-- Name: idx_password_reset_tokens_expires_at; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_password_reset_tokens_expires_at ON public.password_reset_tokens USING btree (expires_at);
+
+
+--
+-- TOC entry 4993 (class 1259 OID 18090)
 -- Name: idx_tour_package_images_package; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -988,7 +1058,15 @@ CREATE INDEX idx_tour_package_images_package ON public.tour_package_images USING
 
 
 --
--- TOC entry 5011 (class 2620 OID 17968)
+-- TOC entry 4974 (class 1259 OID 19048)
+-- Name: idx_users_google_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_users_google_id ON public.users USING btree (google_id);
+
+
+--
+-- TOC entry 5028 (class 2620 OID 17968)
 -- Name: bookings trg_bookings_set_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -996,7 +1074,7 @@ CREATE TRIGGER trg_bookings_set_updated_at BEFORE UPDATE ON public.bookings FOR 
 
 
 --
--- TOC entry 5010 (class 2620 OID 17924)
+-- TOC entry 5027 (class 2620 OID 17924)
 -- Name: tour_packages update_tour_packages_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -1004,7 +1082,7 @@ CREATE TRIGGER update_tour_packages_updated_at BEFORE UPDATE ON public.tour_pack
 
 
 --
--- TOC entry 5006 (class 2606 OID 18108)
+-- TOC entry 5022 (class 2606 OID 18108)
 -- Name: booking_receipts booking_receipts_booking_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1013,7 +1091,7 @@ ALTER TABLE ONLY public.booking_receipts
 
 
 --
--- TOC entry 5003 (class 2606 OID 17954)
+-- TOC entry 5019 (class 2606 OID 17954)
 -- Name: bookings bookings_package_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1022,7 +1100,7 @@ ALTER TABLE ONLY public.bookings
 
 
 --
--- TOC entry 5004 (class 2606 OID 17959)
+-- TOC entry 5020 (class 2606 OID 17959)
 -- Name: bookings bookings_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1031,7 +1109,7 @@ ALTER TABLE ONLY public.bookings
 
 
 --
--- TOC entry 5007 (class 2606 OID 18226)
+-- TOC entry 5023 (class 2606 OID 18226)
 -- Name: custom_package_places custom_package_places_custom_package_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1040,7 +1118,7 @@ ALTER TABLE ONLY public.custom_package_places
 
 
 --
--- TOC entry 5008 (class 2606 OID 18231)
+-- TOC entry 5024 (class 2606 OID 18231)
 -- Name: custom_package_places custom_package_places_place_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1049,7 +1127,7 @@ ALTER TABLE ONLY public.custom_package_places
 
 
 --
--- TOC entry 5009 (class 2606 OID 18269)
+-- TOC entry 5025 (class 2606 OID 18269)
 -- Name: Place fk_category; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1058,7 +1136,16 @@ ALTER TABLE ONLY public."Place"
 
 
 --
--- TOC entry 5005 (class 2606 OID 18085)
+-- TOC entry 5026 (class 2606 OID 19064)
+-- Name: password_reset_tokens password_reset_tokens_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.password_reset_tokens
+    ADD CONSTRAINT password_reset_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 5021 (class 2606 OID 18085)
 -- Name: tour_package_images tour_package_images_package_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1066,27 +1153,11 @@ ALTER TABLE ONLY public.tour_package_images
     ADD CONSTRAINT tour_package_images_package_id_fkey FOREIGN KEY (package_id) REFERENCES public.tour_packages(id) ON DELETE CASCADE;
 
 
-ALTER TABLE users 
-ADD COLUMN IF NOT EXISTS google_id VARCHAR(255) UNIQUE,
-ADD COLUMN IF NOT EXISTS avatar VARCHAR(500),
-ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE;
-
--- Create index for faster Google ID lookups
-CREATE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id);
-
--- Allow password_hash to be empty for OAuth users
-ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
-
--- Verify the changes
-SELECT column_name, data_type, is_nullable 
-FROM information_schema.columns 
-WHERE table_name = 'users' 
-ORDER BY ordinal_position;
--- Completed on 2025-11-09 00:27:04
+-- Completed on 2025-11-09 20:33:13
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict O7VGsOYfZMgNQlA6KmFs9kEVA1ty5ZbJERM3vVhmwIsZbg3fmA3liQzhzqogQho
+\unrestrict t4n4bzbM2mNEOjj3MfQ7xs0oAp87CC1gEzHDYLLdczPDfQrEyXwkXUKRcX1gGne
 

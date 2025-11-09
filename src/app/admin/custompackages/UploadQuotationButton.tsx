@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface UploadQuotationButtonProps {
-  packageId: number;
+  packageId: string;
   currentPdfPath: string | null;
 }
 

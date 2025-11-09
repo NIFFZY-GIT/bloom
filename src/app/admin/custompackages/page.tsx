@@ -33,7 +33,7 @@ interface Place {
 }
 
 interface CustomPackage {
-  id: number;
+  id: string;
   name: string;
   description: string | null;
   totalDurationMinutes: number;
@@ -89,6 +89,10 @@ function tryCastStatus(value: string | undefined): PackageStatus | null {
   return ALLOWED_STATUSES.includes(normalized as PackageStatus) ? (normalized as PackageStatus) : null;
 }
 
+function isValidUuid(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
 async function getCustomPackages(): Promise<CustomPackage[]> {
   try {
     const result = await query(
@@ -136,7 +140,7 @@ async function getCustomPackages(): Promise<CustomPackage[]> {
     );
 
     return result.rows.map((row) => ({
-      id: row.id,
+      id: String(row.id),
       name: row.name,
       description: row.description,
       totalDurationMinutes: row.total_duration_minutes,
@@ -212,10 +216,10 @@ async function updatePackageStatus(formData: FormData) {
   const rawId = formData.get('packageId');
   const rawStatus = formData.get('status');
 
-  const packageId = typeof rawId === 'string' ? Number(rawId) : NaN;
-  const status = typeof rawStatus === 'string' ? rawStatus.toUpperCase() : '';
+  const packageId = typeof rawId === 'string' ? rawId.trim() : '';
+  const status = typeof rawStatus === 'string' ? rawStatus.trim().toUpperCase() : '';
 
-  if (!Number.isInteger(packageId) || packageId <= 0) {
+  if (!packageId || !isValidUuid(packageId)) {
     console.warn('Invalid package id submitted for status update:', rawId);
     return;
   }
@@ -243,9 +247,9 @@ async function deletePackage(formData: FormData) {
   await requireAdmin();
 
   const rawId = formData.get('packageId');
-  const packageId = typeof rawId === 'string' ? Number(rawId) : NaN;
+  const packageId = typeof rawId === 'string' ? rawId.trim() : '';
 
-  if (!Number.isInteger(packageId) || packageId <= 0) {
+  if (!packageId || !isValidUuid(packageId)) {
     console.warn('Invalid package id submitted for deletion:', rawId);
     return;
   }

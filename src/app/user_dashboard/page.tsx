@@ -177,6 +177,10 @@ function computeAmount(price: string | number | null | undefined, guests: number
   return Math.round(total * 100) / 100;
 }
 
+function normalizeEmailForLookup(email: string): string {
+  return email.trim().toLowerCase();
+}
+
 async function getAuthenticatedUser(): Promise<AuthenticatedUser> {
   // First check NextAuth session
   const session = await auth();
@@ -198,11 +202,12 @@ async function getAuthenticatedUser(): Promise<AuthenticatedUser> {
     }
 
     // Use Google name if username is not set in database
-    const displayUsername = row.username || session.user.name || row.email;
+    const normalizedEmail = row.email.trim();
+    const displayUsername = row.username || session.user.name || normalizedEmail;
 
     return {
       id: row.user_id,
-      email: row.email,
+      email: normalizedEmail,
       username: displayUsername,
       role: row.role ?? session.user.role ?? null,
     };
@@ -232,10 +237,12 @@ async function getAuthenticatedUser(): Promise<AuthenticatedUser> {
       throw new Error('Authenticated user not found');
     }
 
+    const normalizedEmail = row.email.trim();
+
     return {
       id: row.user_id,
-      email: row.email,
-      username: row.username ?? row.email,
+      email: normalizedEmail,
+      username: row.username ?? normalizedEmail,
       role: row.role ?? payload.role ?? null,
     };
   } catch (error) {
@@ -245,8 +252,9 @@ async function getAuthenticatedUser(): Promise<AuthenticatedUser> {
 }
 
 async function fetchBookingsForUser(user: AuthenticatedUser): Promise<Booking[]> {
-  console.log(`[Dashboard] Fetching bookings for user:`, { id: user.id, email: user.email });
-  
+  const emailLookup = normalizeEmailForLookup(user.email);
+  console.log('[Dashboard] Fetching bookings for user:', { id: user.id, email: user.email, emailLookup });
+
   const result = await query(
     `SELECT
       b.id,
@@ -276,10 +284,10 @@ async function fetchBookingsForUser(user: AuthenticatedUser): Promise<Booking[]>
       ORDER BY br.uploaded_at DESC NULLS LAST, br.id DESC
       LIMIT 1
     ) AS latest_receipt ON TRUE
-    WHERE b.user_id = $1
-       OR (b.user_id IS NULL AND LOWER(b.customer_email) = LOWER($2))
+   WHERE (b.user_id = $1)
+     OR LOWER(TRIM(b.customer_email)) = $2
     ORDER BY b.created_at DESC NULLS LAST, b.id DESC`,
-    [user.id, user.email],
+   [user.id, emailLookup],
   );
 
   console.log(`[Dashboard] Found ${result.rows.length} bookings for user ${user.id}`);
@@ -309,6 +317,7 @@ async function fetchBookingsForUser(user: AuthenticatedUser): Promise<Booking[]>
 }
 
 async function fetchReceiptsForUser(user: AuthenticatedUser, bookings: Booking[]): Promise<Quotation[]> {
+  const emailLookup = normalizeEmailForLookup(user.email);
   const result = await query(
     `SELECT
       br.id,
@@ -322,10 +331,10 @@ async function fetchReceiptsForUser(user: AuthenticatedUser, bookings: Booking[]
     FROM booking_receipts br
     JOIN bookings b ON br.booking_id = b.id
     LEFT JOIN tour_packages tp ON b.package_id = tp.id
-    WHERE b.user_id = $1
-       OR (b.user_id IS NULL AND LOWER(b.customer_email) = LOWER($2))
+   WHERE (b.user_id = $1)
+     OR LOWER(TRIM(b.customer_email)) = $2
     ORDER BY br.uploaded_at DESC NULLS LAST, br.id DESC`,
-    [user.id, user.email],
+   [user.id, emailLookup],
   );
 
   const seen = new Set<string>();
@@ -381,7 +390,8 @@ async function fetchReceiptsForUser(user: AuthenticatedUser, bookings: Booking[]
 }
 
 async function fetchCustomTripsForUser(user: AuthenticatedUser): Promise<CustomTrip[]> {
-  console.log('[Dashboard] Fetching custom trips for user:', { id: user.id, email: user.email });
+  const emailLookup = normalizeEmailForLookup(user.email);
+  console.log('[Dashboard] Fetching custom trips for user:', { id: user.id, email: user.email, emailLookup });
 
   type RawCustomTripPlace = {
     name?: string | null;
@@ -463,16 +473,16 @@ async function fetchCustomTripsForUser(user: AuthenticatedUser): Promise<CustomT
        LEFT JOIN custom_package_places cpp ON cpp.custom_package_id = cp.id
        LEFT JOIN places p ON p.id = cpp.place_id
        WHERE (cp.user_id = $1)
-          OR (cp.user_id IS NULL AND LOWER(cp.contact_email) = LOWER($2))
+          OR LOWER(TRIM(cp.contact_email)) = $2
        GROUP BY cp.id
        ORDER BY cp.created_at DESC`,
-      [user.id, user.email],
+      [user.id, emailLookup],
     );
 
     console.log(`[Dashboard] Found ${result.rows.length} custom trips linked to user ${user.id}`);
 
     if (result.rows.length > 0) {
-      console.log('[Dashboard] Custom trips emails:', result.rows.map((r) => r.contact_email));
+      console.log('[Dashboard] Custom trips emails:', result.rows.map((r) => (typeof r.contact_email === 'string' ? r.contact_email.trim() : r.contact_email)));
     }
 
   const rows = result.rows as DbCustomTripRow[];
@@ -512,10 +522,10 @@ async function fetchCustomTripsForUser(user: AuthenticatedUser): Promise<CustomT
            FROM custom_packages cp
            LEFT JOIN custom_package_places cpp ON cpp.custom_package_id = cp.id
            LEFT JOIN places p ON p.id = cpp.place_id
-           WHERE LOWER(cp.contact_email) = LOWER($1)
+           WHERE LOWER(TRIM(cp.contact_email)) = $1
            GROUP BY cp.id
            ORDER BY cp.created_at DESC`,
-          [user.email],
+          [emailLookup],
         );
 
         console.log(`[Dashboard] Found ${fallbackResult.rows.length} custom trips via email fallback for ${user.email}`);

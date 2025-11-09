@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import styles from "../bookings/AdminBookings.module.css";
 
 export type DeletePackageButtonProps = {
-  packageId: number;
+  packageId: string;
   packageName: string;
   action: (formData: FormData) => Promise<void>;
 };

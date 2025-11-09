@@ -753,16 +753,10 @@ const CreatePackagePage: React.FC = () => {
                       onChange={handleFormChange}
                       placeholder="your.email@example.com"
                       required
-                      readOnly={isUserAuthenticated && packageForm.contactEmail !== ''}
-                      style={isUserAuthenticated && packageForm.contactEmail !== '' ? { 
-                        backgroundColor: '#f3f4f6', 
-                        cursor: 'not-allowed',
-                        opacity: 0.7 
-                      } : {}}
                     />
                     {isUserAuthenticated && packageForm.contactEmail !== '' && (
                       <small style={{ display: 'block', marginTop: '4px', color: '#6b7280', fontSize: '0.875rem' }}>
-                        📧 This email is from your account and cannot be changed
+                        📧 Pre-filled from your account—update it here if you prefer a different contact email
                       </small>
                     )}
                   </div>
