@@ -644,11 +644,11 @@ export default function BookingConfirmationPage({ searchParams }: PageProps) {
             <div className={styles.supportList}>
               <span>
                 <i className="fas fa-envelope" aria-hidden="true"></i>
-                <a href="mailto:support@zevarone.com">support@zevarone.com</a>
+                <a href="mailto:contact@tropicalbloom.lk">contact@tropicalbloom.lk</a>
               </span>
               <span>
                 <i className="fas fa-phone" aria-hidden="true"></i>
-                <a href="tel:+94115551234">+94 11 555 1234</a>
+                <a href="tel:+94115551234">+94 77 733 0012</a>
               </span>
               <span>
                 <i className="fas fa-comment-dots" aria-hidden="true"></i>

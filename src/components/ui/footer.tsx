@@ -173,30 +173,34 @@ export default function Footer() {
             <div className="bottom-content">
               <div className="copyright-section">
                 <span>© {currentYear} Tropical Bloom Tourism. All rights reserved.</span>
-                <div className="legal-links">
-                  <a href="#" className="legal-link">Privacy</a>
-                  <a href="#" className="legal-link">Terms</a>
-                  <a href="#" className="legal-link">Cookies</a>
-                </div>
+               
               </div>
               
               <div className="developer-section">
-                <div className="location-tag">
-                  <span>🇱🇰</span>
-                  <span>Made with passion in Sri Lanka</span>
-                </div>
-                <div className="developer-tag">
-                  <span className="developed-text">Developed by</span>
-                  <a 
-                    href="https://zevarone.com" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="developer-link"
-                  >
-                    <span className="developer-icon">⚡</span>
-                    <span className="developer-name">XXXX </span>
-                  </a>
-                </div>
+              
+         <div className="developer-tag">
+  <span className="developed-text">Developed by</span>
+  <a 
+    href="https://zevarone.com" 
+    target="_blank" 
+    rel="noopener noreferrer"
+    className="developer-link"
+  >
+    
+    <span className="developer-name">ZEVARONE</span>
+  </a>
+  <span className="and-text"> & </span>
+  <a 
+    // href="https://norwoodtechnologies.com" 
+    target="_blank" 
+    rel="noopener noreferrer"
+    className="developer-link"
+  >
+    
+    <span className="developer-name">Norwood Technologies</span>
+  </a>
+</div>
+
               </div>
             </div>
           </div>

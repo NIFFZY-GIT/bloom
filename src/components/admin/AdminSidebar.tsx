@@ -14,16 +14,18 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/admin/dashboard', label: 'Dashboard', icon: '📊' },
-  { href: '/admin/packages', label: 'Packages', icon: '📦' },
-  { href: '/admin/bookings', label: 'Bookings', icon: '📅' },
-  { href: '/admin/places', label: 'Add Custom Places', icon: '📍' },
-  { href: '/admin/custompackages', label: 'Custom Packages', icon: '✅' },
-  { href: '/admin/users', label: 'Users', icon: '👥' },
-  { href: '/admin/admingallery', label: 'Gallery', icon: '📸' },
-  { href: '/admin/reviews', label: 'Reviews', icon: '⭐' },
-  { href: '/admin/categories', label: 'Add Categories', icon: '📂' },
-  { href: '/admin/home_places', label: 'Add Places', icon: '📍' },
+  { href: '/admin/dashboard', label: '-Dashboard', icon: '📊' },
+    { href: '/admin/bookings', label: '-Check Bookings', icon: '📅' },
+      { href: '/admin/custompackages', label: '-Custom Packages', icon: '✅' },
+  { href: '/admin/packages', label: 'Manage Packages', icon: '📦' },
+
+  { href: '/admin/places', label: 'Manage Custom Places', icon: '📍' },
+
+  { href: '/admin/users', label: 'Manage Users', icon: '👥' },
+  { href: '/admin/admingallery', label: 'Manage Gallery', icon: '📸' },
+  { href: '/admin/reviews', label: 'Manage Reviews', icon: '⭐' },
+  { href: '/admin/categories', label: 'Manage Categories', icon: '📂' },
+  { href: '/admin/home_places', label: 'Manage Places', icon: '📍' },
 ];
 
 export default function AdminSidebar() {
