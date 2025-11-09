@@ -731,14 +731,16 @@ function toSingleValue(value: string | string[] | undefined): string | undefined
 export default async function AdminBookingsPage({
   searchParams,
 }: {
-  searchParams?: SearchParams;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   await requireAdmin();
   const bookings = await getBookings();
 
-  const statusFilter = tryCastBookingStatus(toSingleValue(searchParams?.status));
-  const paymentFilter = tryCastPaymentStatus(toSingleValue(searchParams?.payment));
-  const searchTermRaw = toSingleValue(searchParams?.query);
+  // Await searchParams in Next.js 15
+  const params = await searchParams;
+  const statusFilter = tryCastBookingStatus(toSingleValue(params?.status));
+  const paymentFilter = tryCastPaymentStatus(toSingleValue(params?.payment));
+  const searchTermRaw = toSingleValue(params?.query);
   const searchTerm = searchTermRaw ? searchTermRaw.trim().toLowerCase() : '';
 
   const totalBookings = bookings.length;

@@ -71,10 +71,10 @@ export async function POST(request: Request) {
     }
 
     // Clean up expired codes
-    cleanupExpiredCodes();
+  await cleanupExpiredCodes();
 
     // Verify code
-    const storedData = verificationCodes.get(user.email);
+  const storedData = await verificationCodes.get(user.email);
 
     if (!storedData) {
       return NextResponse.json(
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
     }
 
     if (Date.now() > storedData.expiresAt) {
-      verificationCodes.delete(user.email);
+  await verificationCodes.delete(user.email);
       return NextResponse.json(
         { success: false, message: 'Verification code expired. Please request a new one.' },
         { status: 400 }
@@ -108,7 +108,7 @@ export async function POST(request: Request) {
     );
 
     // Remove used code
-    verificationCodes.delete(user.email);
+  await verificationCodes.delete(user.email);
 
     // Send confirmation email (don't fail if email fails)
     await sendPasswordChangedConfirmation(user.email).catch((error) => {

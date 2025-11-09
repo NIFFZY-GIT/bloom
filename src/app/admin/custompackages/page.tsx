@@ -303,13 +303,15 @@ function toSingleValue(value: string | string[] | undefined): string | undefined
 export default async function AdminCustomPackagesPage({
   searchParams,
 }: {
-  searchParams?: SearchParams;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   await requireAdmin();
   const packages = await getCustomPackages();
 
-  const statusFilter = tryCastStatus(toSingleValue(searchParams?.status));
-  const searchTermRaw = toSingleValue(searchParams?.query);
+  // Await searchParams in Next.js 15
+  const params = await searchParams;
+  const statusFilter = tryCastStatus(toSingleValue(params?.status));
+  const searchTermRaw = toSingleValue(params?.query);
   const searchTerm = searchTermRaw ? searchTermRaw.trim().toLowerCase() : '';
 
   const totalPackages = packages.length;

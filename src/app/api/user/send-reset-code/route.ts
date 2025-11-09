@@ -53,14 +53,14 @@ export async function POST() {
     }
 
     // Clean up expired codes
-    cleanupExpiredCodes();
+    await cleanupExpiredCodes();
 
     // Generate 6-digit code
     const code = generateCode();
     const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
 
     // Store code
-    verificationCodes.set(user.email, { code, expiresAt });
+    await verificationCodes.set(user.email, { code, expiresAt }, user.id);
 
     // Send email with verification code
     const emailSent = await sendPasswordResetCode(user.email, code);

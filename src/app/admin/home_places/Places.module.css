@@ -1,5 +1,5 @@
-/* Root styles and variables */
-:root {
+/* Container with reset styles applied locally */
+.container {
   --primary: #10b981;
   --primary-dark: #059669;
   --text: #f1f5f9;
@@ -7,10 +7,6 @@
   --bg-light: #1e293b;
   --radius: 12px;
   --transition: all 0.3s ease;
-}
-
-/* Container with reset styles applied locally */
-.container {
   font-family: "Inter", system-ui, sans-serif;
   color: var(--text);
   background: #0f172a;

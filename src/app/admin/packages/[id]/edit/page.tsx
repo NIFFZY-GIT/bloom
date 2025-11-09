@@ -4,13 +4,15 @@ import PackageForm from '@/components/admin/PackageForm';
 import { query } from '@/lib/db';
 
 type Params = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 export default async function EditPackagePage({ params }: Params) {
-  const numericId = Number(params.id);
+  // Await params in Next.js 15
+  const { id } = await params;
+  const numericId = Number(id);
   if (!Number.isInteger(numericId) || numericId <= 0) {
     notFound();
   }

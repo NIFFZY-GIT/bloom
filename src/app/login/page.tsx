@@ -32,7 +32,6 @@ export default function LoginPage() {
   const [resetError, setResetError] = useState('');
   const [resetSuccess, setResetSuccess] = useState('');
   const [isResetting, setIsResetting] = useState(false);
-  const [devCode, setDevCode] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -115,7 +114,6 @@ export default function LoginPage() {
     setResetCode('');
     setNewPassword('');
     setConfirmPassword('');
-    setDevCode('');
   };
 
   const handleCloseForgotModal = () => {
@@ -127,7 +125,6 @@ export default function LoginPage() {
     setResetCode('');
     setNewPassword('');
     setConfirmPassword('');
-    setDevCode('');
   };
 
   const handleSendResetCode = async (e: React.FormEvent) => {
@@ -136,11 +133,25 @@ export default function LoginPage() {
     setResetError('');
     setResetSuccess('');
 
+    const normalizedEmail = forgotEmail.trim();
+
+    if (!normalizedEmail) {
+      setResetError('Please enter your email address');
+      setIsResetting(false);
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      setResetError('Please enter a valid email address');
+      setIsResetting(false);
+      return;
+    }
+
     try {
       const response = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: forgotEmail })
+        body: JSON.stringify({ email: normalizedEmail })
       });
 
       const data = await response.json();
@@ -148,9 +159,8 @@ export default function LoginPage() {
       if (data.success) {
         setResetSuccess(data.message);
         setResetStep('code');
-        if (data.devCode) {
-          setDevCode(data.devCode);
-        }
+        setForgotEmail(normalizedEmail);
+        setFormData((prev) => ({ ...prev, email: normalizedEmail }));
       } else {
         setResetError(data.message || 'Failed to send code');
       }
@@ -166,12 +176,26 @@ export default function LoginPage() {
     setResetError('');
     setResetSuccess('');
 
-    if (newPassword !== confirmPassword) {
+  const codeValue = resetCode.trim();
+  const passwordValue = newPassword;
+  const confirmPasswordValue = confirmPassword;
+
+    if (!codeValue) {
+      setResetError('Please enter the verification code');
+      return;
+    }
+
+    if (codeValue.length !== 6) {
+      setResetError('Verification code must be 6 digits');
+      return;
+    }
+
+    if (passwordValue !== confirmPasswordValue) {
       setResetError('Passwords do not match');
       return;
     }
 
-    if (newPassword.length < 6) {
+    if (passwordValue.length < 6) {
       setResetError('Password must be at least 6 characters');
       return;
     }
@@ -183,9 +207,9 @@ export default function LoginPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: forgotEmail,
-          code: resetCode,
-          newPassword
+          email: forgotEmail.trim(),
+          code: codeValue,
+          newPassword: passwordValue
         })
       });
 
@@ -194,10 +218,12 @@ export default function LoginPage() {
       if (data.success) {
         setResetSuccess(data.message);
         setResetStep('success');
+  setResetCode(codeValue);
         
         // Auto-close after 3 seconds
         setTimeout(() => {
           handleCloseForgotModal();
+          setSuccessMessage('✅ Password updated successfully! Please log in with your new password.');
         }, 3000);
       } else {
         setResetError(data.message || 'Failed to reset password');
@@ -389,12 +415,6 @@ export default function LoginPage() {
             {resetSuccess && (
               <div className="alert alert-success">
                 ✅ {resetSuccess}
-              </div>
-            )}
-
-            {devCode && (
-              <div className="alert alert-info">
-                🔧 Dev Code: <strong>{devCode}</strong>
               </div>
             )}
 

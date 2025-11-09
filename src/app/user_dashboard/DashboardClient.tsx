@@ -88,7 +88,6 @@ export default function DashboardClient({ initialBookings, initialQuotations, in
   const [resetError, setResetError] = useState('');
   const [resetSuccess, setResetSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [devCode, setDevCode] = useState(''); // For development
 
   useEffect(() => {
     setBookings(initialBookings);
@@ -172,9 +171,6 @@ export default function DashboardClient({ initialBookings, initialQuotations, in
       if (data.success) {
         setResetStep('code-sent');
         setResetSuccess(data.message);
-        if (data.devCode) {
-          setDevCode(data.devCode);
-        }
       } else {
         setResetError(data.message || 'Failed to send code');
       }
@@ -222,7 +218,6 @@ export default function DashboardClient({ initialBookings, initialQuotations, in
         setResetCode('');
         setNewPassword('');
         setConfirmPassword('');
-        setDevCode('');
       } else {
         setResetError(data.message || 'Failed to reset password');
       }
@@ -240,7 +235,6 @@ export default function DashboardClient({ initialBookings, initialQuotations, in
     setConfirmPassword('');
     setResetError('');
     setResetSuccess('');
-    setDevCode('');
   };
 
   return (
@@ -611,12 +605,6 @@ export default function DashboardClient({ initialBookings, initialQuotations, in
                       {resetError && (
                         <div className="alert alert-error">
                           ❌ {resetError}
-                        </div>
-                      )}
-
-                      {devCode && (
-                        <div className="alert alert-info">
-                          🔧 Development Mode - Your code is: <strong>{devCode}</strong>
                         </div>
                       )}
 

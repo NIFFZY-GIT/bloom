@@ -16,6 +16,10 @@ export async function POST(request: Request) {
       );
     }
 
+    // Normalize email
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedCode = code.trim();
+
     if (newPassword.length < 6) {
       return NextResponse.json(
         { success: false, message: 'Password must be at least 6 characters' },
@@ -23,30 +27,39 @@ export async function POST(request: Request) {
       );
     }
 
-    // Clean up expired codes
-    cleanupExpiredCodes();
-
-    // Verify code
-    const storedData = verificationCodes.get(email.toLowerCase());
-
-    if (!storedData) {
+    if (normalizedCode.length !== 6 || !/^\d{6}$/.test(normalizedCode)) {
       return NextResponse.json(
-        { success: false, message: 'No verification code found. Please request a new one.' },
+        { success: false, message: 'Invalid verification code format' },
         { status: 400 }
       );
     }
 
+    // Clean up expired codes
+    await cleanupExpiredCodes();
+
+    // Verify code
+    const storedData = await verificationCodes.get(normalizedEmail);
+
+    if (!storedData) {
+      return NextResponse.json(
+        { success: false, message: 'Verification code not found or expired. Please request a new one.' },
+        { status: 400 }
+      );
+    }
+
+    // Double-check expiration
     if (Date.now() > storedData.expiresAt) {
-      verificationCodes.delete(email.toLowerCase());
+      await verificationCodes.delete(normalizedEmail);
       return NextResponse.json(
         { success: false, message: 'Verification code expired. Please request a new one.' },
         { status: 400 }
       );
     }
 
-    if (storedData.code !== code) {
+    if (storedData.code !== normalizedCode) {
+      console.log(`Invalid code attempt for ${normalizedEmail}: received ${normalizedCode}, expected ${storedData.code}`);
       return NextResponse.json(
-        { success: false, message: 'Invalid verification code' },
+        { success: false, message: 'Invalid verification code. Please check and try again.' },
         { status: 400 }
       );
     }
@@ -54,7 +67,7 @@ export async function POST(request: Request) {
     // Find user
     const result = await query(
       'SELECT user_id, email FROM users WHERE LOWER(email) = LOWER($1)',
-      [email]
+      [normalizedEmail]
     );
 
     if (result.rows.length === 0) {
@@ -76,7 +89,9 @@ export async function POST(request: Request) {
     );
 
     // Remove used code
-    verificationCodes.delete(email.toLowerCase());
+    await verificationCodes.delete(normalizedEmail);
+
+    console.log(`Password successfully reset for user: ${user.email}`);
 
     // Send confirmation email (don't fail if email fails)
     await sendPasswordChangedConfirmation(user.email).catch((error) => {
@@ -88,7 +103,7 @@ export async function POST(request: Request) {
       message: 'Password updated successfully',
     });
   } catch (error) {
-    console.error('Failed to reset guest password:', error);
+    console.error('Failed to reset password:', error);
     return NextResponse.json(
       { success: false, message: 'Failed to update password' },
       { status: 500 }

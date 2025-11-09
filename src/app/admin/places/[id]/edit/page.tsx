@@ -64,10 +64,12 @@ async function getPlace(id: number) {
   }
 }
 
-export default async function EditPlacePage({ params }: { params: { id: string } }) {
+export default async function EditPlacePage({ params }: { params: Promise<{ id: string }> }) {
   await getAuthStatus();
 
-  const placeId = parseInt(params.id, 10);
+  // Await params in Next.js 15
+  const { id } = await params;
+  const placeId = parseInt(id, 10);
   if (isNaN(placeId)) {
     redirect('/admin/places');
   }
