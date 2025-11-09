@@ -55,6 +55,21 @@ type DbReceiptRow = {
   payment_status: string | null;
 };
 
+type DbCustomTripRow = {
+  id: number;
+  name: string | null;
+  description: string | null;
+  total_duration_label: string | null;
+  guests: number | null;
+  status: string | null;
+  quotation_pdf_path: string | null;
+  start_date: string | Date | null;
+  end_date: string | Date | null;
+  contact_email: string | null;
+  created_at: string | Date | null;
+  places: unknown;
+};
+
 const PAYMENT_STATUSES = ['PENDING', 'UNDER_REVIEW', 'APPROVED', 'REJECTED'] as const;
 type PaymentStatusKey = typeof PAYMENT_STATUSES[number];
 
@@ -368,17 +383,22 @@ async function fetchReceiptsForUser(user: AuthenticatedUser, bookings: Booking[]
 async function fetchCustomTripsForUser(user: AuthenticatedUser): Promise<CustomTrip[]> {
   console.log('[Dashboard] Fetching custom trips for user:', { id: user.id, email: user.email });
 
-  const mapCustomTripRow = (row: Record<string, any>): CustomTrip => {
+  type RawCustomTripPlace = {
+    name?: string | null;
+    duration?: string | null;
+  };
+
+  const mapCustomTripRow = (row: DbCustomTripRow): CustomTrip => {
     const rawPlaces = row.places;
-    let places: Array<{ name: string; duration: string }> = [];
+    let places: RawCustomTripPlace[] = [];
 
     if (Array.isArray(rawPlaces)) {
-      places = rawPlaces;
+      places = rawPlaces as RawCustomTripPlace[];
     } else if (typeof rawPlaces === 'string') {
       try {
-        const parsed = JSON.parse(rawPlaces);
+        const parsed = JSON.parse(rawPlaces) as unknown;
         if (Array.isArray(parsed)) {
-          places = parsed;
+          places = parsed as RawCustomTripPlace[];
         }
       } catch (parseError) {
         console.warn('[Dashboard] Failed to parse custom trip places JSON:', parseError);
@@ -386,20 +406,25 @@ async function fetchCustomTripsForUser(user: AuthenticatedUser): Promise<CustomT
     }
 
     const normalizedPlaces = places
-      .filter((item) => item && typeof item.name === 'string')
+      .filter((item): item is { name: string; duration?: string | null } =>
+        typeof item?.name === 'string' && item.name.trim().length > 0,
+      )
       .map((item) => ({
         name: item.name,
-        duration: typeof item.duration === 'string' && item.duration.trim().length > 0
-          ? item.duration
-          : 'Duration TBD',
+        duration:
+          typeof item.duration === 'string' && item.duration.trim().length > 0
+            ? item.duration
+            : 'Duration TBD',
       }));
+
+    const guestCount = typeof row.guests === 'number' && Number.isFinite(row.guests) ? row.guests : 0;
 
     return {
       id: String(row.id),
-      name: row.name,
+      name: row.name ?? 'Custom trip',
       description: row.description,
       duration: row.total_duration_label ?? 'Duration TBD',
-      guests: row.guests,
+      guests: guestCount,
       status: row.status === 'approved' ? 'approved' : row.status === 'rejected' ? 'rejected' : 'pending',
       quotationPdfPath: row.quotation_pdf_path,
       dateRange: formatDateRange(row.start_date, row.end_date, 'Dates TBD'),
@@ -450,7 +475,8 @@ async function fetchCustomTripsForUser(user: AuthenticatedUser): Promise<CustomT
       console.log('[Dashboard] Custom trips emails:', result.rows.map((r) => r.contact_email));
     }
 
-    return result.rows.map(mapCustomTripRow);
+  const rows = result.rows as DbCustomTripRow[];
+  return rows.map(mapCustomTripRow);
   } catch (error) {
     const pgCode = typeof error === 'object' && error && 'code' in error
       ? (error as { code?: string }).code
@@ -493,7 +519,8 @@ async function fetchCustomTripsForUser(user: AuthenticatedUser): Promise<CustomT
         );
 
         console.log(`[Dashboard] Found ${fallbackResult.rows.length} custom trips via email fallback for ${user.email}`);
-        return fallbackResult.rows.map(mapCustomTripRow);
+  const fallbackRows = fallbackResult.rows as DbCustomTripRow[];
+  return fallbackRows.map(mapCustomTripRow);
       } catch (fallbackError) {
         console.error('[Dashboard] Email fallback query failed:', fallbackError);
         return [];
