@@ -40,5 +40,11 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.16",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@auth/core": "0.41.1",
+    "next-auth": {
+      "@auth/core": "0.41.1"
+    }
   }
 }
