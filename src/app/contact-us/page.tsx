@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, type ChangeEvent } from 'react';
 
 // --- Assets & Icons ---
 const iconSet = {
@@ -78,7 +78,9 @@ export default function ContactRedesign() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleChange = (e: any) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
@@ -103,7 +105,7 @@ export default function ContactRedesign() {
           <h1>Curate your escape.</h1>
           <p className="hero-sub">
             We bridge the gap between boutique luxury and authentic local culture. 
-            Tell us where you want to go, and we'll handle the how.
+            Tell us where you want to go, and we&apos;ll handle the how.
           </p>
           
           <div className="hero-stats">
