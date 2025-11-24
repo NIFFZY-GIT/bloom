@@ -300,6 +300,7 @@ export default function LoginPage() {
               </svg>
               Continue with Google
             </button>
+
           </div>
 
           {/* Modern Divider */}

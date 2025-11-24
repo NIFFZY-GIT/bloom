@@ -36,24 +36,82 @@ export default function ContactPage() {
     }, 3000);
   };
 
+  const iconSet = {
+    location: () => (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path
+          d="M12 22s7-6.1 7-12A7 7 0 0 0 5 10c0 5.9 7 12 7 12z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+        <circle cx="12" cy="10" r="2.5" fill="currentColor" />
+      </svg>
+    ),
+    phone: () => (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path
+          d="M6.5 5.1c-.3-1 .6-2 1.7-1.7l2.3.6c.8.2 1.3 1.1 1 1.9l-.5 1.3a1.4 1.4 0 0 0 .3 1.5l4.4 4.4a1.4 1.4 0 0 0 1.5.3l1.3-.5c.8-.3 1.7.2 1.9 1l.6 2.3c.3 1-.7 2-1.7 1.7-4.1-1-7.8-3.3-10.7-6.2C9.8 10 7.5 6.3 6.5 2.2z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+    mail: () => (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <rect x="3" y="5" width="18" height="14" rx="2" ry="2" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    clock: () => (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M12 8v4l2.5 1.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    ),
+    chat: () => (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path
+          d="M5 18v-8a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3h-4l-4 3v-3H8a3 3 0 0 1-3-3"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+    calendar: () => (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <rect x="3" y="5" width="18" height="16" rx="2" ry="2" fill="none" stroke="currentColor" strokeWidth="1.6" />
+        <path d="M8 3v4m8-4v4M3 11h18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      </svg>
+    )
+  } as const;
+
+  type IconKey = keyof typeof iconSet;
+
   const contactInfo = [
     {
-      icon: '📍',
+      icon: 'location' as IconKey,
       title: 'Visit Us',
       details: 'No. 123, Galle Road\nColombo 03, Sri Lanka'
     },
     {
-      icon: '📞',
+      icon: 'phone' as IconKey,
       title: 'Call Us',
       details: '+94 11 234 5678\n+94 77 123 4567'
     },
     {
-      icon: '✉️',
+      icon: 'mail' as IconKey,
       title: 'Email Us',
       details: 'info@srilankatourism.lk\nbookings@srilankatourism.lk'
     },
     {
-      icon: '🕒',
+      icon: 'clock' as IconKey,
       title: 'Business Hours',
       details: 'Monday - Friday: 8:00 AM - 6:00 PM\nWeekends: 9:00 AM - 4:00 PM'
     }
@@ -61,30 +119,50 @@ export default function ContactPage() {
 
   const quickContacts = [
     {
-      icon: '💬',
+      icon: 'chat' as IconKey,
       title: 'Live Chat',
       description: 'Chat with our travel experts in real-time',
       button: 'Start Chat'
     },
     {
-      icon: '📱',
+      icon: 'phone' as IconKey,
       title: 'WhatsApp',
       description: 'Message us directly on WhatsApp',
       button: '+94 77 123 4567'
     },
     {
-      icon: '📞',
+      icon: 'phone' as IconKey,
       title: 'Call Back',
       description: 'Request a free callback from our team',
       button: 'Request Call'
     },
     {
-      icon: '👥',
+      icon: 'calendar' as IconKey,
       title: 'Visit Office',
       description: 'Schedule an in-person consultation',
       button: 'Book Appointment'
     }
   ];
+
+
+  const highlightStats = [
+    { label: 'Average response', value: '< 12 hrs' },
+    { label: 'Happy travelers', value: '25K+' },
+    { label: 'Countries served', value: '18' }
+  ];
+
+  const contactPerks = [
+    'Dedicated travel concierge assigned to every enquiry',
+    'Tailor-made itineraries delivered within 48 hours',
+    'Multilingual consultants available across time zones'
+  ];
+
+  const conciergeCta = {
+    phoneLabel: '+94 77 123 4567',
+    phoneHref: 'tel:+94771234567',
+    emailLabel: 'hello@tropicalbloom.lk',
+    emailHref: 'mailto:hello@tropicalbloom.lk'
+  };
 
   return (
     <div className="contact-page">
@@ -95,10 +173,15 @@ export default function ContactPage() {
         </div>
         <div className="hero-content">
           <div className="hero-text">
+            <span className="hero-pill">Sri Lanka&apos;s boutique travel studio</span>
             <h1 className="hero-title">Get In Touch</h1>
             <p className="hero-subtitle">
               Ready to plan your perfect Sri Lankan adventure? Let&apos;s start the conversation.
             </p>
+            <ul className="hero-meta-list">
+              <li>Dedicated travel concierge on every enquiry</li>
+              <li>Response guaranteed within 12 business hours</li>
+            </ul>
           </div>
        
           <div className="hero-scroll-indicator">
@@ -118,6 +201,11 @@ export default function ContactPage() {
                 <h2>Send Us a Message</h2>
                 <p>We&apos;ll get back to you within 24 hours</p>
               </div>
+              <ul className="form-perks">
+                {contactPerks.map((perk) => (
+                  <li key={perk}>{perk}</li>
+                ))}
+              </ul>
 
               {isSubmitted ? (
                 <div className="success-message">
@@ -197,13 +285,15 @@ export default function ContactPage() {
 
             {/* Contact Information */}
             <div className="contact-info-section">
-              <div className="contact-info-card">
+                <div className="contact-info-card">
                 <h3>Contact Information</h3>
                 
                 <div className="contact-items">
                   {contactInfo.map((item, index) => (
                     <div key={index} className="contact-item">
-                      <div className="contact-icon">{item.icon}</div>
+                        <div className="contact-icon">
+                          {iconSet[item.icon] ? iconSet[item.icon]() : item.title.charAt(0)}
+                        </div>
                       <div className="contact-details">
                         <h4>{item.title}</h4>
                         <p>{item.details.split('\n').map((line, i) => (
@@ -258,12 +348,32 @@ export default function ContactPage() {
             <div className="quick-contact-grid">
               {quickContacts.map((contact, index) => (
                 <div key={index} className="quick-card">
-                  <div className="card-icon">{contact.icon}</div>
+                  <div className="card-icon">
+                    {iconSet[contact.icon] ? iconSet[contact.icon]() : contact.title.charAt(0)}
+                  </div>
                   <h4>{contact.title}</h4>
                   <p>{contact.description}</p>
                   <button className="card-btn">{contact.button}</button>
                 </div>
               ))}
+            </div>
+          </section>
+
+          <section className="concierge-section">
+            <div className="concierge-card">
+              <div className="concierge-copy">
+                <p className="eyebrow">Need immediate support?</p>
+                <h3>Speak with our concierge team</h3>
+                <p className="concierge-note">Available daily 08:00 – 22:00 (GMT+5:30)</p>
+              </div>
+              <div className="concierge-actions">
+                <a href={conciergeCta.phoneHref} className="concierge-btn primary">
+                  Call {conciergeCta.phoneLabel}
+                </a>
+                <a href={conciergeCta.emailHref} className="concierge-btn secondary">
+                  Email {conciergeCta.emailLabel}
+                </a>
+              </div>
             </div>
           </section>
         </div>
@@ -332,6 +442,37 @@ export default function ContactPage() {
           margin-bottom: 2rem;
           text-align: center;
           width: 100%;
+        }
+
+        .hero-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.45rem 1.15rem;
+          border-radius: 999px;
+          border: 1px solid rgba(255, 255, 255, 0.4);
+          background: rgba(17, 24, 39, 0.45);
+          font-size: 0.85rem;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          margin-bottom: 1.25rem;
+        }
+
+        .hero-meta-list {
+          list-style: none;
+          padding: 0;
+          margin: 1.5rem auto 0;
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          font-size: 0.95rem;
+          color: rgba(255,255,255,0.85);
+        }
+
+        .hero-meta-list li {
+          display: flex;
+          justify-content: center;
+          gap: 0.4rem;
         }
 
         .hero-title {
@@ -408,6 +549,32 @@ export default function ContactPage() {
         .section-header {
           text-align: center;
           margin-bottom: 2rem;
+        }
+
+        .form-perks {
+          list-style: none;
+          padding: 0;
+          margin: 0 0 1.5rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+        }
+
+        .form-perks li {
+          font-size: 0.95rem;
+          color: #475569;
+          display: flex;
+          gap: 0.5rem;
+          align-items: center;
+        }
+
+        .form-perks li::before {
+          content: '';
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+          display: inline-flex;
         }
 
         .section-header h2 {
@@ -603,15 +770,20 @@ export default function ContactPage() {
         }
 
         .contact-icon {
-          font-size: 1.25rem;
-          width: 45px;
-          height: 45px;
+          width: 48px;
+          height: 48px;
           background: linear-gradient(135deg, #f59e0b, #d97706);
-          border-radius: 10px;
+          border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
+          color: white;
+        }
+
+        .contact-icon svg {
+          width: 22px;
+          height: 22px;
         }
 
         .contact-details h4 {
@@ -718,8 +890,20 @@ export default function ContactPage() {
         }
 
         .card-icon {
-          font-size: 2.5rem;
-          margin-bottom: 1.25rem;
+          width: 60px;
+          height: 60px;
+          border-radius: 16px;
+          background: rgba(245, 158, 11, 0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 1.25rem;
+          color: var(--primary);
+        }
+
+        .card-icon svg {
+          width: 26px;
+          height: 26px;
         }
 
         .quick-card h4 {
@@ -752,6 +936,68 @@ export default function ContactPage() {
           background: #d97706;
           transform: translateY(-2px);
           box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .concierge-section {
+          margin-top: 3rem;
+        }
+
+        .concierge-card {
+          background: linear-gradient(135deg, #0f172a, #1e293b);
+          color: white;
+          border-radius: 24px;
+          padding: 2rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+          box-shadow: 0 25px 60px rgba(15, 23, 42, 0.4);
+        }
+
+        .concierge-copy h3 {
+          font-size: 1.6rem;
+          margin: 0.4rem 0;
+        }
+
+        .eyebrow {
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          font-size: 0.85rem;
+          color: rgba(255,255,255,0.7);
+        }
+
+        .concierge-note {
+          color: rgba(255,255,255,0.8);
+          margin: 0;
+        }
+
+        .concierge-actions {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+        }
+
+        .concierge-btn {
+          text-decoration: none;
+          padding: 0.85rem 1.5rem;
+          border-radius: 999px;
+          font-weight: 600;
+          text-align: center;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .concierge-btn.primary {
+          background: white;
+          color: #0f172a;
+          box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
+        }
+
+        .concierge-btn.secondary {
+          border: 1px solid rgba(255,255,255,0.4);
+          color: white;
+        }
+
+        .concierge-btn:hover {
+          transform: translateY(-2px);
         }
 
         /* Animations */
@@ -866,6 +1112,22 @@ export default function ContactPage() {
           .quick-card {
             padding: 2.5rem 2rem;
           }
+
+          .concierge-card {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+          }
+
+          .concierge-actions {
+            flex-direction: row;
+            align-items: center;
+            gap: 1rem;
+          }
+
+          .concierge-btn {
+            min-width: 180px;
+          }
         }
 
         /* Desktop Styles */
@@ -907,12 +1169,13 @@ export default function ContactPage() {
             padding: 2.5rem 2rem;
           }
 
-          .card-icon {
-            font-size: 3rem;
-          }
-
           .quick-card h4 {
             font-size: 1.3rem;
+          }
+
+          .hero-meta-list {
+            flex-direction: row;
+            justify-content: center;
           }
         }
 
