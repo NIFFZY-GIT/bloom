@@ -2,1223 +2,817 @@
 
 import { useState } from 'react';
 
-export default function ContactPage() {
+// --- Assets & Icons ---
+const iconSet = {
+  arrowRight: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+  ),
+  phone: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+  ),
+  mail: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+  ),
+  mapPin: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+  ),
+  whatsapp: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+  ),
+  check: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  ),
+  star: () => (
+     <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+  )
+};
+
+// --- Data ---
+const journeySteps = [
+  {
+    step: '01',
+    title: 'The Wishlist',
+    copy: 'Tell us your rhythm. Do you prefer sunrise hikes or slow mornings? Ancient ruins or boutique cafes? We start with your vision.'
+  },
+  {
+    step: '02',
+    title: 'The Blueprint',
+    copy: 'Within 48 hours, receive a digital mood board and itinerary, complete with curated stays and logistics pricing.'
+  },
+  {
+    step: '03',
+    title: 'The Refinement',
+    copy: 'Collaborate with your planner via WhatsApp or video call to tweak the details until the journey feels uniquely yours.'
+  }
+];
+
+const offices = [
+  {
+    label: 'Experience Studio',
+    address: '118/7 Stratford Ave, Colombo 06',
+    note: 'By appointment only',
+    icon: iconSet.mapPin
+  },
+  {
+    label: 'Concierge Hotline',
+    address: '+94 77 123 4567',
+    note: '08:00 - 22:00 Daily',
+    icon: iconSet.phone
+  },
+  {
+    label: 'Planning Team',
+    address: 'hello@tropicalbloom.lk',
+    note: 'Itineraries & Quotes',
+    icon: iconSet.mail
+  }
+];
+
+export default function ContactRedesign() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    subject: '',
+    phone: '',
+    travelers: '2',
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+  const handleChange = (e: any) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
+    await new Promise(resolve => setTimeout(resolve, 1500));
     setIsSubmitting(false);
     setIsSubmitted(true);
-    
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({ name: '', email: '', subject: '', message: '' });
-    }, 3000);
-  };
-
-  const iconSet = {
-    location: () => (
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path
-          d="M12 22s7-6.1 7-12A7 7 0 0 0 5 10c0 5.9 7 12 7 12z"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-        />
-        <circle cx="12" cy="10" r="2.5" fill="currentColor" />
-      </svg>
-    ),
-    phone: () => (
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path
-          d="M6.5 5.1c-.3-1 .6-2 1.7-1.7l2.3.6c.8.2 1.3 1.1 1 1.9l-.5 1.3a1.4 1.4 0 0 0 .3 1.5l4.4 4.4a1.4 1.4 0 0 0 1.5.3l1.3-.5c.8-.3 1.7.2 1.9 1l.6 2.3c.3 1-.7 2-1.7 1.7-4.1-1-7.8-3.3-10.7-6.2C9.8 10 7.5 6.3 6.5 2.2z"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-    mail: () => (
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <rect x="3" y="5" width="18" height="14" rx="2" ry="2" fill="none" stroke="currentColor" strokeWidth="1.8" />
-        <path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
-    clock: () => (
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" strokeWidth="1.8" />
-        <path d="M12 8v4l2.5 1.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      </svg>
-    ),
-    chat: () => (
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path
-          d="M5 18v-8a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3h-4l-4 3v-3H8a3 3 0 0 1-3-3"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-    calendar: () => (
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <rect x="3" y="5" width="18" height="16" rx="2" ry="2" fill="none" stroke="currentColor" strokeWidth="1.6" />
-        <path d="M8 3v4m8-4v4M3 11h18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-      </svg>
-    )
-  } as const;
-
-  type IconKey = keyof typeof iconSet;
-
-  const contactInfo = [
-    {
-      icon: 'location' as IconKey,
-      title: 'Visit Us',
-      details: 'No. 123, Galle Road\nColombo 03, Sri Lanka'
-    },
-    {
-      icon: 'phone' as IconKey,
-      title: 'Call Us',
-      details: '+94 11 234 5678\n+94 77 123 4567'
-    },
-    {
-      icon: 'mail' as IconKey,
-      title: 'Email Us',
-      details: 'info@srilankatourism.lk\nbookings@srilankatourism.lk'
-    },
-    {
-      icon: 'clock' as IconKey,
-      title: 'Business Hours',
-      details: 'Monday - Friday: 8:00 AM - 6:00 PM\nWeekends: 9:00 AM - 4:00 PM'
-    }
-  ];
-
-  const quickContacts = [
-    {
-      icon: 'chat' as IconKey,
-      title: 'Live Chat',
-      description: 'Chat with our travel experts in real-time',
-      button: 'Start Chat'
-    },
-    {
-      icon: 'phone' as IconKey,
-      title: 'WhatsApp',
-      description: 'Message us directly on WhatsApp',
-      button: '+94 77 123 4567'
-    },
-    {
-      icon: 'phone' as IconKey,
-      title: 'Call Back',
-      description: 'Request a free callback from our team',
-      button: 'Request Call'
-    },
-    {
-      icon: 'calendar' as IconKey,
-      title: 'Visit Office',
-      description: 'Schedule an in-person consultation',
-      button: 'Book Appointment'
-    }
-  ];
-
-
-  const contactPerks = [
-    'Dedicated travel concierge assigned to every enquiry',
-    'Tailor-made itineraries delivered within 48 hours',
-    'Multilingual consultants available across time zones'
-  ];
-
-  const conciergeCta = {
-    phoneLabel: '+94 77 123 4567',
-    phoneHref: 'tel:+94771234567',
-    emailLabel: 'hello@tropicalbloom.lk',
-    emailHref: 'mailto:hello@tropicalbloom.lk'
   };
 
   return (
-    <div className="contact-page">
-      {/* Full Screen Hero Section */}
-      <section className="fullscreen-hero">
-        <div className="hero-background">
-          <div className="hero-overlay"></div>
-        </div>
+    <div className="page-wrapper">
+      
+      {/* Background Decorative Elements */}
+      <div className="bg-noise"></div>
+      
+      {/* --- HERO SECTION --- */}
+      <section className="hero">
         <div className="hero-content">
-          <div className="hero-text">
-            <span className="hero-pill">Sri Lanka&apos;s boutique travel studio</span>
-            <h1 className="hero-title">Get In Touch</h1>
-            <p className="hero-subtitle">
-              Ready to plan your perfect Sri Lankan adventure? Let&apos;s start the conversation.
-            </p>
-            <ul className="hero-meta-list">
-              <li>Dedicated travel concierge on every enquiry</li>
-              <li>Response guaranteed within 12 business hours</li>
-            </ul>
-          </div>
-       
-          <div className="hero-scroll-indicator">
-            <span>Scroll to connect</span>
-            <div className="scroll-arrow">↓</div>
+          <span className="pill">Est. Colombo, 2018</span>
+          <h1>Curate your escape.</h1>
+          <p className="hero-sub">
+            We bridge the gap between boutique luxury and authentic local culture. 
+            Tell us where you want to go, and we'll handle the how.
+          </p>
+          
+          <div className="hero-stats">
+            <div className="stat">
+              <span className="stat-val">4.9<span className="star-icon">{iconSet.star()}</span></span>
+              <span className="stat-label">Guest Rating</span>
+            </div>
+            <div className="divider"></div>
+            <div className="stat">
+              <span className="stat-val">&lt; 6 hrs</span>
+              <span className="stat-label">Reply Time</span>
+            </div>
+            <div className="divider"></div>
+            <div className="stat">
+              <span className="stat-val">100%</span>
+              <span className="stat-label">Tailor Made</span>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Contact Main Section */}
-      <section className="contact-main-section">
-        <div className="container">
-          <div className="contact-grid">
-            {/* Contact Form */}
-            <div className="contact-form-section">
-              <div className="section-header">
-                <h2>Send Us a Message</h2>
-                <p>We&apos;ll get back to you within 24 hours</p>
-              </div>
-              <ul className="form-perks">
-                {contactPerks.map((perk) => (
-                  <li key={perk}>{perk}</li>
-                ))}
-              </ul>
-
-              {isSubmitted ? (
-                <div className="success-message">
-                  <div className="success-icon">✓</div>
-                  <h3>Message Sent Successfully!</h3>
-                  <p>Thank you for contacting us. We&apos;ll get back to you soon.</p>
+      {/* --- MAIN INTERACTION CARD --- */}
+      <section className="overlap-section">
+        <div className="main-card">
+          
+          {/* Left: Contact Info */}
+          <div className="card-sidebar">
+            <div className="sidebar-header">
+              <h3>Get in touch</h3>
+              <p>Prefer a direct line? Reach our Colombo studio directly.</p>
+            </div>
+            
+            <div className="office-list">
+              {offices.map((office, i) => (
+                <div key={i} className="office-item">
+                  <div className="icon-box">
+                    <office.icon />
+                  </div>
+                  <div className="office-details">
+                    <span className="office-label">{office.label}</span>
+                    <span className="office-addr">{office.address}</span>
+                    <span className="office-note">{office.note}</span>
+                  </div>
                 </div>
-              ) : (
-                <form className="contact-form" onSubmit={handleSubmit}>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                        placeholder="Full Name"
-                      />
-                      <div className="input-underline"></div>
-                    </div>
-
-                    <div className="form-group">
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        placeholder="Email Address"
-                      />
-                      <div className="input-underline"></div>
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <input
-                      type="text"
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleChange}
-                      required
-                      placeholder="Subject"
-                    />
-                    <div className="input-underline"></div>
-                  </div>
-
-                  <div className="form-group">
-                    <textarea
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      required
-                      rows={6}
-                      placeholder="Tell us about your dream Sri Lankan adventure..."
-                    ></textarea>
-                    <div className="input-underline"></div>
-                  </div>
-
-                  <button 
-                    type="submit" 
-                    className={`submit-btn ${isSubmitting ? 'submitting' : ''}`}
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="spinner"></div>
-                        Sending...
-                      </>
-                    ) : (
-                      'Send Message'
-                    )}
-                  </button>
-                </form>
-              )}
+              ))}
             </div>
 
-            {/* Contact Information */}
-            <div className="contact-info-section">
-                <div className="contact-info-card">
-                <h3>Contact Information</h3>
-                
-                <div className="contact-items">
-                  {contactInfo.map((item, index) => (
-                    <div key={index} className="contact-item">
-                        <div className="contact-icon">
-                          {iconSet[item.icon] ? iconSet[item.icon]() : item.title.charAt(0)}
-                        </div>
-                      <div className="contact-details">
-                        <h4>{item.title}</h4>
-                        <p>{item.details.split('\n').map((line, i) => (
-                          <span key={i}>{line}<br /></span>
-                        ))}</p>
-                      </div>
-                    </div>
-                  ))}
+            <div className="sidebar-footer">
+              <div className="wa-box">
+                <div className="wa-header">
+                  <iconSet.whatsapp />
+                  <span>Quick Chat</span>
                 </div>
-
-                {/* Social Links */}
-                <div className="social-links">
-                  <h4>Follow Our Journey</h4>
-                  <div className="social-icons">
-                    {['📘', '📷', '🐦', '📺'].map((icon, index) => (
-                      <a key={index} href="#" className="social-icon">
-                        {icon}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Map Section */}
-              <div className="map-section">
-                <h3>Find Us</h3>
-                <div className="map-container">
-                  <div className="map-frame">
-                    <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.798467112139!2d79.85275541532638!3d6.92706619500827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae259130df8cb3d%3A0xcb2d5bceae83c41!2sColombo%2C%20Sri%20Lanka!5e0!3m2!1sen!2sus!4v1633021634345!5m2!1sen!2sus"
-                      width="100%"
-                      height="300"
-                      style={{ border: 0, borderRadius: '12px' }}
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title="Sri Lanka Tourism Office Location"
-                    ></iframe>
-                  </div>
-                </div>
+                <p>Need a quick answer? WhatsApp our on-ground concierge.</p>
+                <a href="#" className="link-arrow">Start chat →</a>
               </div>
             </div>
           </div>
 
-          {/* Quick Contact Section */}
-          <section className="quick-contact-section">
-            <div className="section-header">
-              <h2>Other Ways to Connect</h2>
-              <p>Choose your preferred way to reach out to us</p>
-            </div>
-            
-            <div className="quick-contact-grid">
-              {quickContacts.map((contact, index) => (
-                <div key={index} className="quick-card">
-                  <div className="card-icon">
-                    {iconSet[contact.icon] ? iconSet[contact.icon]() : contact.title.charAt(0)}
-                  </div>
-                  <h4>{contact.title}</h4>
-                  <p>{contact.description}</p>
-                  <button className="card-btn">{contact.button}</button>
+          {/* Right: The Form */}
+          <div className="card-form">
+            {isSubmitted ? (
+              <div className="success-message">
+                <div className="check-circle">{iconSet.check()}</div>
+                <h2>Request Received</h2>
+                <p>Thank you, {formData.name}. Our planning team is reviewing your details. Expect a personal blueprint in your inbox within 6 hours.</p>
+                <button onClick={() => setIsSubmitted(false)} className="reset-btn">Start new enquiry</button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <div className="form-header">
+                  <h2>Start planning</h2>
+                  <p>Share a few details to get the ball rolling.</p>
                 </div>
-              ))}
-            </div>
-          </section>
 
-          <section className="concierge-section">
-            <div className="concierge-card">
-              <div className="concierge-copy">
-                <p className="eyebrow">Need immediate support?</p>
-                <h3>Speak with our concierge team</h3>
-                <p className="concierge-note">Available daily 08:00 – 22:00 (GMT+5:30)</p>
-              </div>
-              <div className="concierge-actions">
-                <a href={conciergeCta.phoneHref} className="concierge-btn primary">
-                  Call {conciergeCta.phoneLabel}
-                </a>
-                <a href={conciergeCta.emailHref} className="concierge-btn secondary">
-                  Email {conciergeCta.emailLabel}
-                </a>
+                <div className="input-group">
+                  <div className="field">
+                    <label>Full Name</label>
+                    <input 
+                      type="text" 
+                      name="name" 
+                      value={formData.name} 
+                      onChange={handleChange} 
+                      placeholder="e.g. Suren Perera" 
+                      required 
+                    />
+                  </div>
+                  <div className="field">
+                    <label>Email Address</label>
+                    <input 
+                      type="email" 
+                      name="email" 
+                      value={formData.email} 
+                      onChange={handleChange} 
+                      placeholder="e.g. hello@tropicalbloom.lk" 
+                      required 
+                    />
+                  </div>
+                </div>
+
+                <div className="input-group">
+                  <div className="field">
+                    <label>Phone (Optional)</label>
+                    <input 
+                      type="tel" 
+                      name="phone" 
+                      value={formData.phone} 
+                      onChange={handleChange} 
+                      placeholder="+94 ..." 
+                    />
+                  </div>
+                  <div className="field">
+                    <label>No. of Travelers</label>
+                    <select name="travelers" value={formData.travelers} onChange={handleChange}>
+                      {[1,2,3,4,5,6,'7+'].map(n => <option key={n} value={n}>{n} {n === 1 ? 'Guest' : 'Guests'}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="field full">
+                  <label>Tell us about your dream trip</label>
+                  <textarea 
+                    name="message" 
+                    rows={4} 
+                    value={formData.message} 
+                    onChange={handleChange} 
+                    placeholder="Approximate dates, interests (beaches, tea country, safari), or specific hotels you love..."
+                    required
+                  />
+                </div>
+
+                <div className="form-actions">
+                  <button type="submit" className={`submit-btn ${isSubmitting ? 'loading' : ''}`} disabled={isSubmitting}>
+                    {isSubmitting ? 'Sending...' : 'Request Itinerary'}
+                    {!isSubmitting && <iconSet.arrowRight />}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* --- TIMELINE SECTION --- */}
+      <section className="timeline-section">
+        <div className="timeline-header">
+          <h2>How we craft your journey</h2>
+        </div>
+        <div className="steps-container">
+          <div className="center-line"></div>
+          {journeySteps.map((step, i) => (
+            <div key={i} className="step-row">
+              <div className="step-marker">{step.step}</div>
+              <div className="step-content">
+                <h3>{step.title}</h3>
+                <p>{step.copy}</p>
               </div>
             </div>
-          </section>
+          ))}
+        </div>
+      </section>
+
+      {/* --- FOOTER STRIP --- */}
+      <section className="map-strip">
+        <div className="map-overlay">
+          <p>Tropical Bloom — Experience Studio</p>
+          <h3>Colombo, Sri Lanka</h3>
+          <a href="#">View on Google Maps</a>
+        </div>
+        <div className="map-frame">
+          <iframe 
+             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.798467112139!2d79.85275541532638!3d6.92706619500827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae259130df8cb3d%3A0xcb2d5bceae83c41!2sColombo%2C%20Sri%20Lanka!5e0!3m2!1sen!2sus!4v1633021634345!5m2!1sen!2us"
+             loading="lazy"
+             title="Map"
+          ></iframe>
         </div>
       </section>
 
       <style jsx>{`
-        .contact-page {
-          min-height: 100vh;
-          margin-top: 0;
+        /* --- DESIGN TOKENS --- */
+        .page-wrapper {
+          --sand-50: #fcfbf9;
+          --sand-100: #f3f0eb;
+          --sand-200: #e6e2db;
+          --jungle-900: #0f2a1f;
+          --jungle-800: #1a4133;
+          --amber-500: #d97706;
+          --amber-600: #b45309;
+          
+          --font-serif: "Georgia", "Times New Roman", serif;
+          --font-sans: system-ui, -apple-system, sans-serif;
+          
+          color: var(--jungle-900);
+          background-color: var(--sand-50);
+          font-family: var(--font-sans);
+          overflow-x: hidden;
         }
 
-        /* Container */
-        .container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 0 1rem;
+        /* --- UTILS --- */
+        .bg-noise {
+          position: fixed;
+          top: 0; left: 0; width: 100%; height: 100%;
+          opacity: 0.03;
+          pointer-events: none;
+          z-index: 0;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
-        /* Full Screen Hero Section - Mobile First */
-        .fullscreen-hero {
-          height: 100vh;
-          min-height: 600px;
+        /* --- HERO --- */
+        .hero {
           position: relative;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          z-index: 1;
+          background-color: var(--jungle-900);
+          color: var(--sand-50);
+          padding: 6rem 1.5rem 10rem; /* Bottom padding creates overlap space */
           text-align: center;
-          color: white;
-          overflow: hidden;
-          margin-top: 0;
-          padding: 1rem;
-        }
-
-        .hero-background {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: url('/images/contact-hero.jpg') center/cover no-repeat;
-        }
-
-        .hero-overlay {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.6));
         }
 
         .hero-content {
+          max-width: 800px;
+          margin: 0 auto;
+        }
+
+        .pill {
+          display: inline-block;
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          border: 1px solid rgba(255,255,255,0.2);
+          padding: 0.5rem 1rem;
+          border-radius: 99px;
+          margin-bottom: 2rem;
+          color: rgba(255,255,255,0.8);
+        }
+
+        h1 {
+          font-family: var(--font-serif);
+          font-size: clamp(3rem, 6vw, 4.5rem);
+          font-weight: 400;
+          line-height: 1.1;
+          margin-bottom: 1.5rem;
+          letter-spacing: -0.02em;
+        }
+
+        .hero-sub {
+          font-size: 1.15rem;
+          line-height: 1.6;
+          color: rgba(255,255,255,0.7);
+          max-width: 50ch;
+          margin: 0 auto 3.5rem;
+        }
+
+        .hero-stats {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 2rem;
+          flex-wrap: wrap;
+        }
+
+        .stat {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .stat-val {
+          font-family: var(--font-serif);
+          font-size: 1.5rem;
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+        }
+
+        .star-icon {
+          color: var(--amber-500);
+          width: 16px;
+          height: 16px;
+        }
+
+        .stat-label {
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          opacity: 0.5;
+          margin-top: 0.2rem;
+        }
+
+        .divider {
+          width: 1px;
+          height: 30px;
+          background: rgba(255,255,255,0.15);
+        }
+
+        /* --- OVERLAP SECTION (The Card) --- */
+        .overlap-section {
           position: relative;
           z-index: 2;
-          width: 100%;
-          max-width: 800px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 100%;
-          text-align: center;
+          margin-top: -6rem; /* The overlap magic */
+          padding: 0 1.5rem 4rem;
         }
 
-        .hero-text {
-          margin-bottom: 2rem;
-          text-align: center;
-          width: 100%;
-        }
-
-        .hero-pill {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.45rem 1.15rem;
-          border-radius: 999px;
-          border: 1px solid rgba(255, 255, 255, 0.4);
-          background: rgba(17, 24, 39, 0.45);
-          font-size: 0.85rem;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          margin-bottom: 1.25rem;
-        }
-
-        .hero-meta-list {
-          list-style: none;
-          padding: 0;
-          margin: 1.5rem auto 0;
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-          font-size: 0.95rem;
-          color: rgba(255,255,255,0.85);
-        }
-
-        .hero-meta-list li {
-          display: flex;
-          justify-content: center;
-          gap: 0.4rem;
-        }
-
-        .hero-title {
-          font-size: 2.5rem;
-          font-weight: 800;
-          margin-bottom: 1rem;
-          text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-          line-height: 1.1;
-          animation: fadeInUp 1s ease-out;
-          text-align: center;
-          width: 100%;
-        }
-
-        .hero-subtitle {
-          font-size: 1.1rem;
-          font-weight: 300;
-          opacity: 0.95;
-          margin-bottom: 2rem;
-          text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
-          animation: fadeInUp 1s ease-out 0.2s both;
-          line-height: 1.5;
-          text-align: center;
-          width: 100%;
-        }
-
-        /* FIXED: Hero Scroll Indicator - Proper Centering */
-  .hero-scroll-indicator {
-          position: absolute;
-          bottom: 30px;
-          left: 0;
-          right: 0;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          gap: 0.4rem;
-          animation: fadeInUp 1s ease-out 0.4s both;
-        }
-
-        .hero-scroll-indicator span {
-          font-size: 0.8rem;
-          opacity: 0.8;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          display: block;
-          text-align: center;
-          white-space: nowrap;
-        }
-
-        .scroll-arrow {
-          font-size: 1.2rem;
-          animation: bounce 2s infinite;
-          display: flex;
-          justify-content: center;
-          width: 100%;
-        }
-
-        /* Contact Main Section */
-        .contact-main-section {
-          padding: 3rem 0;
+        .main-card {
+          max-width: 1100px;
+          margin: 0 auto;
           background: white;
-          position: relative;
-          z-index: 1;
+          border-radius: 4px;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+          display: grid;
+          grid-template-columns: 350px 1fr;
+          overflow: hidden;
         }
 
-        .contact-grid {
+        /* Sidebar Styles */
+        .card-sidebar {
+          background: var(--sand-100);
+          padding: 3rem 2.5rem;
           display: flex;
           flex-direction: column;
           gap: 3rem;
-          margin-bottom: 4rem;
+          border-right: 1px solid var(--sand-200);
         }
 
-        .section-header {
-          text-align: center;
-          margin-bottom: 2rem;
-        }
-
-        .form-perks {
-          list-style: none;
-          padding: 0;
-          margin: 0 0 1.5rem;
-          display: flex;
-          flex-direction: column;
-          gap: 0.75rem;
-        }
-
-        .form-perks li {
-          font-size: 0.95rem;
-          color: #475569;
-          display: flex;
-          gap: 0.5rem;
-          align-items: center;
-        }
-
-        .form-perks li::before {
-          content: '';
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-          display: inline-flex;
-        }
-
-        .section-header h2 {
-          font-size: 1.8rem;
-          font-weight: 700;
-          color: #1f2937;
+        .sidebar-header h3 {
+          font-family: var(--font-serif);
+          font-size: 1.75rem;
           margin-bottom: 0.5rem;
+          font-weight: 400;
         }
 
-        .section-header p {
-          font-size: 1rem;
-          color: #6b7280;
-        }
-
-        /* Contact Form Section */
-        .contact-form-section {
-          background: #f8fafc;
-          border-radius: 16px;
-          padding: 2rem;
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .contact-form {
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-        }
-
-        .form-row {
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-        }
-
-        .form-group {
-          position: relative;
-        }
-
-        .form-group input,
-        .form-group textarea {
-          width: 100%;
-          padding: 1rem 0;
-          border: none;
-          background: transparent;
-          font-size: 1rem;
-          color: #1f2937;
-          border-bottom: 2px solid #e5e7eb;
-          transition: all 0.3s ease;
-          resize: vertical;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-          outline: none;
-          border-bottom-color: #f59e0b;
-        }
-
-        .form-group input::placeholder,
-        .form-group textarea::placeholder {
-          color: #9ca3af;
-        }
-
-        .input-underline {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 0;
-          height: 2px;
-          background: linear-gradient(90deg, #f59e0b, #d97706);
-          transition: width 0.3s ease;
-        }
-
-        .form-group input:focus ~ .input-underline,
-        .form-group textarea:focus ~ .input-underline {
-          width: 100%;
-        }
-
-        /* Submit Button */
-        .submit-btn {
-          background: #f59e0b;
-          color: white;
-          border: none;
-          padding: 1.2rem 2rem;
-          font-size: 1rem;
-          font-weight: 600;
-          border-radius: 50px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-          margin-top: 1rem;
-          box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
-          width: 100%;
-        }
-
-        .submit-btn:hover:not(:disabled) {
-          background: #d97706;
-          transform: translateY(-2px);
-          box-shadow: 0 12px 25px rgba(245, 158, 11, 0.4);
-        }
-
-        .submit-btn:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-        }
-
-        .submit-btn.submitting {
-          background: #6b7280;
-        }
-
-        .spinner {
-          width: 18px;
-          height: 18px;
-          border: 2px solid transparent;
-          border-top: 2px solid white;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-        }
-
-        /* Success Message */
-        .success-message {
-          text-align: center;
-          padding: 2.5rem 1.5rem;
-          background: linear-gradient(135deg, #10b981, #059669);
-          border-radius: 16px;
-          color: white;
-        }
-
-        .success-icon {
-          width: 70px;
-          height: 70px;
-          background: rgba(255, 255, 255, 0.2);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 2rem;
-          margin: 0 auto 1.5rem;
-          animation: bounceIn 0.6s ease-out;
-        }
-
-        .success-message h3 {
-          font-size: 1.5rem;
-          margin-bottom: 0.5rem;
-        }
-
-        .success-message p {
-          font-size: 1rem;
+        .sidebar-header p {
+          font-size: 0.9rem;
+          color: #666;
           line-height: 1.5;
         }
 
-        /* Contact Info Section */
-        .contact-info-section {
+        .office-list {
           display: flex;
           flex-direction: column;
           gap: 2rem;
         }
 
-        .contact-info-card {
-          background: #f8fafc;
-          border-radius: 16px;
-          padding: 2rem;
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        .office-item {
+          display: flex;
+          gap: 1rem;
         }
 
-        .contact-info-card h3 {
-          font-size: 1.5rem;
-          color: #1f2937;
-          margin-bottom: 1.5rem;
-          text-align: center;
+        .icon-box {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: white;
+          border: 1px solid var(--sand-200);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--amber-600);
+          flex-shrink: 0;
         }
+        
+        .icon-box svg { width: 18px; height: 18px; }
 
-        .contact-items {
+        .office-details {
           display: flex;
           flex-direction: column;
-          gap: 1.25rem;
         }
 
-        .contact-item {
-          display: flex;
-          align-items: flex-start;
-          gap: 1rem;
-          padding: 1rem;
-          border-radius: 12px;
-          transition: all 0.3s ease;
-        }
-
-        .contact-item:hover {
-          background: rgba(245, 158, 11, 0.05);
-          transform: translateX(5px);
-        }
-
-        .contact-icon {
-          width: 48px;
-          height: 48px;
-          background: linear-gradient(135deg, #f59e0b, #d97706);
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-          color: white;
-        }
-
-        .contact-icon svg {
-          width: 22px;
-          height: 22px;
-        }
-
-        .contact-details h4 {
-          font-size: 1rem;
+        .office-label {
           font-weight: 600;
-          color: #1f2937;
-          margin-bottom: 0.25rem;
+          font-size: 0.95rem;
+          margin-bottom: 0.2rem;
         }
-
-        .contact-details p {
-          color: #6b7280;
-          line-height: 1.5;
+        
+        .office-addr {
           font-size: 0.9rem;
+          color: #444;
         }
 
-        /* Social Links */
-        .social-links {
-          margin-top: 2rem;
-          padding-top: 2rem;
-          border-top: 1px solid #e5e7eb;
+        .office-note {
+          font-size: 0.8rem;
+          color: #888;
+          margin-top: 0.2rem;
         }
 
-        .social-links h4 {
-          text-align: center;
-          margin-bottom: 1.25rem;
-          color: #374151;
-          font-size: 1.1rem;
+        .wa-box {
+          background: #dcfce7; /* Light green */
+          padding: 1.5rem;
+          border-radius: 8px;
+          border: 1px solid #bbf7d0;
         }
 
-        .social-icons {
+        .wa-header {
           display: flex;
-          justify-content: center;
-          gap: 0.75rem;
-          flex-wrap: wrap;
+          align-items: center;
+          gap: 0.5rem;
+          color: #166534;
+          font-weight: 700;
+          margin-bottom: 0.5rem;
+        }
+        .wa-header svg { width: 20px; height: 20px; }
+
+        .wa-box p {
+          font-size: 0.85rem;
+          color: #14532d;
+          line-height: 1.4;
+          margin-bottom: 1rem;
         }
 
-        .social-icon {
-          width: 45px;
-          height: 45px;
-          background: linear-gradient(135deg, #f59e0b, #d97706);
-          border-radius: 10px;
+        .link-arrow {
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: #166534;
+          text-decoration: none;
+        }
+        .link-arrow:hover { text-decoration: underline; }
+
+        /* Form Styles */
+        .card-form {
+          padding: 3rem 4rem;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+
+        .form-header {
+          margin-bottom: 2.5rem;
+        }
+
+        .form-header h2 {
+          font-family: var(--font-serif);
+          font-size: 2rem;
+          margin-bottom: 0.5rem;
+          font-weight: 400;
+        }
+        
+        .form-header p {
+          color: #666;
+        }
+
+        .input-group {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          margin-bottom: 2rem;
+        }
+
+        .field {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .field.full {
+          margin-bottom: 2.5rem;
+        }
+
+        label {
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          font-weight: 600;
+          color: #888;
+        }
+
+        input, select, textarea {
+          width: 100%;
+          border: none;
+          border-bottom: 1px solid #ddd;
+          padding: 0.75rem 0;
+          font-family: var(--font-serif); /* Serif inputs feel more elegant */
+          font-size: 1.1rem;
+          background: transparent;
+          color: var(--jungle-900);
+          transition: border-color 0.2s;
+          border-radius: 0;
+        }
+
+        input:focus, select:focus, textarea:focus {
+          outline: none;
+          border-bottom-color: var(--amber-500);
+        }
+        
+        textarea {
+          resize: vertical;
+        }
+
+        .submit-btn {
+          background: var(--jungle-900);
+          color: white;
+          border: none;
+          padding: 1rem 2rem;
+          font-size: 1rem;
+          border-radius: 4px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          transition: background 0.2s, transform 0.2s;
+        }
+
+        .submit-btn svg { width: 18px; height: 18px; }
+
+        .submit-btn:hover {
+          background: var(--jungle-800);
+          transform: translateY(-2px);
+        }
+        
+        .submit-btn:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+          transform: none;
+        }
+
+        /* Success State */
+        .success-message {
+          text-align: center;
+          padding: 2rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .check-circle {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          background: #dcfce7;
+          color: #166534;
           display: flex;
           align-items: center;
           justify-content: center;
-          text-decoration: none;
-          transition: all 0.3s ease;
-          font-size: 1.1rem;
+          margin-bottom: 1.5rem;
+        }
+        .check-circle svg { width: 30px; height: 30px; }
+
+        .success-message h2 {
+          font-family: var(--font-serif);
+          font-size: 1.8rem;
+          margin-bottom: 1rem;
+        }
+        
+        .success-message p {
+          color: #555;
+          line-height: 1.6;
+          max-width: 400px;
+          margin-bottom: 2rem;
         }
 
-        .social-icon:hover {
-          transform: translateY(-3px) scale(1.1);
-          box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);
+        .reset-btn {
+          background: none;
+          border: none;
+          color: var(--amber-600);
+          font-weight: 600;
+          cursor: pointer;
+          text-decoration: underline;
         }
 
-        /* Map Section */
-        .map-section {
-          background: #f8fafc;
-          border-radius: 16px;
-          padding: 2rem;
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        /* --- TIMELINE --- */
+        .timeline-section {
+          padding: 4rem 1.5rem 6rem;
+          max-width: 800px;
+          margin: 0 auto;
         }
 
-        .map-section h3 {
-          font-size: 1.3rem;
-          color: #1f2937;
-          margin-bottom: 1.25rem;
+        .timeline-header {
           text-align: center;
+          margin-bottom: 4rem;
         }
 
-        .map-container {
-          border-radius: 12px;
-          overflow: hidden;
-          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        .timeline-header h2 {
+          font-family: var(--font-serif);
+          font-size: 2.5rem;
+          font-weight: 400;
+        }
+
+        .steps-container {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          gap: 4rem;
+        }
+
+        .center-line {
+          position: absolute;
+          left: 24px;
+          top: 0;
+          bottom: 0;
+          width: 1px;
+          background: #ddd;
+          z-index: 0;
+        }
+
+        .step-row {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          gap: 2rem;
+        }
+
+        .step-marker {
+          width: 50px;
+          height: 50px;
+          background: var(--sand-50);
+          border: 1px solid var(--amber-500);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: var(--font-serif);
+          font-weight: 600;
+          color: var(--amber-600);
+          flex-shrink: 0;
+        }
+
+        .step-content h3 {
+          font-family: var(--font-serif);
+          font-size: 1.5rem;
+          margin-bottom: 0.5rem;
+          font-weight: 400;
+        }
+
+        .step-content p {
+          color: #666;
+          line-height: 1.6;
+        }
+
+        /* --- MAP STRIP --- */
+        .map-strip {
+          position: relative;
+          height: 350px;
+          background: #e5e5e5;
         }
 
         .map-frame {
-          border-radius: 10px;
-          overflow: hidden;
-        }
-
-        /* Quick Contact Section */
-        .quick-contact-section {
-          margin-top: 3rem;
-        }
-
-        .quick-contact-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 1.5rem;
-        }
-
-        .quick-card {
-          background: #f8fafc;
-          border-radius: 16px;
-          padding: 2rem 1.5rem;
-          text-align: center;
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-          transition: all 0.3s ease;
-        }
-
-        .quick-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-        }
-
-        .card-icon {
-          width: 60px;
-          height: 60px;
-          border-radius: 16px;
-          background: rgba(245, 158, 11, 0.1);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0 auto 1.25rem;
-          color: var(--primary);
-        }
-
-        .card-icon svg {
-          width: 26px;
-          height: 26px;
-        }
-
-        .quick-card h4 {
-          font-size: 1.2rem;
-          color: #1f2937;
-          margin-bottom: 0.75rem;
-        }
-
-        .quick-card p {
-          color: #6b7280;
-          margin-bottom: 1.5rem;
-          line-height: 1.5;
-          font-size: 0.95rem;
-        }
-
-        .card-btn {
-          background: #f59e0b;
-          color: white;
-          border: none;
-          padding: 0.75rem 1.25rem;
-          border-radius: 25px;
-          cursor: pointer;
-          font-weight: 600;
-          transition: all 0.3s ease;
           width: 100%;
-          font-size: 0.9rem;
+          height: 100%;
+        }
+        
+        .map-frame iframe {
+          width: 100%;
+          height: 100%;
+          border: 0;
+          filter: grayscale(100%); /* Elegant B&W map */
+          opacity: 0.8;
         }
 
-        .card-btn:hover {
-          background: #d97706;
-          transform: translateY(-2px);
-          box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);
-        }
-
-        .concierge-section {
-          margin-top: 3rem;
-        }
-
-        .concierge-card {
-          background: linear-gradient(135deg, #0f172a, #1e293b);
-          color: white;
-          border-radius: 24px;
-          padding: 2rem;
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-          box-shadow: 0 25px 60px rgba(15, 23, 42, 0.4);
-        }
-
-        .concierge-copy h3 {
-          font-size: 1.6rem;
-          margin: 0.4rem 0;
-        }
-
-        .eyebrow {
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          font-size: 0.85rem;
-          color: rgba(255,255,255,0.7);
-        }
-
-        .concierge-note {
-          color: rgba(255,255,255,0.8);
-          margin: 0;
-        }
-
-        .concierge-actions {
-          display: flex;
-          flex-direction: column;
-          gap: 0.75rem;
-        }
-
-        .concierge-btn {
-          text-decoration: none;
-          padding: 0.85rem 1.5rem;
-          border-radius: 999px;
-          font-weight: 600;
-          text-align: center;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .concierge-btn.primary {
+        .map-overlay {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
           background: white;
-          color: #0f172a;
-          box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
+          padding: 2rem 3rem;
+          text-align: center;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+          z-index: 10;
         }
 
-        .concierge-btn.secondary {
-          border: 1px solid rgba(255,255,255,0.4);
-          color: white;
+        .map-overlay h3 {
+          font-family: var(--font-serif);
+          font-size: 1.5rem;
+          margin: 0.5rem 0 1rem;
         }
 
-        .concierge-btn:hover {
-          transform: translateY(-2px);
+        .map-overlay a {
+          color: var(--amber-600);
+          font-weight: 600;
+          text-decoration: none;
         }
 
-        /* Animations */
-        @keyframes bounce {
-          0%, 20%, 50%, 80%, 100% {
-            transform: translateY(0);
+        /* --- MEDIA QUERIES --- */
+        @media (max-width: 900px) {
+          .main-card {
+            grid-template-columns: 1fr;
           }
-          40% {
-            transform: translateY(-8px);
+          
+          .card-sidebar {
+            flex-direction: row;
+            flex-wrap: wrap;
+            padding: 2rem;
+            gap: 2rem;
           }
-          60% {
-            transform: translateY(-4px);
-          }
-        }
-
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes spin {
-          0% {
-            transform: rotate(0deg);
-          }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
-
-        @keyframes bounceIn {
-          0% {
-            opacity: 0;
-            transform: scale(0.3);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1.05);
-          }
-          70% {
-            transform: scale(0.9);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        /* Tablet Styles */
-        @media (min-width: 768px) {
-          .container {
-            padding: 0 2rem;
+          
+          .sidebar-footer {
+            width: 100%;
           }
 
-          .fullscreen-hero {
+          .card-form {
             padding: 2rem;
           }
-
-          .hero-title {
-            font-size: 3.5rem;
-          }
-
-          .hero-subtitle {
-            font-size: 1.4rem;
-          }
-
-          .contact-main-section {
-            padding: 4rem 0;
-          }
-
-          .contact-grid {
-            gap: 4rem;
-            margin-bottom: 5rem;
-          }
-
-          .section-header h2 {
-            font-size: 2.2rem;
-          }
-
-          .section-header p {
-            font-size: 1.1rem;
-          }
-
-          .contact-form-section {
-            padding: 2.5rem;
-          }
-
-          .form-row {
-            flex-direction: row;
-          }
-
-          .submit-btn {
-            width: auto;
-            padding: 1.2rem 2.5rem;
-          }
-
-          .contact-info-card,
-          .map-section {
-            padding: 2.5rem;
-          }
-
-          .quick-contact-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 2rem;
-          }
-
-          .quick-card {
-            padding: 2.5rem 2rem;
-          }
-
-          .concierge-card {
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-          }
-
-          .concierge-actions {
-            flex-direction: row;
-            align-items: center;
-            gap: 1rem;
-          }
-
-          .concierge-btn {
-            min-width: 180px;
-          }
         }
 
-        /* Desktop Styles */
-        @media (min-width: 1024px) {
-          .contact-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            margin-bottom: 6rem;
+        @media (max-width: 600px) {
+          .input-group {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
           }
-
-          .contact-main-section {
-            padding: 6rem 0;
-          }
-
-          .hero-title {
-            font-size: 4.5rem;
-          }
-
-          .hero-subtitle {
-            font-size: 1.6rem;
-          }
-
-          .contact-form-section {
-            padding: 3rem;
-          }
-
-          .contact-info-card,
-          .map-section {
-            padding: 2.5rem;
-          }
-
-          .quick-contact-grid {
-            grid-template-columns: repeat(4, 1fr);
-            gap: 2rem;
-          }
-
-          .quick-card {
-            padding: 2.5rem 2rem;
-          }
-
-          .quick-card h4 {
-            font-size: 1.3rem;
-          }
-
-          .hero-meta-list {
-            flex-direction: row;
-            justify-content: center;
-          }
-        }
-
-        /* Large Desktop Styles */
-        @media (min-width: 1280px) {
-          .container {
-            max-width: 1200px;
-          }
-
-          .hero-title {
-            font-size: 5rem;
-          }
-        }
-
-        /* Small Mobile Adjustments */
-        @media (max-width: 380px) {
-          .hero-title {
-            font-size: 2.2rem;
-          }
-
-          .hero-subtitle {
-            font-size: 1rem;
-          }
-
-          .contact-form-section,
-          .contact-info-card,
-          .map-section,
-          .quick-card {
-            padding: 1.5rem;
-          }
-
-          .contact-item {
+          
+          .card-sidebar {
             flex-direction: column;
-            text-align: center;
-            gap: 0.75rem;
           }
 
-          .contact-icon {
-            margin: 0 auto;
+          h1 {
+            font-size: 2.5rem;
           }
 
-          .social-icons {
-            gap: 0.5rem;
-          }
-
-          .social-icon {
-            width: 40px;
-            height: 40px;
-            font-size: 1rem;
+          .map-overlay {
+            width: 90%;
+            padding: 1.5rem;
           }
         }
       `}</style>
