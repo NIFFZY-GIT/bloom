@@ -106,7 +106,7 @@ export async function POST(request: Request) {
   const totalDurationLabel = normalizeOptionalString(totals?.durationLabel) || '0 hours';
 
   const contact = (body?.contact ?? {}) as Record<string, unknown>;
-  const contactEmail = normalizeString(contact?.email);
+  let contactEmail = normalizeString(contact?.email);
   const contactPhone = normalizeOptionalString(contact?.phone);
   const startDate = normalizeOptionalString(contact?.startDate);
   const endDate = normalizeOptionalString(contact?.endDate);
@@ -115,14 +115,14 @@ export async function POST(request: Request) {
   const foodAndSpecialRequests = normalizeOptionalString(contact?.foodAndSpecialRequests);
   const additionalInfo = normalizeOptionalString(contact?.additionalInfo);
 
-  if (!contactEmail) {
-    return NextResponse.json({ message: 'Contact email is required' }, { status: 400 });
-  }
-
   let userId: number | null = null;
+  let fallbackEmail: string | null = null;
 
   try {
     const session = await auth();
+    if (session?.user?.email && typeof session.user.email === 'string') {
+      fallbackEmail = session.user.email;
+    }
     if (session?.user?.id) {
       const parsedUserId = Number.parseInt(session.user.id, 10);
       if (Number.isInteger(parsedUserId)) {
@@ -153,6 +153,28 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('[CustomPackages API] Failed to resolve authenticated user:', error);
     // Continue as guest - userId remains null
+  }
+
+  if (!contactEmail && fallbackEmail) {
+    contactEmail = fallbackEmail;
+    console.log('[CustomPackages API] Using authenticated session email as contact email');
+  }
+
+  if (!contactEmail && userId !== null) {
+    try {
+      const emailLookup = await query('SELECT email FROM users WHERE user_id = $1', [userId]);
+      const derivedEmail = normalizeString(emailLookup.rows?.[0]?.email);
+      if (derivedEmail) {
+        contactEmail = derivedEmail;
+        console.log('[CustomPackages API] Derived contact email from database for user:', userId);
+      }
+    } catch (lookupError) {
+      console.warn('[CustomPackages API] Unable to resolve contact email for user:', userId, lookupError);
+    }
+  }
+
+  if (!contactEmail) {
+    return NextResponse.json({ message: 'Contact email is required' }, { status: 400 });
   }
 
   const client = await db.pool.connect();

@@ -401,7 +401,8 @@ const CreatePackagePage: React.FC = () => {
     ? packageForm.endDate && packageForm.endDate !== packageForm.startDate
       ? `${packageForm.startDate} to ${packageForm.endDate}`
       : packageForm.startDate
-    : 'Select dates';
+    : 'Select your travel dates';
+  const hasSelectedDates = Boolean(packageForm.startDate);
 
   // Stats data similar to AboutUs page
   const stats = [
@@ -774,6 +775,7 @@ const CreatePackagePage: React.FC = () => {
 
                   <div className="form-group date-range-field">
                     <label htmlFor="preferred-dates">Preferred Travel Dates *</label>
+                    <p className="field-hint">Choose a window so we can lock in hotels, guides, and transfers.</p>
                     <button
                       type="button"
                       id="preferred-dates"
@@ -783,8 +785,17 @@ const CreatePackagePage: React.FC = () => {
                       aria-expanded={isDatePickerOpen}
                       aria-controls="preferred-dates-panel"
                     >
-                      <span>{selectedDateLabel}</span>
-                      <i className="fas fa-calendar-alt" aria-hidden="true"></i>
+                      <div className="date-range-copy">
+                        <span className={`date-range-value ${hasSelectedDates ? '' : 'placeholder'}`}>
+                          {selectedDateLabel}
+                        </span>
+                        <span className="date-range-helper">
+                          {hasSelectedDates ? 'Tap to adjust dates' : 'Tap to choose start & end dates'}
+                        </span>
+                      </div>
+                      <div className="date-range-icon" aria-hidden="true">
+                        <i className="fas fa-calendar-alt"></i>
+                      </div>
                     </button>
                     {isDatePickerOpen && (
                       <div className="date-range-panel" id="preferred-dates-panel" ref={datePickerRef}>
