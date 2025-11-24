@@ -390,17 +390,6 @@ const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
     return images[0] ?? PLACEHOLDER_IMAGE;
   }, [getPackageImages]);
 
-  const renderStars = (rating: number) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-    for (let i = 0; i < fullStars; i++) stars.push(<i key={i} className="fas fa-star"></i>);
-    if (hasHalfStar) stars.push(<i key="half" className="fas fa-star-half-alt"></i>);
-    const emptyStars = 5 - stars.length;
-    for (let i = 0; i < emptyStars; i++) stars.push(<i key={`empty-${i}`} className="far fa-star"></i>);
-    return stars;
-  };
-
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'Easy': return '#4CAF50';

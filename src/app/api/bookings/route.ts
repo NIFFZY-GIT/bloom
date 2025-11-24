@@ -26,7 +26,7 @@ export async function POST(request: Request) {
             userId = typeof payload.sub === 'number' ? payload.sub : parseInt(String(payload.sub), 10);
             console.log('[Bookings API] User authenticated via JWT:', userId);
           }
-        } catch (error) {
+        } catch {
           console.log('[Bookings API] JWT verification failed, proceeding as guest');
         }
       }

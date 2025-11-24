@@ -719,8 +719,6 @@ async function deleteAllBookings() {
 //   }
 // }
 
-type SearchParams = Record<string, string | string[] | undefined>;
-
 function toSingleValue(value: string | string[] | undefined): string | undefined {
   if (!value) {
     return undefined;

@@ -145,12 +145,6 @@ export default function ContactPage() {
   ];
 
 
-  const highlightStats = [
-    { label: 'Average response', value: '< 12 hrs' },
-    { label: 'Happy travelers', value: '25K+' },
-    { label: 'Countries served', value: '18' }
-  ];
-
   const contactPerks = [
     'Dedicated travel concierge assigned to every enquiry',
     'Tailor-made itineraries delivered within 48 hours',

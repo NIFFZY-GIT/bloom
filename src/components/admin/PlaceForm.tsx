@@ -193,8 +193,6 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
     if (index === 0) return; // Already first
     
     const totalExisting = galleryImages.length;
-    const allImages = [...galleryImages, ...previewUrls];
-    const allFiles = [...pendingFiles];
     
     if (index < totalExisting) {
       // Moving an existing image

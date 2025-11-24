@@ -2,6 +2,7 @@
 
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent, FormEvent, MouseEvent as ReactMouseEvent } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 import styles from '@/app/admin/admingallery/AdminGallery.module.css';
@@ -533,11 +534,14 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
               {createPreviewUrl && (
                 <div className={styles.formGroup}>
                   <label className={styles.formLabel}>Image Preview</label>
-                  <div style={{position: 'relative', display: 'inline-block'}}>
-                    <img 
-                      src={createPreviewUrl} 
-                      alt="Preview" 
-                      style={{maxWidth: '200px', maxHeight: '200px', borderRadius: '8px'}}
+                  <div style={{ position: 'relative', display: 'inline-block' }}>
+                    <Image
+                      src={createPreviewUrl}
+                      alt="Preview"
+                      width={200}
+                      height={200}
+                      style={{ maxWidth: '200px', height: 'auto', borderRadius: '8px' }}
+                      unoptimized
                     />
                   </div>
                 </div>
@@ -657,11 +661,14 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
               {editPreviewUrl && (
                 <div className={styles.formGroup}>
                   <label className={styles.formLabel}>New Image Preview</label>
-                  <div style={{position: 'relative', display: 'inline-block'}}>
-                    <img 
-                      src={editPreviewUrl} 
-                      alt="Preview" 
-                      style={{maxWidth: '200px', maxHeight: '200px', borderRadius: '8px'}}
+                  <div style={{ position: 'relative', display: 'inline-block' }}>
+                    <Image
+                      src={editPreviewUrl}
+                      alt="Preview"
+                      width={200}
+                      height={200}
+                      style={{ maxWidth: '200px', height: 'auto', borderRadius: '8px' }}
+                      unoptimized
                     />
                   </div>
                 </div>
