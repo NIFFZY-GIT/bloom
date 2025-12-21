@@ -164,6 +164,7 @@ export default function DashboardClient({ initialBookings, initialQuotations, in
     try {
       const response = await fetch('/api/user/send-reset-code', {
         method: 'POST',
+        credentials: 'include',
       });
 
       const data = await response.json();
@@ -204,6 +205,7 @@ export default function DashboardClient({ initialBookings, initialQuotations, in
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           code: resetCode,
           newPassword,

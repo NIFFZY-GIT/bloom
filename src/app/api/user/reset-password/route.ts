@@ -5,8 +5,31 @@ import bcrypt from 'bcryptjs';
 import { query } from '@/lib/db';
 import { verificationCodes, cleanupExpiredCodes } from '@/lib/verification-codes';
 import { sendPasswordChangedConfirmation } from '@/lib/email';
+import { auth } from '@/lib/auth';
 
 async function getAuthenticatedUser() {
+  // First, try NextAuth session (primary auth method)
+  try {
+    const session = await auth();
+    if (session?.user?.email) {
+      // Get user from database using email from session
+      const result = await query(
+        'SELECT user_id, email FROM users WHERE email = $1',
+        [session.user.email]
+      );
+
+      if (result.rows.length > 0) {
+        return {
+          id: result.rows[0].user_id,
+          email: result.rows[0].email,
+        };
+      }
+    }
+  } catch (error) {
+    console.error('NextAuth session check error:', error);
+  }
+
+  // Fallback to legacy JWT token
   const cookieStore = await cookies();
   const token = cookieStore.get('auth_token')?.value;
 
@@ -37,7 +60,7 @@ async function getAuthenticatedUser() {
       email: result.rows[0].email,
     };
   } catch (error) {
-    console.error('Auth error:', error);
+    console.error('JWT auth error:', error);
     return null;
   }
 }
