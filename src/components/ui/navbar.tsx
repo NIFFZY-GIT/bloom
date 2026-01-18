@@ -2,6 +2,7 @@
 
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef, CSSProperties } from 'react';
 import { signOut } from 'next-auth/react';
@@ -491,7 +492,14 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
           <div style={styles.flexBetween}>
             {/* Logo */}
             <Link href="/" style={styles.logoContainer}>
-              <span style={{ fontSize: screenSize === 'xs' ? '1.875rem' : '2.25rem' }}>🌺</span>
+              <Image 
+                src="/logo/logo1.jpg" 
+                alt="Tropical Bloom Logo" 
+                width={screenSize === 'xs' ? 56 : 70} 
+                height={screenSize === 'xs' ? 56 : 70}
+                style={{ borderRadius: '8px', objectFit: 'cover' }}
+                priority
+              />
               <div>
                 <div style={styles.logoTextPrimary}>Tropical Bloom</div>
                 <div style={styles.logoTextSecondary}>Tourism</div>

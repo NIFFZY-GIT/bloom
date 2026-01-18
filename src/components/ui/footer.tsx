@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { FaFacebookF, FaInstagram, FaYoutube, FaTwitter, FaMapMarkerAlt, FaPhone } from "react-icons/fa";
 import { motion } from "framer-motion";
 
@@ -25,7 +26,13 @@ export default function Footer() {
             >
               <div className="brand-logo">
                 <div className="logo-icon">
-                  <span className="logo-text"></span>
+                  <Image 
+                    src="/logo/logo1.jpg" 
+                    alt="Tropical Bloom Logo" 
+                    width={60} 
+                    height={60}
+                    style={{ borderRadius: '8px', objectFit: 'cover' }}
+                  />
                 </div>
                 <h2 className="brand-title">Tropical Bloom Tourism</h2>
               </div>
@@ -313,13 +320,12 @@ export default function Footer() {
         }
 
         .logo-icon {
-          width: 2.5rem;
-          height: 2.5rem;
-          background: linear-gradient(to right, #f59e0b, #d97706);
-          border-radius: 0.75rem;
+          width: 3.75rem;
+          height: 3.75rem;
           display: flex;
           align-items: center;
           justify-content: center;
+          flex-shrink: 0;
         }
 
         .logo-text {
