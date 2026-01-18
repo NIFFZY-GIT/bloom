@@ -190,7 +190,7 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
       margin: '0 auto', 
       padding: screenSize === 'xs' ? '0 0.5rem' : screenSize === 'sm' ? '0 1rem' : screenSize === 'md' ? '0 1.5rem' : '0 2rem'
     },
-    flexBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '5.5rem' },
+    flexBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '6rem' },
     logoContainer: { 
       display: 'flex', 
       alignItems: 'center', 
@@ -495,9 +495,9 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
               <Image 
                 src="/logo/logo1.jpg" 
                 alt="Tropical Bloom Logo" 
-                width={screenSize === 'xs' ? 56 : 70} 
-                height={screenSize === 'xs' ? 56 : 70}
-                style={{ borderRadius: '8px', objectFit: 'cover' }}
+                width={screenSize === 'xs' ? 48 : screenSize === 'sm' ? 56 : 70} 
+                height={screenSize === 'xs' ? 48 : screenSize === 'sm' ? 56 : 70}
+                style={{ borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }}
                 priority
               />
               <div>
