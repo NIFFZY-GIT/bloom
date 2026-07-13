@@ -676,17 +676,7 @@ export default function CategorySelector({
         /* Extra small devices (phones, less than 576px) */
         @media (max-width: 480px) {
           .categories-scroll-container {
-            /* Extra top room so the lifted (selected) circle is not clipped
-               by the container's top edge on mobile. */
-            padding: 2.25rem 0 2.5rem 0;
-          }
-
-          /* On mobile the selected lift is handled by GSAP on the card itself.
-             Neutralize the inner transform so the two don't stack (~40px) and
-             push the circle above the scroll area's top edge, clipping it. */
-          .category-card:hover .card-inner,
-          .category-card.active .card-inner {
-            transform: none;
+            padding: 1.5rem 0 2.5rem 0;
           }
 
           .categories-track {

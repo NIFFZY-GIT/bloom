@@ -45,7 +45,40 @@ export default function Footer() {
 
   return (
     <footer className="tb-footer">
+      {/* Newsletter band */}
+      <div className="tb-cta">
+        <div className="tb-cta-inner">
+          <div className="tb-cta-copy">
+            <span className="tb-eyebrow">Stay Inspired</span>
+            <h2 className="tb-cta-title">Let the journey find you</h2>
+            <p className="tb-cta-sub">
+              Join our newsletter for handpicked destinations, seasonal offers and
+              insider tips from the pearl of the Indian Ocean.
+            </p>
+          </div>
 
+          {subscribed ? (
+            <div className="tb-thanks">
+              <span className="tb-thanks-mark">✓</span>
+              You&apos;re on the list — welcome aboard!
+            </div>
+          ) : (
+            <form className="tb-form" onSubmit={handleSubscribe}>
+              <input
+                type="email"
+                required
+                placeholder="Enter your email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                aria-label="Email address"
+              />
+              <button type="submit">
+                Subscribe <FaArrowRight />
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
 
       {/* Main */}
       <div className="tb-main">

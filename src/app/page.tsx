@@ -66,13 +66,19 @@ export default function Home() {
         (place) => Number(place.categoryId) === Number(selectedCategory.id)
       );
       setFilteredPlaces(categoryPlaces);
+      
+      // Debug logging
+      console.log('Selected Category:', selectedCategory);
+      console.log('Selected Category ID (type):', typeof selectedCategory.id, selectedCategory.id);
+      console.log('All Places:', places);
+      console.log('Places categoryId types:', places.map(p => ({ name: p.name, categoryId: p.categoryId, type: typeof p.categoryId })));
+      console.log('Filtered Places:', categoryPlaces);
     }
   }, [selectedCategory, places]);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-5 bg-gradient-to-br from-amber-500 to-amber-600 p-4">
-        <div className="h-12 w-12 rounded-full border-4 border-white/30 border-t-white animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-500 to-amber-600 p-4">
         <div className="text-white text-xl md:text-2xl font-semibold text-center">Loading paradise…</div>
       </div>
     );
@@ -106,7 +112,7 @@ export default function Home() {
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex flex-col items-center justify-center w-full">
                 <span className="journey-eyebrow">Find your escape</span>
-                <h2 className="journey-title text-center">What&apos;s your journey?</h2>
+                <h1 className="journey-title text-center">What&apos;s your journey?</h1>
                 <CategorySelector
                   categories={categories}
                   selectedCategory={selectedCategory}
