@@ -142,7 +142,7 @@ export default function PlaceCard({ place }: PlaceCardProps) {
         }
 
         .place-card:focus-visible {
-          outline: 3px solid #3b82f6;
+          outline: 3px solid #f59e0b;
           outline-offset: 2px;
         }
 
@@ -492,7 +492,7 @@ export default function PlaceCard({ place }: PlaceCardProps) {
 
         /* Focus styles for keyboard navigation */
         .place-card:focus {
-          outline: 2px solid #3b82f6;
+          outline: 2px solid #f59e0b;
           outline-offset: 2px;
         }
 
