@@ -65,6 +65,11 @@
   --foreground: var(--ink);
 }
 
+/* Base reset lives in the `base` cascade layer so Tailwind's utility layer
+   (colors, spacing, text-decoration, …) can override it. Without this, the
+   unlayered `*` and `a` resets would win over layered utilities in Tailwind v4
+   regardless of specificity, silently breaking classes like `px-4`/`underline`. */
+@layer base {
 * {
   margin: 0;
   padding: 0;
@@ -136,6 +141,7 @@ a {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--brand);
 }
+} /* end @layer base */
 
 /* ---- Shared helpers (opt-in) ---- */
 
@@ -171,4 +177,12 @@ a {
   transform: translateY(-2px);
   filter: brightness(1.03);
   box-shadow: 0 18px 34px -12px rgba(245, 158, 11, 0.65);
+}
+
+/* When the create-package "Browsing Mode" banner is present, it is pinned in
+   front of the fixed global navbar. Push the navbar down by the banner's live
+   height (set from JS as --notice-banner-h) so the two stack cleanly instead
+   of overlapping. `!important` overrides the navbar's inline `top: 0`. */
+body:has(.auth-notice-banner) nav {
+  top: var(--notice-banner-h, 0px) !important;
 }

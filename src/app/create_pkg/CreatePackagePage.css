@@ -323,37 +323,9 @@
   font-weight: 700;
 }
 
-/* Authentication Notice */
-.auth-notice-banner {
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
-  border: 1px solid #f59e0b;
-  padding: 1rem 2rem;
-  text-align: center;
-  position: relative;
-  z-index: 1000;
-}
-
-.auth-notice-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  color: #92400e;
-}
-
-.auth-notice-content i {
-  font-size: 1.2rem;
-}
-
-.login-link {
-  color: #d97706;
-  font-weight: 600;
-  text-decoration: underline;
-}
-
-.login-link:hover {
-  color: #b45309;
-}
+/* Authentication Notice — styling now lives in the component via Tailwind.
+   The `.auth-notice-banner` class is retained only as a selector hook used by
+   globals.css (`body:has(.auth-notice-banner) nav`) and the height-sync ref. */
 
 /* Rest of the CSS remains the same as previous version */
 /* ... (previous CSS styles for sections, forms, etc.) ... */

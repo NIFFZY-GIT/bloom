@@ -47,6 +47,7 @@ const CreatePackagePage: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const datePickerRef = useRef<HTMLDivElement | null>(null);
   const dateTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const authBannerRef = useRef<HTMLDivElement | null>(null);
 
   // Fetch places from database
   useEffect(() => {
@@ -72,6 +73,33 @@ const CreatePackagePage: React.FC = () => {
 
     fetchPlaces();
   }, []);
+
+  // Keep the fixed global navbar pushed down below the browsing-mode banner
+  // by exposing the banner's live height as a CSS variable on <html>.
+  useEffect(() => {
+    const root = document.documentElement;
+
+    if (isUserAuthenticated) {
+      root.style.removeProperty('--notice-banner-h');
+      return;
+    }
+
+    const banner = authBannerRef.current;
+    if (!banner) return;
+
+    const syncHeight = () => {
+      root.style.setProperty('--notice-banner-h', `${banner.offsetHeight}px`);
+    };
+
+    syncHeight();
+    const observer = new ResizeObserver(syncHeight);
+    observer.observe(banner);
+
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty('--notice-banner-h');
+    };
+  }, [isUserAuthenticated]);
 
   // Check authentication status and fetch user data
   useEffect(() => {
@@ -414,15 +442,18 @@ const CreatePackagePage: React.FC = () => {
 
   return (
     <div className="create-package-page">
-      {/* Authentication Notice Banner */}
+      {/* Authentication Notice Banner - pinned in front of the global navbar */}
       {!isUserAuthenticated && (
-        <div className="auth-notice-banner">
-          <div className="auth-notice-content">
-            <i className="fas fa-info-circle"></i>
+        <div
+          ref={authBannerRef}
+          className="auth-notice-banner fixed inset-x-0 top-0 z-[1100] border-b border-amber-500 bg-gradient-to-br from-amber-100 to-amber-200 px-4 py-3 text-center sm:px-8"
+        >
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-amber-800 sm:text-base">
+            <i className="fas fa-info-circle text-lg"></i>
             <span>
               <strong>Browsing Mode:</strong> You can explore places, but you&apos;ll need to{' '}
-              <a href="/login?redirect=/create_pkg" className="login-link">log in</a> or{' '}
-              <a href="/sign-up?redirect=/create_pkg" className="login-link">sign up</a> to customize and submit your package.
+              <a href="/login?redirect=/create_pkg" className="font-semibold text-amber-600 underline underline-offset-2 hover:text-amber-700">log in</a> or{' '}
+              <a href="/sign-up?redirect=/create_pkg" className="font-semibold text-amber-600 underline underline-offset-2 hover:text-amber-700">sign up</a> to customize and submit your package.
             </span>
           </div>
         </div>

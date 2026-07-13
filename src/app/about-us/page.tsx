@@ -1,234 +1,266 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 
 export default function AboutUs() {
   const [activeTab, setActiveTab] = useState('mission');
 
   const stats = [
-    { number: '15+', label: 'Years Experience' },
-    { number: '50K+', label: 'Happy Travelers' },
-    { number: '200+', label: 'Destinations' },
-    { number: '98%', label: 'Satisfaction Rate' }
+    { number: '15+', label: 'Years of Excellence' },
+    { number: '50K+', label: 'Global Travelers' },
+    { number: '200+', label: 'Curated Destinations' },
+    { number: '98%', label: 'Retention & Satisfaction' }
   ];
 
   const values = [
     {
       icon: '🌱',
       title: 'Sustainable Tourism',
-      description: 'We prioritize eco-friendly practices and support local communities.'
+      description: 'We prioritize low-impact, eco-sensitive operational methodologies while actively supporting community-led preservation initiatives.'
     },
     {
       icon: '💎',
-      title: 'Authentic Experiences',
-      description: 'Discover the real Sri Lanka through curated local experiences.'
+      title: 'Uncompromising Authenticity',
+      description: 'Our deep local integration unlocks exclusive, uncompromised access to the authentic heritage of Sri Lanka.'
     },
     {
       icon: '🤝',
-      title: 'Personalized Service',
-      description: 'Tailored journeys designed specifically for your preferences.'
+      title: 'Bespoke Private Service',
+      description: 'Every itinerary is meticulously engineered entirely from the ground up to match precise stakeholder expectations.'
     },
     {
       icon: '🛡️',
-      title: 'Trust & Safety',
-      description: 'Your safety and comfort are our highest priorities.'
+      title: 'Risk Management & Safety',
+      description: 'A comprehensive operational infrastructure engineered to guarantee traveler safety, comfort, and logistical continuity.'
     }
   ];
 
   const team = [
     {
       name: 'Sarah Perera',
-      role: 'Founder & CEO',
-      image: '/images/team/sarah.jpg',
-      description: '15+ years in sustainable tourism'
+      role: 'Founder & Chief Executive Officer',
+      description: 'Over 15 years directing sustainable tourism strategies and cross-cultural operations.'
     },
     {
       name: 'Rajiv Fernando',
-      role: 'Head of Operations',
-      image: '/images/team/rajiv.jpg',
-      description: 'Expert in logistics and customer experience'
+      role: 'Chief Operating Officer',
+      description: 'Specialist in high-end hospitality logistics, fleet deployment, and structural risk management.'
     },
     {
       name: 'Maya Silva',
-      role: 'Travel Curator',
-      image: '/images/team/maya.jpg',
-      description: 'Local culture and adventure specialist'
+      role: 'Director of Itinerary Design',
+      description: 'Veteran travel curator dedicated to local cultural integration and heritage preservation.'
     },
     {
       name: 'David Chen',
       role: 'Sustainability Director',
-      image: '/images/team/david.jpg',
-      description: 'Environmental conservation advocate'
+      description: 'Environmental economist managing our carbon-neutral portfolios and regional ESG compliance.'
     }
   ];
 
   return (
-    <div className="about-us-page">
-      {/* Full Screen Hero Section */}
-      <section className="fullscreen-hero">
-        <div className="hero-background">
-          <div className="hero-overlay"></div>
+    <div className="min-h-screen bg-[#F8FAFC] text-[#1E293B] antialiased selection:bg-[#C5A880]/20 font-sans">
+      
+      {/* --- HERO SECTION --- */}
+      <section className="h-[85vh] relative flex items-center justify-center text-center text-white overflow-hidden pt-20">
+        <div 
+          className="absolute inset-0 w-full h-full bg-[url('/images/about-hero.jpg')] bg-center bg-cover bg-no-repeat transition-transform duration-1000"
+          aria-hidden="true"
+        >
+          <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-[#1E293B]/60 via-[#1E293B]/70 to-[#1E293B]/90" />
         </div>
-        <div className="hero-content">
-          <div className="hero-text">
-            <h1 className="hero-title">Our Story</h1>
-            <p className="hero-subtitle">
-              Crafting unforgettable journeys through the heart of Sri Lanka since 2010
+        
+        <div className="relative z-10 max-w-4xl px-6 flex flex-col items-center justify-center h-full">
+          <div className="space-y-4">
+            <span className="text-[0.8rem] font-bold tracking-[0.25em] text-[#C5A880] uppercase block animate-[fadeInUp_0.8s_ease-out]">
+              Corporate Profile
+            </span>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-light tracking-tight mb-6 drop-shadow-sm uppercase text-white animate-[fadeInUp_0.8s_ease-out_0.1s_both]">
+              Our Institutional Story
+            </h1>
+            <p className="text-lg sm:text-xl font-normal opacity-90 max-w-3xl leading-relaxed text-slate-200 font-serif italic tracking-wide animate-[fadeInUp_0.8s_ease-out_0.2s_both]">
+              Architecting bespoke luxury expeditions across the Sri Lankan subcontinent since 2010.
             </p>
+          </div>
 
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center gap-2 text-slate-400 animate-[fadeInUp_0.8s_ease-out_0.4s_both]">
+            <span className="text-[0.7rem] tracking-[0.2em] uppercase font-bold">
+              Explore Enterprise Profile
+            </span>
+            <div className="text-lg animate-bounce">↓</div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- CORPORATE OVERVIEW SECTION --- */}
+      <section className="py-28 bg-white border-b border-slate-100 relative z-10">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+            <div className="lg:col-span-7 space-y-6">
+              <span className="text-[0.75rem] font-bold tracking-widest text-[#C5A880] uppercase block">
+                Executive Overview
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-semibold text-[#1E293B] tracking-tight">
+                Tropical Bloom Corporate Governance
+              </h2>
+              <p className="text-base leading-relaxed text-slate-500">
+                Established in 2010, Tropical Bloom Tourism was conceptualized with a clear corporate mandate: 
+                to structuralize, modernize, and elevate the standard of custom destination management inside Sri Lanka. 
+                What originated as a private boutique portfolio has systematically evolved into one of the country&apos;s 
+                most authoritative assets in custom holiday engineering.
+              </p>
+              <p className="text-base leading-relaxed text-slate-500">
+                We assert that modern executive travel must satisfy three key pillars: absolute operational precision, 
+                environmental stewardship, and flawless experiential curation. Every asset deployment under our stewardship 
+                is guaranteed to offer exceptional luxury, from remote highland reserve access to curated historical asset encounters.
+              </p>
+            </div>
             
-            <div className="hero-scroll-indicator">
-              <span>Scroll to explore</span>
-              <div className="scroll-arrow">↓</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Introduction Section */}
-      <section className="introduction-section">
-        <div className="container">
-          <div className="intro-grid">
-            <div className="intro-content">
-              <h2>Welcome to Tropical Bloom Tourism</h2>
-              <p>
-                Founded in 2010, Tropical Bloom Tourism emerged from a simple passion: 
-                to share the breathtaking beauty and rich cultural tapestry of Sri Lanka 
-                with the world. What started as a small family-run operation has blossomed 
-                into one of Sri Lanka&apos;s most trusted travel curators.
-              </p>
-              <p>
-                We believe that travel should be transformative, sustainable, and deeply 
-                personal. Every journey we craft is a carefully woven tapestry of authentic 
-                experiences, from misty mountain treks to golden beach sunsets, ancient 
-                temple explorations to vibrant local market encounters.
-              </p>
-            </div>
-            <div className="intro-image">
-              <div className="image-frame">
-                <div className="main-image"></div>
-                <div className="accent-shape shape-1"></div>
-                <div className="accent-shape shape-2"></div>
+            <div className="lg:col-span-5 relative w-full max-w-md lg:max-w-none mx-auto">
+              <div className="relative w-full h-[420px]">
+                {/* Structural Abstract Frame Overlap */}
+                <div className="w-full h-full  rounded-lg relative z-20 ">
+                  <Image
+                    src="/logo/logo1.jpg"
+                    alt="Tropical Bloom logo"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    className="object-contain p-12 mix-blend-multiply"
+                    priority
+                  />
+                </div>
+                <div className="absolute w-32 h-32 bg-slate-100 -top-6 -left-6 z-10 border border-slate-200 rounded" />
+                <div className="absolute w-32 h-32 bg-[#C5A880]/10 -bottom-6 -right-6 z-10 rounded" />
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="stats-section">
-        <div className="container">
-          <div className="stats-grid">
+      {/* --- ANALYTICS / STATS SECTION --- */}
+      <section className="py-20 bg-[#F8FAFC] border-b border-slate-200 relative z-10">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-12 gap-x-8 divide-x-0 sm:divide-x divide-slate-200">
             {stats.map((stat, index) => (
-              <div key={index} className="stat-card">
-                <div className="stat-number">{stat.number}</div>
-                <div className="stat-label">{stat.label}</div>
+              <div key={index} className="text-center sm:first:pl-0 sm:pl-4">
+                <div className="text-4xl sm:text-5xl font-light text-[#1E293B] mb-2 tracking-tight">
+                  {stat.number}
+                </div>
+                <div className="text-[0.75rem] font-bold text-slate-400 uppercase tracking-widest">
+                  {stat.label}
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Values Section */}
-      <section className="values-section">
-        <div className="container">
-          <div className="section-header">
-            <h2>Our Values</h2>
-            <p>The principles that guide every journey we create</p>
+      {/* --- VALUES SECTION --- */}
+      <section className="py-28 bg-white relative z-10">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-20 space-y-3">
+            <span className="text-[0.75rem] font-bold tracking-widest text-[#C5A880] uppercase block">
+              Operational Philosophies
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-semibold text-[#1E293B] tracking-tight">
+              Our Core Principles
+            </h2>
+            <p className="text-base text-slate-400 max-w-xl mx-auto">
+              The fundamental criteria that dictate risk mitigation and design mechanics across our entire corporate network.
+            </p>
           </div>
-          <div className="values-grid">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {values.map((value, index) => (
-              <div key={index} className="value-card">
-                <div className="value-icon">{value.icon}</div>
-                <h3>{value.title}</h3>
-                <p>{value.description}</p>
+              <div 
+                key={index} 
+                className="text-left p-10 bg-[#F8FAFC] border border-slate-100 rounded-lg transition-all duration-300 hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 hover:border-slate-200/60"
+              >
+                <div className="text-4xl mb-6 text-[#C5A880]">{value.icon}</div>
+                <h3 className="text-xl font-semibold text-[#1E293B] mb-3 tracking-tight">{value.title}</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">{value.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Story Tabs Section */}
-      <section className="story-section">
-        <div className="container">
-          <div className="story-tabs-container">
-            <div className="story-tabs">
+      {/* --- MISSION STRATEGY TABS SECTION --- */}
+      <section className="py-28 bg-[#F8FAFC] border-t border-b border-slate-200 relative z-10">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex justify-center mb-16">
+            <div className="flex flex-col sm:flex-row bg-white rounded-lg p-1.5 border border-slate-200 shadow-sm w-full sm:w-auto overflow-hidden">
               <button 
-                className={`tab-button ${activeTab === 'mission' ? 'active' : ''}`}
+                className={`px-8 py-4 font-semibold transition-all duration-200 flex items-center justify-center gap-3 min-w-[180px] text-xs uppercase tracking-wider rounded ${activeTab === 'mission' ? 'bg-[#1E293B] text-white shadow-sm' : 'text-slate-500 hover:text-[#1E293B]'}`}
                 onClick={() => setActiveTab('mission')}
               >
-                <span className="tab-icon">🎯</span>
-                <span className="tab-text">Our Mission</span>
-                <div className="active-indicator"></div>
+                <span>Our Mission</span>
               </button>
+              
               <button 
-                className={`tab-button ${activeTab === 'vision' ? 'active' : ''}`}
+                className={`px-8 py-4 font-semibold transition-all duration-200 flex items-center justify-center gap-3 min-w-[180px] text-xs uppercase tracking-wider rounded ${activeTab === 'vision' ? 'bg-[#1E293B] text-white shadow-sm' : 'text-slate-500 hover:text-[#1E293B]'}`}
                 onClick={() => setActiveTab('vision')}
               >
-                <span className="tab-icon">🔭</span>
-                <span className="tab-text">Our Vision</span>
-                <div className="active-indicator"></div>
+                <span>Our Vision</span>
               </button>
+              
               <button 
-                className={`tab-button ${activeTab === 'approach' ? 'active' : ''}`}
+                className={`px-8 py-4 font-semibold transition-all duration-200 flex items-center justify-center gap-3 min-w-[180px] text-xs uppercase tracking-wider rounded ${activeTab === 'approach' ? 'bg-[#1E293B] text-white shadow-sm' : 'text-slate-500 hover:text-[#1E293B]'}`}
                 onClick={() => setActiveTab('approach')}
               >
-                <span className="tab-icon">🚀</span>
-                <span className="tab-text">Our Approach</span>
-                <div className="active-indicator"></div>
+                <span>Our Approach</span>
               </button>
             </div>
           </div>
 
-          <div className="tab-content">
+          <div className="max-w-4xl mx-auto bg-white p-10 sm:p-16 rounded-xl border border-slate-200/60 shadow-md">
             {activeTab === 'mission' && (
-              <div className="content-panel">
-                <h3>Creating Meaningful Connections</h3>
-                <p>
-                  Our mission is to bridge cultures and create meaningful connections 
-                  between travelers and the soul of Sri Lanka. We go beyond typical 
-                  tourism to deliver experiences that inspire, educate, and transform.
+              <div className="space-y-6">
+                <h3 className="text-2xl font-semibold text-[#1E293B] tracking-tight">Fostering Transnational Integration</h3>
+                <p className="text-base leading-relaxed text-slate-500">
+                  Our professional mandate is to orchestrate strategic links between global travelers and the socio-cultural fabric of Sri Lanka. 
+                  We surpass conventional commercial leisure limits to generate highly optimized, high-yielding experiential solutions that inform, empower, and deliver absolute structural value.
                 </p>
-                <ul>
-                  <li>Promote sustainable travel practices</li>
-                  <li>Support local communities and economies</li>
-                  <li>Preserve cultural heritage</li>
-                  <li>Create lifelong memories</li>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+                  {['Implement strict verification protocols', 'Subsidize regional infrastructure', 'Protect national heritage frameworks', 'Deliver multi-generational value'].map((item, idx) => (
+                    <li key={idx} className="relative pl-6 text-sm text-slate-500 font-medium">
+                      <span className="absolute left-0 text-[#C5A880] font-bold">▪</span> {item}
+                    </li>
+                  ))}
                 </ul>
               </div>
             )}
 
             {activeTab === 'vision' && (
-              <div className="content-panel">
-                <h3>Leading Sustainable Tourism</h3>
-                <p>
-                  We envision a future where tourism becomes a powerful force for 
-                  positive change - protecting natural wonders, empowering local 
-                  communities, and creating economic opportunities while preserving 
-                  cultural authenticity.
+              <div className="space-y-6">
+                <h3 className="text-2xl font-semibold text-[#1E293B] tracking-tight">Pioneering Responsible Industry Metrics</h3>
+                <p className="text-base leading-relaxed text-slate-500">
+                  We look ahead toward an integrated destination framework where premium travel behaves as an intentional driver for sustainable local advancement—safeguarding unique natural typography, elevating host capability parameters, and developing transparent carbon-neutral micro-economies.
                 </p>
-                <ul>
-                  <li>Become Sri Lanka&apos;s most sustainable tour operator by 2025</li>
-                  <li>Expand community-based tourism initiatives</li>
-                  <li>Pioneer carbon-neutral travel experiences</li>
-                  <li>Set new standards for ethical tourism</li>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+                  {['Attain Net-Zero operating indexes', 'Formulate community equity shares', 'Inaugurate carbon-neutral private fleets', 'Enforce rigorous fair-trade labor codes'].map((item, idx) => (
+                    <li key={idx} className="relative pl-6 text-sm text-slate-500 font-medium">
+                      <span className="absolute left-0 text-[#C5A880] font-bold">▪</span> {item}
+                    </li>
+                  ))}
                 </ul>
               </div>
             )}
 
             {activeTab === 'approach' && (
-              <div className="content-panel">
-                <h3>Personalized & Responsible</h3>
-                <p>
-                  Every journey begins with understanding your dreams and preferences. 
-                  Our team of local experts then crafts a personalized itinerary that 
-                  balances adventure, relaxation, culture, and sustainability.
+              <div className="space-y-6">
+                <h3 className="text-2xl font-semibold text-[#1E293B] tracking-tight">Analytical & High-Touch Customization</h3>
+                <p className="text-base leading-relaxed text-slate-500">
+                  Every asset design sequence initiates with an exhaustive discovery phase detailing client expectations. 
+                  Our corporate planning apparatus subsequently builds a closed-loop itinerary structure that successfully aligns ground dynamics, specialized navigation support, and elite security compliance.
                 </p>
-                <ul>
-                  <li>In-depth consultation and planning</li>
-                  <li>Local expert guides and hosts</li>
-                  <li>Eco-friendly accommodations and transport</li>
-                  <li>24/7 support throughout your journey</li>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+                  {['Exhaustive intake diagnostics', 'Verified sovereign guide access', 'Certified sustainable asset lists', '24/7 dedicated mission control centers'].map((item, idx) => (
+                    <li key={idx} className="relative pl-6 text-sm text-slate-500 font-medium">
+                      <span className="absolute left-0 text-[#C5A880] font-bold">▪</span> {item}
+                    </li>
+                  ))}
                 </ul>
               </div>
             )}
@@ -236,718 +268,58 @@ export default function AboutUs() {
         </div>
       </section>
 
-      {/* Team Section */}
-      <section className="team-section">
-        <div className="container">
-          <div className="section-header">
-            <h2>Meet Our Team</h2>
-            <p>Passionate locals dedicated to creating your perfect Sri Lankan adventure</p>
+      {/* --- EXECUTIVE LEADERSHIP SECTION ---
+      <section className="py-28 bg-white relative z-10">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-20 space-y-3">
+            <span className="text-[0.75rem] font-bold tracking-widest text-[#C5A880] uppercase block">
+              Corporate Registry
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-semibold text-[#1E293B] tracking-tight">
+              Executive Directorate
+            </h2>
+            <p className="text-base text-slate-400 max-w-xl mx-auto">
+              A leadership group combining cross-border hospitality execution, local asset governance, and compliance mastery.
+            </p>
           </div>
-          <div className="team-grid">
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {team.map((member, index) => (
-              <div key={index} className="team-card">
-                <div className="member-image">
-                  <div className="image-placeholder">{member.name.split(' ').map(n => n[0]).join('')}</div>
+              <div key={index} className="text-left p-6 bg-[#F8FAFC] rounded border border-slate-100">
+                <div className="w-[80px] h-[80px] mb-6 rounded-full bg-gradient-to-br from-[#1E293B] to-slate-700 flex items-center justify-center text-white text-xl font-semibold shadow-inner border border-slate-800">
+                  {member.name.split(' ').map(n => n[0]).join('')}
                 </div>
-                <div className="member-info">
-                  <h3>{member.name}</h3>
-                  <div className="member-role">{member.role}</div>
-                  <p>{member.description}</p>
+                <div className="space-y-1.5">
+                  <h3 className="text-lg font-bold text-[#1E293B] tracking-tight">{member.name}</h3>
+                  <div className="text-[#C5A880] font-bold text-[0.7rem] uppercase tracking-wider">{member.role}</div>
+                  <div className="w-10 h-[2px] bg-slate-200 my-3" />
+                  <p className="text-slate-500 text-xs leading-relaxed">{member.description}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
-      {/* CTA Section */}
-      <section className="cta-section">
-        <div className="container">
-          <div className="cta-content">
-            <h2>Ready to Begin Your Journey?</h2>
-            <p>
-              Let us craft your perfect Sri Lankan adventure. Share your dreams, 
-              and we&apos;ll make them a reality.
+      {/* --- ENTERPRISE CALL TO ACTION --- */}
+      {/* <section className="py-24 bg-[#1E293B] text-white text-center relative z-10 border-t border-slate-800">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="max-w-2xl mx-auto space-y-6">
+            <h2 className="text-3xl sm:text-4xl font-light tracking-tight uppercase">Initiate Private Consultation</h2>
+            <p className="text-base opacity-80 leading-relaxed text-slate-300 font-light">
+              Engage our project engineering desk to formulate a distinct, highly secure, and optimized corporate package or independent tour.
             </p>
-            <div className="cta-buttons">
-              <button className="explore-button">Explore Packages</button>
-              <button className="contact-button">Contact Us</button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
+              <button className="bg-[#C5A880] text-white border-none py-3.5 px-8 text-xs uppercase tracking-widest font-bold rounded shadow-md transition-all duration-200 hover:bg-[#B3956D] hover:-translate-y-0.5 w-full sm:w-auto">
+                Review Portfolios
+              </button>
+              <button className="bg-transparent text-slate-200 border border-slate-700 py-3.5 px-8 text-xs uppercase tracking-widest font-bold rounded transition-all duration-200 hover:bg-white hover:text-[#1E293B] hover:-translate-y-0.5 w-full sm:w-auto">
+                Corporate Inquiries
+              </button>
             </div>
           </div>
         </div>
-      </section>
-
-      <style jsx>{`
-        .about-us-page {
-          min-height: 100vh;
-          margin-top: 0;
-        }
-
-        /* Full Screen Hero Section */
-        .fullscreen-hero {
-          height: 100vh;
-          position: relative;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          color: white;
-          overflow: hidden;
-          margin-top: 0;
-          padding-top: 80px;
-        }
-
-        .hero-background {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: url('/images/about-hero.jpg') center/cover no-repeat;
-        }
-
-        .hero-overlay {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.6));
-        }
-
-        /* Centered hero content */
-        .hero-content {
-          position: relative;
-          z-index: 2;
-          max-width: 800px;
-          padding: 0 2rem;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 100%;
-        }
-
-        /* Hero text styling */
-        .hero-text {
-          margin-bottom: 80px;
-        }
-
-        .hero-title {
-          font-size: 4.5rem;
-          font-weight: 800;
-          margin-bottom: 1.5rem;
-          text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-          line-height: 1.1;
-          animation: fadeInUp 1s ease-out;
-        }
-
-        .hero-subtitle {
-          font-size: 1.6rem;
-          font-weight: 300;
-          opacity: 0.95;
-          margin-bottom: 3rem;
-          text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
-          animation: fadeInUp 1s ease-out 0.2s both;
-        }
-
-        /* Scroll indicator placed at bottom of hero */
-        .hero-scroll-indicator {
-          position: absolute;
-          bottom: 30px;
-          left: 0%;
-          transform: translateX(-50%);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          gap: 0.4rem;
-          width: 100%;
-          animation: fadeInUp 1s ease-out 0.4s both;
-        }
-
-        .hero-scroll-indicator span {
-          font-size: 0.9rem;
-          opacity: 0.8;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          display: block;
-          width: 100%;
-          text-align: center;
-        }
-
-        .scroll-arrow {
-          font-size: 1.5rem;
-          animation: bounce 2s infinite;
-          display: flex;
-          justify-content: center;
-          width: 100%;
-        }
-
-        @keyframes bounce {
-          0%, 20%, 50%, 80%, 100% {
-            transform: translateY(0);
-          }
-          40% {
-            transform: translateY(-10px);
-          }
-          60% {
-            transform: translateY(-5px);
-          }
-        }
-
-        /* Introduction Section */
-        .introduction-section {
-          padding: 6rem 0;
-          background: white;
-          position: relative;
-          z-index: 1;
-        }
-
-        .container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 0 2rem;
-        }
-
-        .intro-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 4rem;
-          align-items: center;
-        }
-
-        .intro-content h2 {
-          font-size: 2.5rem;
-          font-weight: 700;
-          color: #1f2937;
-          margin-bottom: 1.5rem;
-        }
-
-        .intro-content p {
-          font-size: 1.1rem;
-          line-height: 1.7;
-          color: #6b7280;
-          margin-bottom: 1.5rem;
-        }
-
-        .intro-image {
-          position: relative;
-        }
-
-        .image-frame {
-          position: relative;
-          width: 100%;
-          height: 400px;
-        }
-
-        .main-image {
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(135deg, #f59e0b, #d97706);
-          border-radius: 20px;
-          position: relative;
-          z-index: 2;
-        }
-
-        .accent-shape {
-          position: absolute;
-          border-radius: 15px;
-          background: linear-gradient(135deg, #059669, #10b981);
-        }
-
-        .shape-1 {
-          width: 100px;
-          height: 100px;
-          top: -20px;
-          left: -20px;
-          z-index: 1;
-        }
-
-        .shape-2 {
-          width: 80px;
-          height: 80px;
-          bottom: -15px;
-          right: -15px;
-          z-index: 1;
-        }
-
-        /* Stats Section */
-        .stats-section {
-          padding: 4rem 0;
-          background: linear-gradient(135deg, #fefce8, #fef3c7);
-          position: relative;
-          z-index: 1;
-        }
-
-        .stats-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 2rem;
-        }
-
-        .stat-card {
-          text-align: center;
-          padding: 2rem;
-        }
-
-        .stat-number {
-          font-size: 3rem;
-          font-weight: 800;
-          color: #d97706;
-          margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-          font-size: 1.1rem;
-          color: #92400e;
-          font-weight: 600;
-        }
-
-        /* Values Section */
-        .values-section {
-          padding: 6rem 0;
-          background: white;
-          position: relative;
-          z-index: 1;
-        }
-
-        .section-header {
-          text-align: center;
-          margin-bottom: 4rem;
-        }
-
-        .section-header h2 {
-          font-size: 2.5rem;
-          font-weight: 700;
-          color: #1f2937;
-          margin-bottom: 1rem;
-        }
-
-        .section-header p {
-          font-size: 1.2rem;
-          color: #6b7280;
-        }
-
-        .values-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 3rem;
-        }
-
-        .value-card {
-          text-align: center;
-          padding: 3rem 2rem;
-          background: #f8fafc;
-          border-radius: 20px;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .value-card:hover {
-          transform: translateY(-10px);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .value-icon {
-          font-size: 3rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .value-card h3 {
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: #1f2937;
-          margin-bottom: 1rem;
-        }
-
-        .value-card p {
-          color: #6b7280;
-          line-height: 1.6;
-        }
-
-        /* Story Section - UPDATED TAB DESIGN */
-        .story-section {
-          padding: 6rem 0;
-          background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-          position: relative;
-          z-index: 1;
-        }
-
-        .story-tabs-container {
-          display: flex;
-          justify-content: center;
-          margin-bottom: 3rem;
-        }
-
-        .story-tabs {
-          display: flex;
-          background: white;
-          border-radius: 16px;
-          padding: 0.5rem;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-          border: 1px solid #e5e7eb;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .tab-button {
-          position: relative;
-          padding: 1.25rem 2rem;
-          border: none;
-          background: none;
-          border-radius: 12px;
-          font-weight: 600;
-          color: #6b7280;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          min-width: 160px;
-          justify-content: center;
-          z-index: 1;
-        }
-
-        .tab-button:hover {
-          color: #059669;
-          transform: translateY(-2px);
-        }
-
-        .tab-button.active {
-          color: white;
-          transform: translateY(0);
-        }
-
-        .tab-button.active .active-indicator {
-          opacity: 1;
-          transform: scale(1);
-        }
-
-        .active-indicator {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(135deg, #059669, #10b981);
-          border-radius: 12px;
-          opacity: 0;
-          transform: scale(0.95);
-          transition: all 0.3s ease;
-          z-index: -1;
-        }
-
-        .tab-icon {
-          font-size: 1.25rem;
-          transition: transform 0.3s ease;
-        }
-
-        .tab-button.active .tab-icon {
-          transform: scale(1.1);
-        }
-
-        .tab-text {
-          font-size: 1rem;
-          font-weight: 600;
-          white-space: nowrap;
-        }
-
-        .tab-content {
-          max-width: 800px;
-          margin: 0 auto;
-          background: white;
-          padding: 3rem;
-          border-radius: 20px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .content-panel h3 {
-          font-size: 1.8rem;
-          font-weight: 700;
-          color: #1f2937;
-          margin-bottom: 1.5rem;
-        }
-
-        .content-panel p {
-          font-size: 1.1rem;
-          line-height: 1.7;
-          color: #6b7280;
-          margin-bottom: 2rem;
-        }
-
-        .content-panel ul {
-          list-style: none;
-          padding: 0;
-        }
-
-        .content-panel li {
-          padding: 0.5rem 0;
-          color: #6b7280;
-          position: relative;
-          padding-left: 2rem;
-        }
-
-        .content-panel li:before {
-          content: '✓';
-          position: absolute;
-          left: 0;
-          color: #059669;
-          font-weight: bold;
-        }
-
-        /* Team Section */
-        .team-section {
-          padding: 6rem 0;
-          background: white;
-          position: relative;
-          z-index: 1;
-        }
-
-        .team-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 2rem;
-        }
-
-        .team-card {
-          text-align: center;
-          padding: 2rem;
-          background: #f8fafc;
-          border-radius: 20px;
-          transition: transform 0.3s ease;
-        }
-
-        .team-card:hover {
-          transform: translateY(-5px);
-        }
-
-        .member-image {
-          width: 120px;
-          height: 120px;
-          margin: 0 auto 1.5rem;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #f59e0b, #d97706);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-size: 2rem;
-          font-weight: bold;
-        }
-
-        .member-info h3 {
-          font-size: 1.3rem;
-          font-weight: 700;
-          color: #1f2937;
-          margin-bottom: 0.5rem;
-        }
-
-        .member-role {
-          color: #059669;
-          font-weight: 600;
-          margin-bottom: 1rem;
-        }
-
-        .member-info p {
-          color: #6b7280;
-          font-size: 0.9rem;
-        }
-
-        /* CTA Section */
-        .cta-section {
-          padding: 6rem 0;
-          background: linear-gradient(135deg, #1e293b, #0f172a);
-          color: white;
-          text-align: center;
-          position: relative;
-          z-index: 1;
-        }
-
-        .cta-content h2 {
-          font-size: 2.5rem;
-          font-weight: 700;
-          margin-bottom: 1rem;
-        }
-
-        .cta-content p {
-          font-size: 1.2rem;
-          opacity: 0.9;
-          margin-bottom: 2rem;
-          max-width: 600px;
-          margin-left: auto;
-          margin-right: auto;
-        }
-
-        .cta-buttons {
-          display: flex;
-          gap: 1rem;
-          justify-content: center;
-          flex-wrap: wrap;
-        }
-
-        .explore-button {
-          background: #f59e0b;
-          color: white;
-          border: none;
-          padding: 1rem 2rem;
-          border-radius: 50px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .explore-button:hover {
-          background: #d97706;
-          transform: translateY(-2px);
-        }
-
-        .contact-button {
-          background: transparent;
-          color: white;
-          border: 2px solid white;
-          padding: 1rem 2rem;
-          border-radius: 50px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .contact-button:hover {
-          background: white;
-          color: #1e293b;
-          transform: translateY(-2px);
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-          .intro-grid {
-            grid-template-columns: 1fr;
-            gap: 3rem;
-          }
-
-          .values-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .team-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-
-          .story-tabs {
-            flex-wrap: wrap;
-          }
-
-          .tab-button {
-            min-width: 140px;
-            padding: 1rem 1.5rem;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .fullscreen-hero {
-            padding-top: 70px;
-          }
-
-          .hero-title {
-            font-size: 3.5rem;
-          }
-
-          .hero-subtitle {
-            font-size: 1.4rem;
-          }
-
-          .hero-content {
-            margin-top: -20px;
-          }
-
-          .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-
-          .story-tabs {
-            flex-direction: column;
-            border-radius: 12px;
-            padding: 0.25rem;
-          }
-
-          .tab-button {
-            width: 100%;
-            min-width: auto;
-            padding: 1rem;
-            margin: 0.25rem 0;
-          }
-
-          .tab-content {
-            padding: 2rem;
-          }
-
-          .cta-buttons {
-            flex-direction: column;
-            align-items: center;
-          }
-
-          .explore-button,
-          .contact-button {
-            width: 100%;
-            max-width: 300px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .hero-title {
-            font-size: 2.8rem;
-          }
-
-          .hero-subtitle {
-            font-size: 1.2rem;
-          }
-
-          .container {
-            padding: 0 1rem;
-          }
-
-          .stats-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .team-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .value-card {
-            padding: 2rem 1rem;
-          }
-
-          .story-tabs {
-            border-radius: 10px;
-          }
-
-          .tab-button {
-            padding: 0.875rem 1rem;
-          }
-
-          .tab-text {
-            font-size: 0.9rem;
-          }
-
-          .tab-icon {
-            font-size: 1.1rem;
-          }
-        }
-      `}</style>
+      </section> */}
     </div>
   );
 }
