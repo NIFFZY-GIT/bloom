@@ -20,7 +20,14 @@ function decodeJWT(token: string): { sub: string; email: string; role: string } 
 }
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, host } = request.nextUrl;
+
+  const requestHost = request.headers.get('host') || '';
+  if (requestHost.startsWith('www.')) {
+    const url = request.nextUrl.clone();
+    url.hostname = requestHost.replace(/^www\./, '');
+    return NextResponse.redirect(url, 308);
+  }
 
   // Rewrite /uploads/* to API route for serving files
   if (pathname.startsWith('/uploads/')) {
