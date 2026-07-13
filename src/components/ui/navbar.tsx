@@ -17,7 +17,7 @@ interface NavbarProps {
 }
 export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
   // --- State Management ---
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isBookingsDropdownOpen, setIsBookingsDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -29,7 +29,7 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
  
   // State for responsive design (enhanced with screen size categories)
-  const [screenSize, setScreenSize] = useState<'xs' | 'sm' | 'md' | 'lg'>('lg');
+  const [screenSize, setScreenSize] = useState<'xs' | 'sm' | 'md' | 'lg'>('xs');
  
   // --- Refs ---
   const bookingsDropdownRef = useRef<HTMLDivElement | null>(null);
