@@ -93,18 +93,35 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      <BackgroundAnimation category={selectedCategory} />
-      
+    <div className="min-h-screen relative overflow-hidden bg-white">
       <div className="relative z-10">
         <HeroCarousel />
         
         <main>
-          <section className="journey-section">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex flex-col items-center justify-center w-full">
-                <span className="journey-eyebrow">Find your escape</span>
-                <h1 className="journey-title text-center">What&apos;s your journey?</h1>
+          <section className="relative overflow-hidden bg-[#0F172A]">
+            {/* Per-category animated background (colour + themed motion), contained to this section */}
+            <BackgroundAnimation category={selectedCategory} />
+            {/* Readability veil so the heading and cards stay crisp over any scene */}
+            <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/45 via-black/25 to-[#0F172A]/75" />
+            {/* Hairline to blend from the hero above */}
+            <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-px bg-gradient-to-r from-transparent via-[#C5A880]/40 to-transparent" />
+
+            <div className="relative z-10 mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
+              <div className="flex flex-col items-center text-center">
+                <span className="mb-5 inline-flex items-center gap-3 text-[0.7rem] font-bold uppercase tracking-[0.28em] text-[#C5A880]">
+                  <span className="h-px w-8 bg-[#C5A880]/50" />
+                  Find your escape
+                  <span className="h-px w-8 bg-[#C5A880]/50" />
+                </span>
+                <h2 className="max-w-3xl text-4xl font-light leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-6xl">
+                  What&apos;s your <span className="text-[#C5A880]">journey</span>?
+                </h2>
+                <p className="mt-6 max-w-xl text-sm leading-relaxed text-slate-300/80 sm:text-base">
+                  Pick a theme and we&apos;ll curate the destinations, stays and experiences to match the trip you have in mind.
+                </p>
+              </div>
+
+              <div className="mt-14 sm:mt-16">
                 <CategorySelector
                   categories={categories}
                   selectedCategory={selectedCategory}
@@ -114,92 +131,12 @@ export default function Home() {
             </div>
           </section>
 
-          <CategoryDetails 
+          <CategoryDetails
             category={selectedCategory}
             places={filteredPlaces}
           />
         </main>
       </div>
-
-      <style jsx global>{`
-        /* Default Mobile view styles (up to 767px) */
-        .journey-section {
-          padding: 6rem 0; /* Expanded padding for clean layout space */
-          position: relative;
-          z-index: 2;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 75vh; /* Dramatically increased from 40vh for greater mobile height */
-        }
-
-        .journey-eyebrow {
-          display: inline-block;
-          font-size: 0.75rem;
-          font-weight: 700;
-          letter-spacing: 0.25em;
-          text-transform: uppercase;
-          color: #C5A880;
-          margin-bottom: 1.25rem;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-        }
-
-        .journey-title {
-          font-size: 2rem;
-          font-weight: 300;
-          color: white;
-          margin-bottom: 2.5rem;
-          letter-spacing: -0.01em;
-          text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-          line-height: 1.2;
-          width: 100%;
-          text-align: center;
-        }
-
-        /* Strict small footprint overrides */
-        @media (max-width: 375px) {
-          .journey-section {
-            padding: 5rem 0;
-            min-height: 70vh;
-          }
-          .journey-title {
-            font-size: 1.75rem;
-          }
-        }
-
-        /* Tablet styles */
-        @media (min-width: 768px) {
-          .journey-section {
-            padding: 4rem 0;
-            min-height: 50vh;
-          }
-
-          .journey-title {
-            font-size: 3rem;
-            margin-bottom: 2.5rem;
-          }
-        }
-
-        /* Desktop styles */
-        @media (min-width: 1024px) {
-          .journey-section {
-            padding: 5rem 0;
-            min-height: 60vh;
-          }
-
-          .journey-title {
-            font-size: 3.5rem;
-            margin-bottom: 3rem;
-          }
-        }
-
-        /* Large desktop styles */
-        @media (min-width: 1280px) {
-          .journey-title {
-            font-size: 4rem;
-          }
-        }
-      `}</style>
     </div>
   );
 }

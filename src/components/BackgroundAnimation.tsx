@@ -47,7 +47,7 @@ export default function BackgroundAnimation({ category }: BackgroundAnimationPro
       
       <style jsx>{`
         .background-animation {
-          position: fixed;
+          position: absolute;
           top: 0;
           left: 0;
           width: 100%;
