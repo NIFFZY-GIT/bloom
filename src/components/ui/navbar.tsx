@@ -17,7 +17,7 @@ interface NavbarProps {
 }
 export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
   // --- State Management ---
-  const [isMenuOpen, setIsMenuOpen] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isBookingsDropdownOpen, setIsBookingsDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -29,7 +29,7 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
  
   // State for responsive design (enhanced with screen size categories)
-  const [screenSize, setScreenSize] = useState<'xs' | 'sm' | 'md' | 'lg'>('xs');
+  const [screenSize, setScreenSize] = useState<'xs' | 'sm' | 'md' | 'lg'>('lg');
  
   // --- Refs ---
   const bookingsDropdownRef = useRef<HTMLDivElement | null>(null);
@@ -340,19 +340,19 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
       transformOrigin: '1px' 
     },
     mobileMenuOverlay: {
-      position: 'fixed', 
-      top: 0, 
-      left: 0, 
-      width: '100vw', 
-      height: '100vh',
-      backgroundColor: '#ffffff', 
-      zIndex: 999, 
-      display: 'flex', 
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100dvh',
+      backgroundColor: '#ffffff',
+      zIndex: 999,
+      display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center', 
-      justifyContent: 'center', 
+      alignItems: 'center',
+      justifyContent: 'center',
       transition: 'opacity 0.3s ease-in-out',
-      opacity: isMenuOpen ? 1 : 0, 
+      opacity: isMenuOpen ? 1 : 0,
       visibility: isMenuOpen ? 'visible' : 'hidden',
     },
     mobileNavLinksContainer: { 
@@ -428,9 +428,8 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
       borderRadius: '0.75rem',
       transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
       position: 'relative',
-      backgroundColor: 'rgba(255, 255, 255, 0.6)',
-      border: '1px solid rgba(226, 232, 240, 0.8)',
-      backdropFilter: 'blur(8px)',
+      backgroundColor: '#f8fafc',
+      border: '1px solid #e2e8f0',
     },
     mobileDropdownItemIcon: {
       position: 'absolute',
