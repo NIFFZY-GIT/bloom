@@ -91,6 +91,12 @@ export default function Footer() {
               width={54}
               height={54}
               className="tb-mark"
+              style={{
+                borderRadius: "20%",
+                objectFit: "cover",
+                background: "#fff",
+                boxShadow: "0 6px 18px -6px rgba(0, 0, 0, 0.5)",
+              }}
             />
             <span>
               <span className="tb-name">Tropical Bloom</span>

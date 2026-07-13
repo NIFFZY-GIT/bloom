@@ -690,9 +690,9 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
                                }}
                                onMouseLeave={(e) => {
                                  if (pathname !== subItem.id) {
-                                   e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
+                                   e.currentTarget.style.backgroundColor = '#f8fafc';
                                    e.currentTarget.style.color = '#4a5568';
-                                   e.currentTarget.style.borderColor = 'rgba(226, 232, 240, 0.8)';
+                                   e.currentTarget.style.borderColor = '#e2e8f0';
                                    e.currentTarget.style.transform = 'translateX(0) scale(1)';
                                    e.currentTarget.style.boxShadow = 'none';
                                    const icon = e.currentTarget.querySelector('[data-icon]') as HTMLElement;
