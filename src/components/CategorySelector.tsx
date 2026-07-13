@@ -642,7 +642,7 @@ export default function CategorySelector({
         /* Small devices (landscape phones, 576px and up) */
         @media (min-width: 576px) {
           .categories-track {
-            justify-content: center;
+            justify-content: flex-start;
           }
         }
 
@@ -691,6 +691,7 @@ export default function CategorySelector({
           .category-image-container {
             width: 100px;
             height: 100px;
+            box-shadow: none;
           }
 
           .category-content {

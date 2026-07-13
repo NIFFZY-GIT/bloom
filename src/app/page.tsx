@@ -61,41 +61,33 @@ export default function Home() {
   // Filter places when category changes
   useEffect(() => {
     if (selectedCategory) {
-      // Convert both to numbers to ensure proper comparison
       const categoryPlaces = places.filter(
         (place) => Number(place.categoryId) === Number(selectedCategory.id)
       );
       setFilteredPlaces(categoryPlaces);
-      
-      // Debug logging
-      console.log('Selected Category:', selectedCategory);
-      console.log('Selected Category ID (type):', typeof selectedCategory.id, selectedCategory.id);
-      console.log('All Places:', places);
-      console.log('Places categoryId types:', places.map(p => ({ name: p.name, categoryId: p.categoryId, type: typeof p.categoryId })));
-      console.log('Filtered Places:', categoryPlaces);
     }
   }, [selectedCategory, places]);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-500 to-amber-600 p-4">
-        <div className="text-white text-xl md:text-2xl font-semibold text-center">Loading paradise…</div>
+      <div className="min-h-screen flex items-center justify-center bg-[#1E293B] p-4">
+        <div className="text-white text-xl md:text-2xl font-light text-center tracking-wide">Loading paradise…</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-600 to-red-800 p-4">
-        <div className="text-white text-xl md:text-2xl font-semibold text-center">{error}</div>
+      <div className="min-h-screen flex items-center justify-center bg-red-950 p-4">
+        <div className="text-white text-xl md:text-2xl font-light text-center tracking-wide">{error}</div>
       </div>
     );
   }
 
   if (!selectedCategory) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-600 to-gray-800 p-4">
-        <div className="text-white text-xl md:text-2xl font-semibold text-center">No categories available</div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-900 p-4">
+        <div className="text-white text-xl md:text-2xl font-light text-center tracking-wide">No categories available</div>
       </div>
     );
   }
@@ -130,43 +122,55 @@ export default function Home() {
       </div>
 
       <style jsx global>{`
+        /* Default Mobile view styles (up to 767px) */
         .journey-section {
-          padding: 2rem 0;
+          padding: 6rem 0; /* Expanded padding for clean layout space */
           position: relative;
           z-index: 2;
           display: flex;
           align-items: center;
           justify-content: center;
-          min-height: 40vh;
+          min-height: 75vh; /* Dramatically increased from 40vh for greater mobile height */
         }
 
         .journey-eyebrow {
           display: inline-block;
-          font-size: 0.8rem;
+          font-size: 0.75rem;
           font-weight: 700;
-          letter-spacing: 0.3em;
+          letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: #e9d8a6;
-          margin-bottom: 1rem;
-          text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+          color: #C5A880;
+          margin-bottom: 1.25rem;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
         }
 
         .journey-title {
-          font-size: 2.25rem;
-          font-weight: 700;
+          font-size: 2rem;
+          font-weight: 300;
           color: white;
-          margin-bottom: 2rem;
-          letter-spacing: -0.02em;
-          text-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
-          line-height: 1.15;
+          margin-bottom: 2.5rem;
+          letter-spacing: -0.01em;
+          text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+          line-height: 1.2;
           width: 100%;
           text-align: center;
+        }
+
+        /* Strict small footprint overrides */
+        @media (max-width: 375px) {
+          .journey-section {
+            padding: 5rem 0;
+            min-height: 70vh;
+          }
+          .journey-title {
+            font-size: 1.75rem;
+          }
         }
 
         /* Tablet styles */
         @media (min-width: 768px) {
           .journey-section {
-            padding: 3rem 0;
+            padding: 4rem 0;
             min-height: 50vh;
           }
 
@@ -179,7 +183,7 @@ export default function Home() {
         /* Desktop styles */
         @media (min-width: 1024px) {
           .journey-section {
-            padding: 4rem 0;
+            padding: 5rem 0;
             min-height: 60vh;
           }
 
@@ -193,19 +197,6 @@ export default function Home() {
         @media (min-width: 1280px) {
           .journey-title {
             font-size: 4rem;
-          }
-        }
-
-        /* Extra small devices */
-        @media (max-width: 375px) {
-          .journey-title {
-            font-size: 1.75rem;
-            margin-bottom: 1.5rem;
-          }
-          
-          .journey-section {
-            padding: 1.5rem 0;
-            min-height: 35vh;
           }
         }
       `}</style>
