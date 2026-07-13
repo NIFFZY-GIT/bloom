@@ -178,19 +178,17 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
   const styles: { [key: string]: CSSProperties } = {
     nav: {
       position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 1000,
-      transition: 'background-color 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease',
-      backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.85)' : '#ffffff',
-      backdropFilter: isScrolled ? 'blur(10px)' : 'none',
-      WebkitBackdropFilter: isScrolled ? 'blur(10px)' : 'none',
+      transition: 'box-shadow 0.4s ease',
+      backgroundColor: '#ffffff',
       boxShadow: isScrolled ? '0 2px 20px rgba(0, 0, 0, 0.07)' : 'none',
-      borderBottom: isScrolled ? '1px solid transparent' : '1px solid #e2e8f0',
+      borderBottom: '1px solid #e2e8f0',
     },
     container: { 
       maxWidth: '1280px', 
       margin: '0 auto', 
       padding: screenSize === 'xs' ? '0 0.5rem' : screenSize === 'sm' ? '0 1rem' : screenSize === 'md' ? '0 1.5rem' : '0 2rem'
     },
-    flexBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '6rem' },
+    flexBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: isMobile ? '4.5rem' : '6rem' },
     logoContainer: { 
       display: 'flex', 
       alignItems: 'center', 
