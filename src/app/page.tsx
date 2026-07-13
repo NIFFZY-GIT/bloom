@@ -78,8 +78,8 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-blue-800 p-4">
-        <div className="text-white text-xl md:text-2xl font-semibold text-center">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-500 to-amber-600 p-4">
+        <div className="text-white text-xl md:text-2xl font-semibold text-center">Loading paradise…</div>
       </div>
     );
   }
@@ -111,8 +111,9 @@ export default function Home() {
           <section className="journey-section">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex flex-col items-center justify-center w-full">
+                <span className="journey-eyebrow">Find your escape</span>
                 <h1 className="journey-title text-center">What&apos;s your journey?</h1>
-                <CategorySelector 
+                <CategorySelector
                   categories={categories}
                   selectedCategory={selectedCategory}
                   onCategorySelect={setSelectedCategory}
@@ -139,14 +140,25 @@ export default function Home() {
           min-height: 40vh;
         }
 
+        .journey-eyebrow {
+          display: inline-block;
+          font-size: 0.8rem;
+          font-weight: 700;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          color: #e9d8a6;
+          margin-bottom: 1rem;
+          text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+        }
+
         .journey-title {
-          font-size: 2rem;
-          font-weight: 800;
+          font-size: 2.25rem;
+          font-weight: 700;
           color: white;
           margin-bottom: 2rem;
-          letter-spacing: -0.025em;
-          text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-          line-height: 1.2;
+          letter-spacing: -0.02em;
+          text-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+          line-height: 1.15;
           width: 100%;
           text-align: center;
         }

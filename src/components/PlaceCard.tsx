@@ -110,14 +110,8 @@ export default function PlaceCard({ place }: PlaceCardProps) {
           <h3 className="place-name">{place.name}</h3>
           <p className="place-description">{place.description}</p>
           <div className="card-footer">
-            {place.name && (
-              <div className="price-tag">
-                <span className="price-amount">${place.name}</span>
-                <span className="price-label">per person</span>
-              </div>
-            )}
-            <button 
-              className="explore-button" 
+            <button
+              className="explore-button"
               ref={buttonRef}
               aria-label={`Explore ${place.name}`}
             >

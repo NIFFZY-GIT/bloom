@@ -1,752 +1,543 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
-import { FaFacebookF, FaInstagram, FaYoutube, FaTwitter, FaMapMarkerAlt, FaPhone } from "react-icons/fa";
-import { motion } from "framer-motion";
+import Link from "next/link";
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaYoutube,
+  FaTwitter,
+  FaMapMarkerAlt,
+  FaPhone,
+  FaEnvelope,
+  FaArrowRight,
+} from "react-icons/fa";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+
+  const socials = [
+    { Icon: FaFacebookF, label: "Facebook", href: "#" },
+    { Icon: FaInstagram, label: "Instagram", href: "#" },
+    { Icon: FaYoutube, label: "YouTube", href: "#" },
+    { Icon: FaTwitter, label: "Twitter", href: "#" },
+  ];
+
+  const navLinks = [
+    { label: "Home", href: "/" },
+    { label: "Destinations", href: "/packages" },
+    { label: "Tour Packages", href: "/packages" },
+    { label: "Gallery", href: "/gallery" },
+    { label: "About Us", href: "/about-us" },
+    { label: "Contact", href: "/contact-us" },
+  ];
+
+  
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setSubscribed(true);
+    setEmail("");
+  };
 
   return (
-    <>
-      <footer className="footer-container">
-        {/* Background Pattern */}
-        <div className="footer-bg-overlay" />
-        <div className="footer-bg-gradient" />
-        
-        <div className="footer-content">
-          {/* Main Footer Content */}
-          <div className="footer-grid">
-            {/* Brand Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="brand-section"
-            >
-              <div className="brand-logo">
-                <div className="logo-icon">
-                  <Image 
-                    src="/logo/logo1.jpg" 
-                    alt="Tropical Bloom Logo" 
-                    width={60} 
-                    height={60}
-                    style={{ borderRadius: '8px', objectFit: 'cover' }}
-                  />
-                </div>
-                <h2 className="brand-title">Tropical Bloom Tourism</h2>
-              </div>
-              <p className="brand-description">
-                Discover the soul of Sri Lanka through authentic experiences. From pristine beaches to ancient heritage sites, we bring you closer to paradise.
-              </p>
-              <div className="social-links">
-                {[
-                  { Icon: FaFacebookF, color: '#1877f2', delay: 0 },
-                  { Icon: FaInstagram, color: '#e4405f', delay: 0.1 },
-                  { Icon: FaYoutube, color: '#ff0000', delay: 0.2 },
-                  { Icon: FaTwitter, color: '#1da1f2', delay: 0.3 }
-                ].map(({ Icon, color, delay }, index) => (
-                  <motion.a
-                    key={index}
-                    href="#"
-                    initial={{ opacity: 0, scale: 0 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.4, delay }}
-                    whileHover={{ 
-                      scale: 1.2, 
-                      rotate: 360,
-                      transition: { duration: 0.4 }
-                    }}
-                    whileTap={{ scale: 0.9 }}
-                    className="social-icon"
-                    style={{ '--hover-color': color } as React.CSSProperties}
-                  >
-                    <Icon className="icon" />
-                  </motion.a>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Quick Links */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="links-section"
-            >
-              <h3 className="section-title">
-                <span className="title-indicator"></span>
-                Navigation
-              </h3>
-              <ul className="links-list">
-                {['Home', 'Destinations', 'Tour Packages', 'Experiences', 'About Us'].map((item, index) => (
-                  <motion.li 
-                    key={item} 
-                    className="link-item"
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                  >
-                    <a href="#" className="link">
-                      <span className="link-bullet"></span>
-                      {item}
-                    </a>
-                  </motion.li>
-                ))}
-              </ul>
-            </motion.div>
-
-            {/* Popular Destinations */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="links-section"
-            >
-              <h3 className="section-title">
-                <span className="title-indicator"></span>
-                Top Destinations
-              </h3>
-              <ul className="links-list">
-                {[
-                  'Sigiriya Rock Fortress',
-                  'Ella & Nine Arch Bridge',
-                  'Temple of the Tooth',
-                  'Mirissa Beach',
-                  'Yala National Park',
-                  'Galle Fort'
-                ].map((destination, index) => (
-                  <motion.li 
-                    key={destination} 
-                    className="link-item"
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                  >
-                    <a href="#" className="destination-link">
-                      <span className="destination-arrow">→</span>
-                      {destination}
-                    </a>
-                  </motion.li>
-                ))}
-              </ul>
-            </motion.div>
-
-            {/* Contact Info */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="contact-section"
-            >
-              <h3 className="section-title">
-                <span className="title-indicator"></span>
-                Get In Touch
-              </h3>
-              <div className="contact-info">
-                <motion.div 
-                  className="contact-item"
-                  whileHover={{ x: 5 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <div className="contact-icon">
-                    <FaMapMarkerAlt className="icon" />
-                  </div>
-                  <div>
-                    <p className="contact-label">Location</p>
-                    <p className="contact-detail">Colombo 03, Sri Lanka</p>
-                  </div>
-                </motion.div>
-                
-                <motion.div 
-                  className="contact-item"
-                  whileHover={{ x: 5 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <div className="contact-icon">
-                    <FaPhone className="icon" />
-                  </div>
-                  <div>
-                    <p className="contact-label">Phone</p>
-                    <p className="contact-detail">+94 77 123 4567</p>
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
+    <footer className="tb-footer">
+      {/* Newsletter band */}
+      <div className="tb-cta">
+        <div className="tb-cta-inner">
+          <div className="tb-cta-copy">
+            <span className="tb-eyebrow">Stay Inspired</span>
+            <h2 className="tb-cta-title">Let the journey find you</h2>
+            <p className="tb-cta-sub">
+              Join our newsletter for handpicked destinations, seasonal offers and
+              insider tips from the pearl of the Indian Ocean.
+            </p>
           </div>
 
-          {/* Bottom Bar */}
-          <div className="bottom-bar">
-            <div className="bottom-content">
-              <div className="copyright-section">
-                <span>© {currentYear} Tropical Bloom Tourism. All rights reserved.</span>
-               
-              </div>
-              
-              <div className="developer-section">
-              
-         <div className="developer-tag">
-  <span className="developed-text">Developed by</span>
-  <a 
-    href="https://zevarone.com" 
-    target="_blank" 
-    rel="noopener noreferrer"
-    className="developer-link"
-  >
-    
-    <span className="developer-name">ZEVARONE</span>
-  </a>
-  <span className="and-text"> & </span>
-  <a 
-    // href="https://norwoodtechnologies.com" 
-    target="_blank" 
-    rel="noopener noreferrer"
-    className="developer-link"
-  >
-    
-    <span className="developer-name">Norwood Technologies</span>
-  </a>
-</div>
-
-              </div>
+          {subscribed ? (
+            <div className="tb-thanks">
+              <span className="tb-thanks-mark">✓</span>
+              You&apos;re on the list — welcome aboard!
             </div>
+          ) : (
+            <form className="tb-form" onSubmit={handleSubscribe}>
+              <input
+                type="email"
+                required
+                placeholder="Enter your email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                aria-label="Email address"
+              />
+              <button type="submit">
+                Subscribe <FaArrowRight />
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+
+      {/* Main */}
+      <div className="tb-main">
+        {/* Brand */}
+        <div className="tb-brand">
+          <Link href="/" className="tb-lockup">
+            <Image
+              src="/logo/logo1.jpg"
+              alt="Tropical Bloom Tourism"
+              width={54}
+              height={54}
+              className="tb-mark"
+            />
+            <span>
+              <span className="tb-name">Tropical Bloom</span>
+              <span className="tb-kicker">Tourism</span>
+            </span>
+          </Link>
+          <p className="tb-desc">
+            Curated journeys through the soul of Sri Lanka — from pristine
+            coastlines and misty highlands to ancient heritage and wildlife.
+          </p>
+          <div className="tb-socials">
+            {socials.map(({ Icon, label, href }) => (
+              <a key={label} href={href} aria-label={label} className="tb-social">
+                <Icon />
+              </a>
+            ))}
           </div>
         </div>
 
-        {/* Floating Elements */}
-        <motion.div 
-          className="floating-element amber"
-          animate={{
-            y: [0, -20, 0],
-            scale: [1, 1.1, 1],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div 
-          className="floating-element blue"
-          animate={{
-            y: [0, 20, 0],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div 
-          className="floating-element green"
-          animate={{
-            x: [0, 20, 0],
-            scale: [1, 1.15, 1],
-          }}
-          transition={{
-            duration: 6,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-      </footer>
+        {/* Explore */}
+        <nav className="tb-col">
+          <h3>Explore</h3>
+          <ul>
+            {navLinks.map((l) => (
+              <li key={l.label}>
+                <Link href={l.href}>{l.label}</Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+     
+
+        {/* Contact */}
+        <div className="tb-col tb-contact">
+          <h3>Get in Touch</h3>
+          <ul>
+            <li>
+              <span className="tb-ic"><FaMapMarkerAlt /></span>
+              <span>Colombo 03,<br />Sri Lanka</span>
+            </li>
+            <li>
+              <span className="tb-ic"><FaPhone /></span>
+              <a href="tel:+94771234567">+94 77 123 4567</a>
+            </li>
+            <li>
+              <span className="tb-ic"><FaEnvelope /></span>
+              <a href="mailto:hello@tropicalbloom.lk">hello@tropicalbloom.lk</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Bottom */}
+      <div className="tb-bottom">
+        <div className="tb-bottom-inner">
+          <p>© {currentYear} Tropical Bloom Tourism. All rights reserved.</p>
+          <div className="tb-legal">
+            <a href="#">Privacy Policy</a>
+            <span className="tb-dot">•</span>
+            <a href="#">Terms of Service</a>
+          </div>
+          <div className="tb-dev">
+            <span>Powered by</span>
+            <a
+              href="https://zevarone.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="tb-zev"
+              aria-label="ZEVARONE"
+            >
+              <Image
+                src="/newlogos/Asset 13.svg"
+                alt="ZEVARONE"
+                width={110}
+                height={22}
+                className="tb-zev-logo"
+              />
+            </a>
+            <span className="tb-amp">&amp;</span>
+            <span>Norwood Technologies</span>
+          </div>
+        </div>
+      </div>
 
       <style jsx>{`
-        .footer-container {
-          background: #0f172a;
-          color: white;
+        .tb-footer {
           position: relative;
+          background:
+            radial-gradient(120% 90% at 85% -10%, rgba(245, 158, 11, 0.12), transparent 60%),
+            linear-gradient(180deg, #0d2a37 0%, #0a2230 55%, #081b26 100%);
+          color: #a9bcc2;
           overflow: hidden;
         }
 
-        .footer-bg-overlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #020617 100%);
-          opacity: 0.95;
+        /* ---- Newsletter band ---- */
+        .tb-cta {
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .footer-bg-gradient {
-          position: absolute;
-          inset: 0;
-          background: radial-gradient(ellipse at top right, rgba(245, 158, 11, 0.1) 0%, transparent 50%, transparent 100%);
-        }
-
-        .footer-content {
-          position: relative;
-          z-index: 10;
+        .tb-cta-inner {
           max-width: 80rem;
           margin: 0 auto;
-          padding: 4rem 1.5rem;
-        }
-
-        @media (min-width: 1024px) {
-          .footer-content {
-            padding: 4rem 2rem;
-          }
-        }
-
-        .footer-grid {
+          padding: 3.5rem 1.5rem;
           display: grid;
           grid-template-columns: 1fr;
           gap: 2rem;
-          margin-bottom: 3rem;
-        }
-
-        @media (min-width: 1024px) {
-          .footer-grid {
-            grid-template-columns: repeat(4, 1fr);
-            gap: 3rem;
-          }
-        }
-
-        /* Brand Section */
-        .brand-section {
-          grid-column: 1 / -1;
-        }
-
-        @media (min-width: 1024px) {
-          .brand-section {
-            grid-column: span 1;
-          }
-        }
-
-        .brand-logo {
-          display: flex;
           align-items: center;
-          gap: 0.75rem;
-          margin-bottom: 1.5rem;
         }
 
-        .logo-icon {
-          width: 3.75rem;
-          height: 3.75rem;
+        @media (min-width: 900px) {
+          .tb-cta-inner {
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 3rem;
+            padding: 3.75rem 2rem;
+          }
+        }
+
+        .tb-eyebrow {
+          display: inline-block;
+          font-size: 0.72rem;
+          font-weight: 700;
+          letter-spacing: 0.28em;
+          text-transform: uppercase;
+          color: #f0c674;
+          margin-bottom: 0.85rem;
+        }
+
+        .tb-cta-title {
+          font-family: var(--font-display, Georgia, serif);
+          color: #fff;
+          font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+          font-weight: 700;
+          line-height: 1.1;
+          letter-spacing: -0.01em;
+          margin-bottom: 0.75rem;
+        }
+
+        .tb-cta-sub {
+          font-size: 0.95rem;
+          line-height: 1.7;
+          color: #9fb2b9;
+          max-width: 34rem;
+        }
+
+        .tb-form {
           display: flex;
+          gap: 0.6rem;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 9999px;
+          padding: 0.4rem 0.4rem 0.4rem 0.35rem;
+          max-width: 30rem;
+          width: 100%;
+          transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .tb-form:focus-within {
+          border-color: rgba(245, 158, 11, 0.55);
+          box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.12);
+        }
+
+        .tb-form input {
+          flex: 1;
+          min-width: 0;
+          background: transparent;
+          border: none;
+          outline: none;
+          color: #fff;
+          font-size: 0.95rem;
+          padding: 0.65rem 0.5rem 0.65rem 1.1rem;
+        }
+
+        .tb-form input::placeholder {
+          color: #7c9198;
+        }
+
+        .tb-form button {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          flex-shrink: 0;
+          border: none;
+          cursor: pointer;
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: #1a1206;
+          background: linear-gradient(135deg, #fbbf24, #f59e0b);
+          border-radius: 9999px;
+          padding: 0.7rem 1.4rem;
+          transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+          box-shadow: 0 8px 20px -8px rgba(245, 158, 11, 0.6);
+        }
+
+        .tb-form button:hover {
+          transform: translateY(-1px);
+          filter: brightness(1.04);
+          box-shadow: 0 12px 26px -10px rgba(245, 158, 11, 0.75);
+        }
+
+        .tb-thanks {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.7rem;
+          color: #e9d8a6;
+          font-size: 0.98rem;
+          font-weight: 500;
+        }
+
+        .tb-thanks-mark {
+          display: inline-flex;
           align-items: center;
           justify-content: center;
-          flex-shrink: 0;
+          width: 1.9rem;
+          height: 1.9rem;
+          border-radius: 50%;
+          background: rgba(245, 158, 11, 0.16);
+          border: 1px solid rgba(245, 158, 11, 0.5);
+          color: #f59e0b;
+          font-size: 0.85rem;
+          font-weight: 700;
         }
 
-        .logo-text {
-          color: #0f172a;
-          font-weight: bold;
-          font-size: 1.125rem;
+        /* ---- Main columns ---- */
+        .tb-main {
+          max-width: 80rem;
+          margin: 0 auto;
+          padding: 3.5rem 1.5rem 2.5rem;
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 2.75rem;
         }
 
-        .brand-title {
-          font-size: 1.5rem;
-          font-weight: bold;
-          background: linear-gradient(to right, #f59e0b, #d97706);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
+        @media (min-width: 640px) {
+          .tb-main {
+            grid-template-columns: 1fr 1fr;
+          }
         }
 
-        .brand-description {
-          color: #cbd5e1;
-          line-height: 1.625;
-          margin-bottom: 1.5rem;
-          font-size: 0.875rem;
+        @media (min-width: 1000px) {
+          .tb-main {
+            grid-template-columns: 2fr 1fr 1.4fr;
+            gap: 3.5rem;
+            padding: 4rem 2rem 2.75rem;
+          }
         }
 
-        .social-links {
+        .tb-lockup {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.85rem;
+          margin-bottom: 1.35rem;
+        }
+
+        .tb-mark {
+          border-radius: 50%;
+          object-fit: cover;
+          background: #fff;
+          box-shadow: 0 6px 18px -6px rgba(0, 0, 0, 0.5);
+        }
+
+        .tb-name {
+          display: block;
+          font-family: var(--font-display, Georgia, serif);
+          font-size: 1.35rem;
+          font-weight: 700;
+          color: #fff;
+          line-height: 1.05;
+        }
+
+        .tb-kicker {
+          display: block;
+          font-size: 0.64rem;
+          font-weight: 600;
+          letter-spacing: 0.28em;
+          text-transform: uppercase;
+          color: #f0c674;
+          margin-top: 0.2rem;
+        }
+
+        .tb-desc {
+          font-size: 0.92rem;
+          line-height: 1.75;
+          color: #9fb2b9;
+          max-width: 26rem;
+          margin-bottom: 1.6rem;
+        }
+
+        .tb-socials {
           display: flex;
-          gap: 1rem;
+          gap: 0.6rem;
         }
 
-        .social-icon {
+        .tb-social {
           width: 2.5rem;
           height: 2.5rem;
-          background: #1e293b;
-          border-radius: 0.5rem;
-          display: flex;
+          display: inline-flex;
           align-items: center;
           justify-content: center;
-          color: #cbd5e1;
-          border: 1px solid #334155;
-          transition: all 0.3s ease;
-          position: relative;
-          overflow: hidden;
+          border-radius: 10px;
+          color: #c2d2d7;
+          font-size: 0.9rem;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          transition: transform 0.25s ease, background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
         }
 
-        .social-icon::before {
-          content: '';
+        .tb-social:hover {
+          transform: translateY(-3px);
+          background: linear-gradient(135deg, #fbbf24, #f59e0b);
+          border-color: transparent;
+          color: #1a1206;
+        }
+
+        .tb-col h3 {
+          font-family: var(--font-body, sans-serif);
+          font-size: 0.78rem;
+          font-weight: 700;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: #fff;
+          margin-bottom: 1.35rem;
+          position: relative;
+          padding-bottom: 0.7rem;
+        }
+
+        .tb-col h3::after {
+          content: "";
           position: absolute;
-          inset: 0;
-          background: var(--hover-color, #f59e0b);
-          opacity: 0;
-          transition: opacity 0.3s ease;
+          left: 0;
+          bottom: 0;
+          width: 2rem;
+          height: 2px;
+          border-radius: 2px;
+          background: linear-gradient(90deg, #f59e0b, transparent);
         }
 
-        .social-icon:hover {
-          color: white;
-          border-color: var(--hover-color, #f59e0b);
-          box-shadow: 0 0 20px var(--hover-color, #f59e0b);
-        }
-
-        .social-icon:hover::before {
-          opacity: 0.2;
-        }
-
-        .icon {
-          font-size: 0.875rem;
-          position: relative;
-          z-index: 1;
-        }
-
-        /* Links Sections */
-        .links-section {
-          margin-bottom: 1rem;
-        }
-
-        .section-title {
-          font-size: 1.125rem;
-          font-weight: 600;
-          margin-bottom: 1.5rem;
-          color: white;
-          display: flex;
-          align-items: center;
-        }
-
-        .title-indicator {
-          width: 0.25rem;
-          height: 1rem;
-          background: linear-gradient(to bottom, #f59e0b, #fbbf24);
-          margin-right: 0.75rem;
-          border-radius: 9999px;
-          animation: glow 2s ease-in-out infinite;
-        }
-
-        @keyframes glow {
-          0%, 100% {
-            box-shadow: 0 0 5px rgba(245, 158, 11, 0.5);
-          }
-          50% {
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.8);
-          }
-        }
-
-        .links-list {
-          display: flex;
-          flex-direction: column;
-          gap: 0.75rem;
-        }
-
-        .link-item {
+        .tb-col ul {
           list-style: none;
-        }
-
-        .link {
-          color: #cbd5e1;
-          transition: color 0.3s ease;
-          font-size: 0.875rem;
-          font-weight: 500;
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-
-        .link:hover {
-          color: #f59e0b;
-        }
-
-        .link-bullet {
-          width: 0.375rem;
-          height: 0.375rem;
-          background: #475569;
-          border-radius: 9999px;
-          transition: all 0.3s ease;
-        }
-
-        .link:hover .link-bullet {
-          background: #f59e0b;
-          transform: scale(1.5);
-          box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
-        }
-
-        .destination-link {
-          color: #cbd5e1;
-          transition: color 0.3s ease;
-          font-size: 0.875rem;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .destination-link:hover {
-          color: #f59e0b;
-        }
-
-        .destination-arrow {
-          color: #f59e0b;
-          opacity: 0;
-          transition: all 0.3s ease;
-          transform: translateX(-10px);
-        }
-
-        .destination-link:hover .destination-arrow {
-          opacity: 1;
-          transform: translateX(0);
-        }
-
-        /* Contact Section */
-        .contact-section {
-          margin-bottom: 1rem;
-        }
-
-        .contact-info {
           display: flex;
           flex-direction: column;
-          gap: 1rem;
+          gap: 0.9rem;
         }
 
-        .contact-item {
+        .tb-col a {
+          font-size: 0.92rem;
+          color: #9fb2b9;
+          transition: color 0.2s ease, padding-left 0.2s ease;
+        }
+
+        .tb-col a:hover {
+          color: #fff;
+          padding-left: 5px;
+        }
+
+        .tb-contact li {
           display: flex;
           align-items: flex-start;
-          gap: 0.75rem;
+          gap: 0.8rem;
+          font-size: 0.92rem;
+          color: #9fb2b9;
+          line-height: 1.5;
+          margin-bottom: 1rem;
         }
 
-        .contact-icon {
-          width: 2rem;
-          height: 2rem;
-          background: #1e293b;
-          border-radius: 0.5rem;
-          display: flex;
+        .tb-ic {
+          display: inline-flex;
           align-items: center;
           justify-content: center;
+          width: 2.1rem;
+          height: 2.1rem;
           flex-shrink: 0;
-          margin-top: 0.125rem;
-          position: relative;
-          transition: all 0.3s ease;
-        }
-
-        .contact-item:hover .contact-icon {
-          background: rgba(245, 158, 11, 0.1);
-          transform: scale(1.1);
-        }
-
-        .contact-icon .icon {
+          border-radius: 9px;
+          background: rgba(245, 158, 11, 0.12);
           color: #f59e0b;
-          font-size: 0.875rem;
-          transition: transform 0.3s ease;
+          font-size: 0.82rem;
         }
 
-        .contact-item:hover .contact-icon .icon {
-          transform: scale(1.1);
+        /* ---- Bottom bar ---- */
+        .tb-bottom {
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .contact-label {
-          color: #cbd5e1;
-          font-size: 0.875rem;
-          font-weight: 500;
-          margin-bottom: 0.25rem;
-        }
-
-        .contact-detail {
-          color: #94a3b8;
-          font-size: 0.75rem;
-        }
-
-        /* Bottom Bar */
-        .bottom-bar {
-          border-top: 1px solid #1e293b;
-          padding-top: 2rem;
-        }
-
-        .bottom-content {
+        .tb-bottom-inner {
+          max-width: 80rem;
+          margin: 0 auto;
+          padding: 1.6rem 1.5rem;
           display: flex;
           flex-direction: column;
-          gap: 1rem;
           align-items: center;
+          gap: 0.85rem;
+          font-size: 0.8rem;
+          color: #7f959b;
+          text-align: center;
         }
 
-        @media (min-width: 1024px) {
-          .bottom-content {
+        @media (min-width: 1000px) {
+          .tb-bottom-inner {
             flex-direction: row;
             justify-content: space-between;
-            gap: 0;
+            padding: 1.6rem 2rem;
+            text-align: left;
           }
         }
 
-        .copyright-section {
+        .tb-legal {
           display: flex;
-          flex-direction: column;
-          gap: 1rem;
-          align-items: center;
-        }
-
-        @media (min-width: 1024px) {
-          .copyright-section {
-            flex-direction: row;
-            gap: 1.5rem;
-            align-items: center;
-          }
-        }
-
-        .copyright-section span {
-          color: #94a3b8;
-          font-size: 0.875rem;
-        }
-
-        .legal-links {
-          display: flex;
-          gap: 1rem;
-        }
-
-        .legal-link {
-          color: #94a3b8;
-          font-size: 0.875rem;
-          transition: color 0.3s ease;
-        }
-
-        .legal-link:hover {
-          color: #f59e0b;
-        }
-
-        .developer-section {
-          display: flex;
-          flex-direction: column;
           align-items: center;
           gap: 0.75rem;
         }
 
-        @media (min-width: 1024px) {
-          .developer-section {
-            flex-direction: row;
-            align-items: center;
-            gap: 1.5rem;
-          }
+        .tb-legal a:hover {
+          color: #e9d8a6;
         }
 
-        .location-tag {
+        .tb-dot {
+          opacity: 0.5;
+        }
+
+        .tb-dev {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
-          color: #94a3b8;
-          font-size: 0.875rem;
+          gap: 0.55rem;
+          color: #7f959b;
         }
 
-        .developer-tag {
-          display: flex;
+        .tb-zev {
+          display: inline-flex;
           align-items: center;
-          gap: 0.5rem;
-          font-size: 0.875rem;
         }
 
-        .developed-text {
-          color: #94a3b8;
+        .tb-zev-logo {
+          height: 17px;
+          width: auto;
+          filter: brightness(0) invert(1);
+          opacity: 0.85;
+          transition: opacity 0.2s ease;
         }
 
-        .developer-link {
-          display: flex;
-          align-items: center;
-          gap: 0.375rem;
-          padding: 0.375rem 0.75rem;
-          background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.05));
-          border: 1px solid rgba(245, 158, 11, 0.2);
-          border-radius: 0.5rem;
-          transition: all 0.3s ease;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .developer-link::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.1));
-          opacity: 0;
-          transition: opacity 0.3s ease;
-        }
-
-        .developer-link:hover::before {
+        .tb-zev:hover .tb-zev-logo {
           opacity: 1;
         }
 
-        .developer-link:hover {
-          border-color: rgba(245, 158, 11, 0.4);
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
-        }
-
-        .developer-icon {
-          font-size: 1rem;
-          position: relative;
-          z-index: 1;
-        }
-
-        .developer-name {
-          color: #f59e0b;
-          font-weight: 700;
-          letter-spacing: 0.05em;
-          font-size: 0.875rem;
-          position: relative;
-          z-index: 1;
-          background: linear-gradient(135deg, #f59e0b, #fbbf24);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        /* Floating Elements */
-        .floating-element {
-          position: absolute;
-          border-radius: 9999px;
-          filter: blur(40px);
-          pointer-events: none;
-        }
-
-        .floating-element.amber {
-          bottom: 10%;
-          right: 10%;
-          width: 12rem;
-          height: 12rem;
-          background: radial-gradient(circle, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.1));
-        }
-
-        .floating-element.blue {
-          top: 20%;
-          left: 5%;
-          width: 10rem;
-          height: 10rem;
-          background: radial-gradient(circle, rgba(59, 130, 246, 0.25), rgba(37, 99, 235, 0.1));
-        }
-
-        .floating-element.green {
-          top: 50%;
-          right: 20%;
-          width: 8rem;
-          height: 8rem;
-          background: radial-gradient(circle, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.05));
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-fade-in-up {
-          animation: fadeInUp 1s ease-out both;
-        }
-
-        .animation-delay-200 {
-          animation-delay: 0.2s;
-        }
-
-        .animation-delay-400 {
-          animation-delay: 0.4s;
+        .tb-amp {
+          opacity: 0.55;
         }
       `}</style>
-    </>
+    </footer>
   );
 }
-
-/*hiiiiiiiiiiiiiii*/

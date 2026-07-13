@@ -212,30 +212,17 @@ export default function CategorySelector({
                   />
                   <div className="image-overlay"></div>
                   <div className="selection-ring"></div>
-                  <div 
-                    className="energy-aura"
-                    style={{ borderColor: category.color }}
-                  ></div>
                 </div>
-                
+
                 <div className="category-content">
                   <h3 className="category-name">{category.name}</h3>
                   <div className="progress-indicator">
-                    <div 
+                    <div
                       className="progress-bar"
                       style={{ backgroundColor: category.color }}
                     ></div>
                   </div>
                 </div>
-
-                {/* Hover Effect Elements */}
-                {!isMobile && (
-                  <div className="hover-sparkles">
-                    {Array.from({ length: 8 }).map((_, i) => (
-                      <div key={i} className="sparkle" style={{ '--i': i } as React.CSSProperties}></div>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
           ))}
@@ -390,20 +377,16 @@ export default function CategorySelector({
 
         .selection-ring {
           position: absolute;
-          top: -6px;
-          left: -6px;
-          right: -6px;
-          bottom: -6px;
+          inset: -6px;
           border: 2px solid transparent;
           border-radius: 50%;
           opacity: 0;
-          transition: all 0.4s ease;
+          transition: opacity 0.35s ease, border-color 0.35s ease;
         }
 
         .category-card.active .selection-ring {
           opacity: 1;
-          animation: rotateRing 3s linear infinite;
-          border-image: conic-gradient(from 0deg, var(--category-color), transparent, var(--category-color)) 1;
+          border-color: rgba(255, 255, 255, 0.92);
         }
 
         .energy-aura {

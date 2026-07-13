@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Playfair_Display } from 'next/font/google';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import './globals.css';
@@ -8,7 +8,18 @@ import Footer from '../components/ui/footer';
 import { AuthProvider } from '../components/AuthProvider';
 import { auth } from '@/lib/auth';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-playfair',
+  weight: ['500', '600', '700', '800'],
+  display: 'swap',
+});
 
 type AuthState = {
   isAuthenticated: boolean;
@@ -48,8 +59,9 @@ async function resolveAuthState(): Promise<AuthState> {
 }
 
 export const metadata: Metadata = {
-  title: 'Sri Lanka Tourism - Discover Paradise',
-  description: 'Explore the beautiful island of Sri Lanka',
+  title: 'Tropical Bloom Tourism — Discover Paradise in Sri Lanka',
+  description:
+    'Curated Sri Lanka travel experiences by Tropical Bloom Tourism — from pristine beaches and ancient heritage to wildlife safaris and hill-country escapes.',
 };
 
 export default async function RootLayout({
@@ -70,7 +82,7 @@ export default async function RootLayout({
           referrerPolicy="no-referrer"
         />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${playfair.variable}`}>
         <AuthProvider>
           <Navbar isAuthenticated={isAuthenticated} userRole={role} />
           {children}

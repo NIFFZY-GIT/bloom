@@ -197,17 +197,20 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
       gap: screenSize === 'xs' ? '0.5rem' : '0.75rem', 
       textDecoration: 'none' 
     },
-    logoTextPrimary: { 
-      fontSize: screenSize === 'xs' ? '1rem' : screenSize === 'sm' ? '1.125rem' : '1.25rem', 
-      fontWeight: 700, 
-      color: '#1a202c' 
+    logoTextPrimary: {
+      fontFamily: 'var(--font-display)',
+      fontSize: screenSize === 'xs' ? '1.1rem' : screenSize === 'sm' ? '1.25rem' : '1.4rem',
+      fontWeight: 700,
+      color: 'var(--navy)',
+      letterSpacing: '-0.01em',
+      lineHeight: 1.05,
     },
-    logoTextSecondary: { 
-      fontSize: screenSize === 'xs' ? '0.625rem' : '0.7rem', 
-      fontWeight: 400, 
-      color: '#718096', 
-      letterSpacing: '0.05em', 
-      textTransform: 'uppercase' 
+    logoTextSecondary: {
+      fontSize: screenSize === 'xs' ? '0.6rem' : '0.68rem',
+      fontWeight: 600,
+      color: 'var(--brand)',
+      letterSpacing: '0.22em',
+      textTransform: 'uppercase'
     },
     desktopNavContainer: { 
       display: isMobile ? 'none' : 'flex', 
@@ -227,7 +230,7 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
       cursor: 'pointer', 
       transition: 'color 0.3s ease, background-color 0.3s ease',
     },
-    navLinkActive: { color: '#00796B' },
+    navLinkActive: { color: '#f59e0b' },
     dropdownContainer: {
       position: 'absolute', 
       left: 0, 
@@ -264,12 +267,12 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
       fontSize: screenSize === 'md' ? '0.875rem' : '0.9rem', 
       fontWeight: 600, 
       color: '#ffffff',
-      backgroundColor: '#00796B', 
+      backgroundColor: '#f59e0b', 
       border: 'none', 
       borderRadius: '9999px', 
       cursor: 'pointer',
       transition: 'transform 0.3s ease, box-shadow 0.3s ease', 
-      boxShadow: '0 4px 15px -5px rgba(0, 121, 107, 0.5)',
+      boxShadow: '0 4px 15px -5px rgba(245, 158, 11, 0.5)',
     },
     authButton: {
       padding: screenSize === 'md' ? '0.625rem 1.25rem' : '0.75rem 1.5rem', 
@@ -387,10 +390,10 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
       width: '1.75rem',
       height: '1.75rem',
       borderRadius: '50%',
-      backgroundColor: 'rgba(0, 121, 107, 0.1)',
+      backgroundColor: 'rgba(245, 158, 11, 0.1)',
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       fontSize: '0.75rem',
-      color: '#00796B',
+      color: '#f59e0b',
       fontWeight: 'bold',
     },
     mobileDropdownContainer: {
@@ -463,12 +466,12 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
       fontSize: screenSize === 'xs' ? '0.875rem' : '1rem', 
       fontWeight: 600, 
       color: '#ffffff',
-      backgroundColor: '#00796B', 
+      backgroundColor: '#f59e0b', 
       border: 'none', 
       borderRadius: '9999px', 
       cursor: 'pointer',
       transition: 'transform 0.3s ease, box-shadow 0.3s ease', 
-      boxShadow: '0 4px 15px -5px rgba(0, 121, 107, 0.5)',
+      boxShadow: '0 4px 15px -5px rgba(245, 158, 11, 0.5)',
     },
     mobileSecondaryButton: {
       width: '100%', 
@@ -553,8 +556,8 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
                           href={subItem.id}
                           style={combineStyles(
                             styles.dropdownLink,
-                            pathname === subItem.id ? { color: '#00796B' } : {},
-                            hoveredItemId === subItem.id ? { backgroundColor: '#f7fafc', color: '#00796B'} : {}
+                            pathname === subItem.id ? { color: '#f59e0b' } : {},
+                            hoveredItemId === subItem.id ? { backgroundColor: '#f7fafc', color: '#f59e0b'} : {}
                           )}
                           onMouseEnter={() => setHoveredItemId(subItem.id)}
                           onMouseLeave={() => setHoveredItemId(null)}
@@ -570,7 +573,7 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
             </div>
             {/* Auth and CTA */}
             <div style={styles.authContainer}>
-              <button type="button" style={combineStyles(styles.ctaButton, hoveredItemId === 'cta' ? { transform: 'translateY(-2px)', boxShadow: '0 8px 20px -5px rgba(0, 121, 107, 0.6)' } : {})} onClick={handleBookNow} onMouseEnter={() => setHoveredItemId('cta')} onMouseLeave={() => setHoveredItemId(null)}>
+              <button type="button" style={combineStyles(styles.ctaButton, hoveredItemId === 'cta' ? { transform: 'translateY(-2px)', boxShadow: '0 8px 20px -5px rgba(245, 158, 11, 0.6)' } : {})} onClick={handleBookNow} onMouseEnter={() => setHoveredItemId('cta')} onMouseLeave={() => setHoveredItemId(null)}>
                 Book Now
               </button>
               <div style={{ position: 'relative' }} ref={profileDropdownRef}>
@@ -579,11 +582,11 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
                 </button>
                 {isAuthenticated && (
                   <div style={styles.profileDropdown} role="menu">
-                    <Link href={userRole === 'ADMIN' ? '/admin/dashboard' : '/user_dashboard'} style={combineStyles(styles.profileDropdownItem, hoveredItemId === 'profile-dashboard' ? { backgroundColor: '#f7fafc', color: '#00796B' } : {})} onClick={() => setIsProfileDropdownOpen(false)} onMouseEnter={() => setHoveredItemId('profile-dashboard')} onMouseLeave={() => setHoveredItemId(null)} role="menuitem">
+                    <Link href={userRole === 'ADMIN' ? '/admin/dashboard' : '/user_dashboard'} style={combineStyles(styles.profileDropdownItem, hoveredItemId === 'profile-dashboard' ? { backgroundColor: '#f7fafc', color: '#f59e0b' } : {})} onClick={() => setIsProfileDropdownOpen(false)} onMouseEnter={() => setHoveredItemId('profile-dashboard')} onMouseLeave={() => setHoveredItemId(null)} role="menuitem">
                       {userRole === 'ADMIN' ? 'Admin Dashboard' : 'My Trips'}
                     </Link>
                     {userRole === 'ADMIN' && (
-                      <Link href="/admin/packages" style={combineStyles(styles.profileDropdownItem, hoveredItemId === 'profile-packages' ? { backgroundColor: '#f7fafc', color: '#00796B' } : {})} onClick={() => setIsProfileDropdownOpen(false)} onMouseEnter={() => setHoveredItemId('profile-packages')} onMouseLeave={() => setHoveredItemId(null)} role="menuitem">
+                      <Link href="/admin/packages" style={combineStyles(styles.profileDropdownItem, hoveredItemId === 'profile-packages' ? { backgroundColor: '#f7fafc', color: '#f59e0b' } : {})} onClick={() => setIsProfileDropdownOpen(false)} onMouseEnter={() => setHoveredItemId('profile-packages')} onMouseLeave={() => setHoveredItemId(null)} role="menuitem">
                         Manage Packages
                       </Link>
                     )}
@@ -616,8 +619,8 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
                          isMobileBookingsOpen ? { 
                            backgroundColor: 'rgba(240, 253, 244, 0.95)', 
                            padding: '0.5rem',
-                           borderColor: 'rgba(0, 121, 107, 0.2)',
-                           boxShadow: '0 4px 16px rgba(0, 121, 107, 0.08)'
+                           borderColor: 'rgba(245, 158, 11, 0.2)',
+                           boxShadow: '0 4px 16px rgba(245, 158, 11, 0.08)'
                          } : {}
                        )}>
                          <button
@@ -626,8 +629,8 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
                            style={combineStyles(
                              styles.mobileDropdownParent,
                              isMobileBookingsOpen ? { 
-                               backgroundColor: 'rgba(0, 121, 107, 0.08)',
-                               color: '#00796B'
+                               backgroundColor: 'rgba(245, 158, 11, 0.08)',
+                               color: '#f59e0b'
                              } : {}
                            )}
                            aria-expanded={isMobileBookingsOpen}
@@ -641,7 +644,7 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
                              styles.mobileDropdownChevron, 
                              isMobileBookingsOpen ? { 
                                transform: 'rotate(180deg)',
-                               backgroundColor: '#00796B',
+                               backgroundColor: '#f59e0b',
                                color: '#ffffff'
                              } : { transform: 'rotate(0)' }
                            )}>▾</span>
@@ -669,21 +672,21 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
                                style={combineStyles(
                                  styles.mobileDropdownItem,
                                  pathname === subItem.id ? { 
-                                   backgroundColor: '#00796B', 
+                                   backgroundColor: '#f59e0b', 
                                    color: '#ffffff',
                                    fontWeight: 600,
-                                   borderColor: '#00796B',
-                                   boxShadow: '0 2px 8px rgba(0, 121, 107, 0.3)'
+                                   borderColor: '#f59e0b',
+                                   boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)'
                                  } : {}
                                )}
                                onClick={() => { setIsMenuOpen(false); setIsMobileBookingsOpen(false); }}
                                onMouseEnter={(e) => {
                                  if (pathname !== subItem.id) {
-                                   e.currentTarget.style.backgroundColor = 'rgba(0, 121, 107, 0.12)';
-                                   e.currentTarget.style.color = '#00796B';
-                                   e.currentTarget.style.borderColor = 'rgba(0, 121, 107, 0.3)';
+                                   e.currentTarget.style.backgroundColor = 'rgba(245, 158, 11, 0.12)';
+                                   e.currentTarget.style.color = '#f59e0b';
+                                   e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.3)';
                                    e.currentTarget.style.transform = 'translateX(8px) scale(1.02)';
-                                   e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 121, 107, 0.15)';
+                                   e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.15)';
                                    const icon = e.currentTarget.querySelector('[data-icon]') as HTMLElement;
                                    if (icon) icon.style.transform = 'translateY(-50%) scale(1.2)';
                                  }
@@ -704,7 +707,7 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
                                  data-icon
                                  style={combineStyles(
                                    styles.mobileDropdownItemIcon,
-                                   pathname === subItem.id ? { color: '#ffffff' } : { color: '#00796B' }
+                                   pathname === subItem.id ? { color: '#ffffff' } : { color: '#f59e0b' }
                                  )}
                                >
                                  {subItem.label === 'Packages' ? '📦' : '✨'}
@@ -720,15 +723,15 @@ export default function Navbar({ isAuthenticated, userRole }: NavbarProps) {
                          style={combineStyles(
                            styles.mobileNavLink,
                            pathname === item.id ? {
-                             backgroundColor: 'rgba(0, 121, 107, 0.08)',
-                             color: '#00796B'
+                             backgroundColor: 'rgba(245, 158, 11, 0.08)',
+                             color: '#f59e0b'
                            } : {}
                          )}
                          onClick={() => setIsMenuOpen(false)}
                          onMouseEnter={(e) => {
                            if (pathname !== item.id) {
-                             e.currentTarget.style.backgroundColor = 'rgba(0, 121, 107, 0.05)';
-                             e.currentTarget.style.color = '#00796B';
+                             e.currentTarget.style.backgroundColor = 'rgba(245, 158, 11, 0.05)';
+                             e.currentTarget.style.color = '#f59e0b';
                            }
                          }}
                          onMouseLeave={(e) => {

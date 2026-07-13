@@ -80,8 +80,9 @@ export default function HeroCarousel() {
       {/* Hero Content */}
       <div className="hero-overlay">
         <div className="hero-content">
-          <h1 className="hero-title">Discover Sri Lanka</h1>
-          <p className="hero-subtitle">Experience the pearl of the Indian Ocean</p>
+          <span className="hero-eyebrow">Tropical Bloom Tourism</span>
+          <h1 className="hero-title">Discover the Soul of Sri Lanka</h1>
+          <p className="hero-subtitle">Curated journeys across pristine beaches, misty highlands and ancient wonders.</p>
           <button className="explore-button">
             Explore Now
             <svg 
@@ -160,7 +161,6 @@ export default function HeroCarousel() {
           background-repeat: no-repeat;
           opacity: 0;
           transition: opacity 1s ease-in-out;
-          will-change: opacity;
         }
 
         .slide.active {
@@ -173,22 +173,40 @@ export default function HeroCarousel() {
           left: 0;
           width: 100%;
           height: 100%;
-          background: linear-gradient(
-            135deg,
-            rgba(0, 0, 0, 0.4) 0%,
-            rgba(0, 0, 0, 0.2) 100%
-          );
-          z-index: 1;
+          background:
+            linear-gradient(
+              180deg,
+              rgba(8, 26, 35, 0.58) 0%,
+              rgba(8, 26, 35, 0.42) 42%,
+              rgba(8, 26, 35, 0.82) 100%
+            );
+          z-index: 2;
+          transform: translateZ(0);
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 1rem;
         }
 
+        .hero-eyebrow {
+          display: inline-block;
+          font-family: var(--font-body);
+          font-size: clamp(0.7rem, 2vw, 0.85rem);
+          font-weight: 700;
+          letter-spacing: 0.32em;
+          text-transform: uppercase;
+          color: #e9d8a6;
+          margin-bottom: 1.1rem;
+          padding-bottom: 0.35rem;
+          border-bottom: 1px solid rgba(233, 216, 166, 0.5);
+          animation: fadeInUp 1s ease-out;
+        }
+
         .hero-content {
           text-align: center;
           color: white;
-          z-index: 2;
+          position: relative;
+          z-index: 5;
           width: 100%;
           max-width: 1200px;
           padding: 0 1rem;
@@ -219,7 +237,7 @@ export default function HeroCarousel() {
         }
 
         .explore-button {
-          background: #f59e0b;
+          background: linear-gradient(135deg, #f59e0b, #d97706);
           color: white;
           border: none;
           padding: clamp(0.875rem, 3vw, 1.2rem) clamp(2rem, 6vw, 3rem);
@@ -239,9 +257,9 @@ export default function HeroCarousel() {
         }
 
         .explore-button:hover {
-          background: #d97706;
+          background: linear-gradient(135deg, #f59e0b, #b45309);
           transform: translateY(-3px);
-          box-shadow: 0 12px 35px rgba(245, 158, 11, 0.4);
+          box-shadow: 0 16px 40px rgba(245, 158, 11, 0.5);
         }
 
         .button-icon {
@@ -269,7 +287,7 @@ export default function HeroCarousel() {
           justify-content: center;
           cursor: pointer;
           transition: all 0.3s ease;
-          z-index: 3;
+          z-index: 5;
           backdrop-filter: blur(10px);
           color: white;
         }
@@ -300,7 +318,7 @@ export default function HeroCarousel() {
           transform: translateX(-50%);
           display: flex;
           gap: 0.75rem;
-          z-index: 3;
+          z-index: 5;
           padding: 0.5rem;
         }
 
@@ -327,11 +345,9 @@ export default function HeroCarousel() {
         /* Animations */
         @keyframes fadeInUp {
           from {
-            opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(24px);
           }
           to {
-            opacity: 1;
             transform: translateY(0);
           }
         }

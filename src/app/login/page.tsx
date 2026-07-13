@@ -59,7 +59,7 @@ export default function LoginPage() {
   // Check if user was just registered
   useEffect(() => {
     if (searchParams.get('registered') === 'true') {
-      setSuccessMessage('🎉 Registration successful! Please log in with your credentials.');
+      setSuccessMessage('Registration successful. Please log in with your credentials.');
     }
   }, [searchParams]);
 
@@ -223,7 +223,7 @@ export default function LoginPage() {
         // Auto-close after 3 seconds
         setTimeout(() => {
           handleCloseForgotModal();
-          setSuccessMessage('✅ Password updated successfully! Please log in with your new password.');
+          setSuccessMessage('Password updated successfully. Please log in with your new password.');
         }, 3000);
       } else {
         setResetError(data.message || 'Failed to reset password');
@@ -259,17 +259,11 @@ export default function LoginPage() {
             Discover the most beautiful destinations in Sri Lanka with Tropical Bloom Tourism. 
             Your perfect vacation starts here.
           </p>
-          <div className="hero-buttons">
-            <button className="explore-btn-yellow">
-              EXPLORE
-            </button>
-            <button className="discover-btn">
-              Discover
-            </button>
-            <button className="know-more-btn">
-              Know More
-            </button>
-          </div>
+          <ul className="hero-highlights">
+            <li><span className="hl-check">✓</span> Handpicked destinations across the island</li>
+            <li><span className="hl-check">✓</span> Expert local guides &amp; tailor-made itineraries</li>
+            <li><span className="hl-check">✓</span> Trusted by travellers worldwide</li>
+          </ul>
         </div>
 
         {/* Modern Login Card with Yellow Theme */}
@@ -277,7 +271,7 @@ export default function LoginPage() {
           {/* Header with Dark Background - FIXED: Reduced top positioning */}
           <div className="login-card-header">
             <div className="logo-badge">
-              <span className="logo-icon">🌴</span>
+              <span className="logo-icon">TB</span>
             </div>
             <div className="login-header-text">
               <h3>Welcome Back</h3>
@@ -402,20 +396,20 @@ export default function LoginPage() {
             <button className="modal-close" onClick={handleCloseForgotModal}>×</button>
             
             <div className="modal-header">
-              <div className="modal-icon">🔐</div>
+              <div className="modal-icon"><i className="fas fa-lock"></i></div>
               <h2>Reset Password</h2>
               <p>We&apos;ll send you a verification code to reset your password</p>
             </div>
 
             {resetError && (
               <div className="alert alert-error">
-                ❌ {resetError}
+                {resetError}
               </div>
             )}
 
             {resetSuccess && (
               <div className="alert alert-success">
-                ✅ {resetSuccess}
+                {resetSuccess}
               </div>
             )}
 
@@ -435,7 +429,7 @@ export default function LoginPage() {
                 </div>
 
                 <button type="submit" className="modal-btn" disabled={isResetting}>
-                  {isResetting ? '⏳ Sending...' : '📧 Send Verification Code'}
+                  {isResetting ? 'Sending…' : 'Send Verification Code'}
                 </button>
               </form>
             )}
@@ -508,7 +502,7 @@ export default function LoginPage() {
 
                 <div className="modal-actions">
                   <button type="submit" className="modal-btn" disabled={isResetting}>
-                    {isResetting ? '⏳ Updating...' : '🔒 Update Password'}
+                    {isResetting ? 'Updating…' : 'Update Password'}
                   </button>
                   <button type="button" className="modal-btn-secondary" onClick={() => setResetStep('email')}>
                     ← Back
@@ -519,8 +513,8 @@ export default function LoginPage() {
 
             {resetStep === 'success' && (
               <div className="success-state">
-                <div className="success-icon">✅</div>
-                <h3>Password Reset Successful!</h3>
+                <div className="success-icon"><i className="fas fa-circle-check"></i></div>
+                <h3>Password Reset Successful</h3>
                 <p>You can now log in with your new password.</p>
               </div>
             )}
@@ -568,10 +562,10 @@ export default function LoginPage() {
           width: 100%;
           height: 100%;
           background: linear-gradient(
-            135deg,
-            rgba(0, 0, 0, 0.4) 0%,
-            rgba(0, 0, 0, 0.2) 50%,
-            rgba(0, 0, 0, 0.4) 100%
+            90deg,
+            rgba(8, 26, 35, 0.78) 0%,
+            rgba(8, 26, 35, 0.55) 40%,
+            rgba(8, 26, 35, 0.18) 100%
           );
         }
 
@@ -606,7 +600,7 @@ export default function LoginPage() {
         }
 
         .highlight {
-          background: linear-gradient(135deg, #f59e0b, #d97706);
+          background: linear-gradient(135deg, #f0e0b0, #c79a4b);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -625,6 +619,41 @@ export default function LoginPage() {
           display: flex;
           gap: 1rem;
           flex-wrap: wrap;
+        }
+
+        .hero-highlights {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+          max-width: 460px;
+        }
+
+        .hero-highlights li {
+          display: flex;
+          align-items: center;
+          gap: 0.85rem;
+          font-size: 1.02rem;
+          font-weight: 400;
+          color: rgba(255, 255, 255, 0.92);
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+        }
+
+        .hl-check {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 1.6rem;
+          height: 1.6rem;
+          flex-shrink: 0;
+          border-radius: 50%;
+          background: rgba(233, 216, 166, 0.16);
+          border: 1px solid rgba(233, 216, 166, 0.55);
+          color: #e9d8a6;
+          font-size: 0.8rem;
+          font-weight: 700;
         }
 
         /* Yellow Explore Button */
@@ -703,7 +732,7 @@ export default function LoginPage() {
 
         .know-more-btn:hover {
           background: white;
-          color: #1f2937;
+          color: #0c2a38;
           transform: translateY(-2px);
         }
 
@@ -724,7 +753,7 @@ export default function LoginPage() {
         }
 
         .login-card-header {
-          background: linear-gradient(135deg, #1f2937, #374151);
+          background: linear-gradient(135deg, #0c2a38, #123b4c);
           padding: 2rem 1.5rem 1.5rem;
           position: relative;
         }
@@ -745,12 +774,11 @@ export default function LoginPage() {
         }
 
         .logo-icon {
-          font-size: 1.5rem;
-          background: linear-gradient(135deg, #f59e0b, #d97706);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+          font-family: var(--font-display);
+          font-size: 1.35rem;
+          font-weight: 700;
+          letter-spacing: 0.01em;
+          color: #f59e0b;
         }
 
         .login-header-text {
@@ -899,7 +927,7 @@ export default function LoginPage() {
           border: 1px solid #e5e7eb;
           border-radius: 10px;
           padding: 1.1rem 1rem 0.7rem;
-          color: #1f2937;
+          color: #0c2a38;
           font-size: 0.95rem;
           transition: all 0.3s ease;
         }
@@ -954,7 +982,7 @@ export default function LoginPage() {
         }
 
         .modern-checkbox:hover {
-          color: #374151;
+          color: #123b4c;
         }
 
         .checkbox-input {
@@ -1238,7 +1266,7 @@ export default function LoginPage() {
 
         .modal-close:hover {
           background: #e5e7eb;
-          color: #1f2937;
+          color: #0c2a38;
           transform: rotate(90deg);
         }
 
@@ -1248,13 +1276,14 @@ export default function LoginPage() {
         }
 
         .modal-icon {
-          font-size: 2.5rem;
-          margin-bottom: 0.75rem;
+          font-size: 1.75rem;
+          margin-bottom: 0.85rem;
+          color: #f59e0b;
         }
 
         .modal-header h2 {
           font-size: 1.5rem;
-          color: #1f2937;
+          color: #0c2a38;
           margin-bottom: 0.5rem;
         }
 
@@ -1303,7 +1332,7 @@ export default function LoginPage() {
 
         .form-group label {
           font-weight: 600;
-          color: #1f2937;
+          color: #0c2a38;
           font-size: 0.9rem;
         }
 
@@ -1400,7 +1429,7 @@ export default function LoginPage() {
 
         .modal-btn-secondary:hover {
           background: #e5e7eb;
-          color: #374151;
+          color: #123b4c;
         }
 
         .modal-actions {
@@ -1415,8 +1444,9 @@ export default function LoginPage() {
         }
 
         .success-icon {
-          font-size: 3rem;
+          font-size: 2.75rem;
           margin-bottom: 1rem;
+          color: #f59e0b;
         }
 
         .success-state h3 {

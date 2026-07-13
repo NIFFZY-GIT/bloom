@@ -4,20 +4,29 @@ import Credentials from "next-auth/providers/credentials";
 import { query } from "@/lib/db";
 import bcrypt from "bcryptjs";
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [
-    Google({
-      clientId: process.env.AUTH_GOOGLE_ID!,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET!,
-      authorization: {
-        params: {
-          prompt: "consent",
-          access_type: "offline",
-          response_type: "code"
-        }
-      }
-    }),
-    Credentials({
+const authSecret =
+  process.env.AUTH_SECRET ||
+  process.env.NEXTAUTH_SECRET ||
+  process.env.JWT_SECRET ||
+  "dev-secret-change-me";
+
+const providers = [
+  ...(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET
+    ? [
+        Google({
+          clientId: process.env.AUTH_GOOGLE_ID,
+          clientSecret: process.env.AUTH_GOOGLE_SECRET,
+          authorization: {
+            params: {
+              prompt: "consent",
+              access_type: "offline",
+              response_type: "code",
+            },
+          },
+        }),
+      ]
+    : []),
+  Credentials({
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email" },
@@ -59,8 +68,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
       }
-    })
-  ],
+    }),
+  ];
+
+export const { handlers, signIn, signOut, auth } = NextAuth({
+  providers,
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
@@ -164,5 +176,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
     maxAge: 7 * 24 * 60 * 60, // 7 days
   },
-  secret: process.env.AUTH_SECRET,
+  secret: authSecret,
+  trustHost: true,
 });
