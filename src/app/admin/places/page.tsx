@@ -1,10 +1,8 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import jwt from 'jsonwebtoken';
 import { query } from '@/lib/db';
 import Link from 'next/link';
 import styles from '../packages/AdminPackages.module.css';
 import PlacesTable from '@/components/admin/PlacesTable';
+import { requireAdminPage } from '@/lib/admin-auth';
 
 interface Place {
   id: number;
@@ -17,23 +15,7 @@ interface Place {
 }
 
 async function getAuthStatus() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('auth_token')?.value;
-
-  if (!token) {
-    redirect('/login?redirect=/admin/places');
-  }
-
-  try {
-    const secret = process.env.JWT_SECRET || 'dev-secret';
-    const payload = jwt.verify(token, secret) as { role?: string };
-    if (payload.role !== 'ADMIN') {
-      redirect('/');
-    }
-  } catch (error) {
-    console.error('Failed to verify auth token for admin places page:', error);
-    redirect('/login?redirect=/admin/places');
-  }
+  await requireAdminPage('/admin/places');
 }
 
 async function getPlaces(): Promise<Place[]> {

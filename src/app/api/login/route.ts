@@ -12,11 +12,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing email or password' }, { status: 400 });
     }
 
-    const res = await query('SELECT user_id, email, password_hash, role FROM users WHERE email = $1', [email]);
+    // Normalize email: emails are case-insensitive, and mobile keyboards often
+    // auto-capitalize or add whitespace. Match the same normalization used by the
+    // forgot-password / reset / Google flows so a correct password never 401s.
+    const normalizedEmail = String(email).trim().toLowerCase();
+
+    const res = await query(
+      'SELECT user_id, email, password_hash, role FROM users WHERE LOWER(email) = $1',
+      [normalizedEmail],
+    );
     const user = res.rows[0];
 
     if (!user) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+    }
+
+    // Accounts created via Google sign-in have no password set.
+    if (!user.password_hash) {
+      return NextResponse.json(
+        { error: 'This account uses Google sign-in. Please continue with Google.' },
+        { status: 401 },
+      );
     }
 
     const valid = await bcrypt.compare(password, user.password_hash);

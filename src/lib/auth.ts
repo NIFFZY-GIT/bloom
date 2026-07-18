@@ -38,9 +38,10 @@ const providers = [
         }
 
         try {
+          const normalizedEmail = String(credentials.email).trim().toLowerCase();
           const result = await query(
-            "SELECT * FROM users WHERE email = $1",
-            [credentials.email]
+            "SELECT * FROM users WHERE LOWER(email) = $1",
+            [normalizedEmail]
           );
 
           if (result.rows.length === 0) {
@@ -48,6 +49,12 @@ const providers = [
           }
 
           const user = result.rows[0];
+
+          // Google-only accounts have no password hash to compare against.
+          if (!user.password_hash) {
+            return null;
+          }
+
           const isValid = await bcrypt.compare(
             credentials.password as string,
             user.password_hash

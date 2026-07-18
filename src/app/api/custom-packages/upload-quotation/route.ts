@@ -2,26 +2,15 @@ import { NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
-import { cookies } from 'next/headers';
-import jwt from 'jsonwebtoken';
 import { query } from '@/lib/db';
+import { getAdminContext } from '@/lib/admin-auth';
 import { notifyUserQuotationUploaded, notifyAdminCustomPackage } from '@/lib/email';
 
 async function requireAdmin() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('auth_token')?.value;
-
-  if (!token) {
-    return false;
-  }
-
-  try {
-    const secret = process.env.JWT_SECRET || 'dev-secret';
-    const payload = jwt.verify(token, secret) as { role?: string };
-    return payload.role === 'ADMIN';
-  } catch {
-    return false;
-  }
+  // Accepts a NextAuth session (e.g. Google admin) or the legacy auth_token, with
+  // the current role verified against the DB.
+  const context = await getAdminContext();
+  return context?.role === 'ADMIN';
 }
 
 export async function POST(request: Request) {

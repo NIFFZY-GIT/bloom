@@ -1,8 +1,7 @@
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
 
 import { query } from '@/lib/db';
+import { requireAdminApi } from '@/lib/admin-auth';
 
 type Params = {
   params: Promise<{
@@ -10,38 +9,11 @@ type Params = {
   }>;
 };
 
-function unauthorized() {
-  return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-}
-
 async function requireAdmin() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('auth_token')?.value;
-
-  if (!token) {
-    throw unauthorized();
-  }
-
-  try {
-    const secret = process.env.JWT_SECRET || 'dev-secret';
-    const payload = jwt.verify(token, secret) as { sub?: string | number; role?: string };
-
-    if (payload.role !== 'ADMIN') {
-      throw unauthorized();
-    }
-
-    const adminId = payload.sub ? Number(payload.sub) : null;
-    if (!adminId) {
-      throw unauthorized();
-    }
-
-    return adminId;
-  } catch (error) {
-    if (error instanceof Response) {
-      throw error;
-    }
-    throw unauthorized();
-  }
+  // Accepts a NextAuth session (e.g. Google admin) or the legacy auth_token, and
+  // verifies the current role against the DB. Throws a 401 Response otherwise.
+  const { userId } = await requireAdminApi();
+  return userId;
 }
 
 function badRequest(message: string) {

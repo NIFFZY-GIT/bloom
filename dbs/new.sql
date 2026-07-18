@@ -52,7 +52,9 @@ CREATE TABLE public.password_reset_tokens (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE UNIQUE INDEX idx_password_reset_tokens_email ON public.password_reset_tokens (LOWER(email));
+-- Plain-column unique index so the app's `ON CONFLICT (email)` upsert works.
+-- (App normalizes email to lowercase before insert.)
+CREATE UNIQUE INDEX idx_password_reset_tokens_email ON public.password_reset_tokens (email);
 CREATE INDEX idx_password_reset_tokens_expires_at ON public.password_reset_tokens (expires_at);
 
 CREATE TABLE public."Category" (

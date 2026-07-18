@@ -1,28 +1,11 @@
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import jwt from 'jsonwebtoken';
 import { query } from '@/lib/db';
 import PlaceForm from '@/components/admin/PlaceForm';
+import { requireAdminPage } from '@/lib/admin-auth';
 import styles from '../../../packages/AdminPackages.module.css';
 
 async function getAuthStatus() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('auth_token')?.value;
-
-  if (!token) {
-    redirect('/login');
-  }
-
-  try {
-    const secret = process.env.JWT_SECRET || 'dev-secret';
-    const payload = jwt.verify(token, secret) as { role?: string };
-    if (payload.role !== 'ADMIN') {
-      redirect('/');
-    }
-  } catch (error) {
-    console.error('Failed to verify auth token for edit place page:', error);
-    redirect('/login');
-  }
+  await requireAdminPage('/admin/places');
 }
 
 async function getPlace(id: number) {

@@ -1,13 +1,28 @@
 import nodemailer from 'nodemailer';
 
+// SMTP config. The .env for this project uses SMTP_* names, but earlier code read
+// EMAIL_* names — that mismatch left host/user/pass undefined so no mail ever sent.
+// Read SMTP_* first and fall back to EMAIL_* so both naming schemes work.
+const smtpHost = process.env.SMTP_HOST || process.env.EMAIL_HOST;
+const smtpPort = Number(process.env.SMTP_PORT || process.env.EMAIL_PORT || 587);
+const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER;
+const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_PASSWORD;
+// Port 465 is implicit TLS; otherwise honor an explicit *_SECURE flag.
+const smtpSecure =
+  (process.env.SMTP_SECURE || process.env.EMAIL_SECURE) === 'true' || smtpPort === 465;
+
+// The address messages are sent "from" (and shown as the support/contact address).
+const SUPPORT_EMAIL =
+  process.env.SMTP_FROM || smtpUser || process.env.ADMIN_EMAIL || 'no-reply@zevarone.com';
+
 // Create reusable transporter
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: Number(process.env.EMAIL_PORT),
-  secure: process.env.EMAIL_SECURE === 'true', // true for 465, false for other ports
+  host: smtpHost,
+  port: smtpPort,
+  secure: smtpSecure, // true for 465, false for other ports
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
+    user: smtpUser,
+    pass: smtpPass,
   },
 });
 
@@ -20,8 +35,8 @@ export interface EmailOptions {
 
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   try {
-    const fromName = process.env.EMAIL_FROM_NAME || 'Bloom Travel';
-    const fromEmail = process.env.EMAIL_USER;
+    const fromName = process.env.EMAIL_FROM_NAME || process.env.SMTP_FROM_NAME || 'Bloom Travel';
+    const fromEmail = SUPPORT_EMAIL;
 
     await transporter.sendMail({
       from: `"${fromName}" <${fromEmail}>`,
@@ -224,7 +239,7 @@ export async function sendPasswordChangedConfirmation(email: string): Promise<bo
           </div>
           
           <div class="warning">
-            ⚠️ If you didn't make this change, please contact our support team immediately at <strong>${process.env.EMAIL_USER}</strong>
+            ⚠️ If you didn't make this change, please contact our support team immediately at <strong>${SUPPORT_EMAIL}</strong>
           </div>
           
           <div class="footer">
@@ -243,7 +258,7 @@ Your password has been successfully updated.
 
 You can now use your new password to log in to your account.
 
-If you didn't make this change, please contact our support team immediately at ${process.env.EMAIL_USER}
+If you didn't make this change, please contact our support team immediately at ${SUPPORT_EMAIL}
 
 © ${new Date().getFullYear()} Bloom Travel
   `.trim();
@@ -271,7 +286,7 @@ export async function notifyAdminNewBooking(bookingDetails: {
   specialRequests?: string | null;
   toEmail?: string; // Optional: specific admin email to send to
 }): Promise<boolean> {
-  const adminEmail = bookingDetails.toEmail || process.env.EMAIL_USER || 'admin@zevarone.com';
+  const adminEmail = bookingDetails.toEmail || SUPPORT_EMAIL || 'admin@zevarone.com';
   const subject = `🎯 New Booking #${bookingDetails.bookingId} - ${bookingDetails.packageName}`;
   
   const formatCurrency = (amount: number) => `$${amount.toFixed(2)}`;
@@ -643,7 +658,7 @@ export async function notifyAdminCustomPackage(customPackageDetails: {
   dateRange: string;
   toEmail?: string; // Optional: specific admin email to send to
 }): Promise<boolean> {
-  const adminEmail = customPackageDetails.toEmail || process.env.EMAIL_USER || 'admin@zevarone.com';
+  const adminEmail = customPackageDetails.toEmail || SUPPORT_EMAIL || 'admin@zevarone.com';
   const subject = `✨ New Custom Package Request - ${customPackageDetails.packageName}`;
   
   const html = `
@@ -940,7 +955,7 @@ export async function notifyUserQuotationUploaded(userDetails: {
           </div>
           
           <div class="footer">
-            <p>Questions? Contact us at ${process.env.EMAIL_USER}</p>
+            <p>Questions? Contact us at ${SUPPORT_EMAIL}</p>
             <p>© ${new Date().getFullYear()} Bloom Travel. All rights reserved.</p>
           </div>
         </div>
@@ -962,7 +977,7 @@ What's next?
 - Contact us if you have any questions
 - Proceed with booking when ready
 
-Questions? Contact us at ${process.env.EMAIL_USER}
+Questions? Contact us at ${SUPPORT_EMAIL}
 
 © ${new Date().getFullYear()} Bloom Travel
   `.trim();
@@ -1105,7 +1120,7 @@ export async function notifyUserBookingStatusChange(userDetails: {
           </div>
           
           <div class="footer">
-            <p>Questions? Contact us at ${process.env.EMAIL_USER}</p>
+            <p>Questions? Contact us at ${SUPPORT_EMAIL}</p>
             <p>© ${new Date().getFullYear()} Bloom Travel. All rights reserved.</p>
           </div>
         </div>
@@ -1122,7 +1137,7 @@ New Status: ${userDetails.newStatus}
 
 View your bookings: ${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/user_dashboard
 
-Questions? Contact us at ${process.env.EMAIL_USER}
+Questions? Contact us at ${SUPPORT_EMAIL}
 
 © ${new Date().getFullYear()} Bloom Travel
   `.trim();
@@ -1267,7 +1282,7 @@ export async function notifyUserPaymentStatusChange(userDetails: {
           </div>
           
           <div class="footer">
-            <p>Questions? Contact us at ${process.env.EMAIL_USER}</p>
+            <p>Questions? Contact us at ${SUPPORT_EMAIL}</p>
             <p>© ${new Date().getFullYear()} Bloom Travel. All rights reserved.</p>
           </div>
         </div>
@@ -1286,7 +1301,7 @@ Payment Status: ${userDetails.newPaymentStatus.replace('_', ' ')}
 
 View your bookings: ${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/user_dashboard
 
-Questions? Contact us at ${process.env.EMAIL_USER}
+Questions? Contact us at ${SUPPORT_EMAIL}
 
 © ${new Date().getFullYear()} Bloom Travel
   `.trim();
@@ -1670,7 +1685,7 @@ export async function sendBookingConfirmationToUser(bookingDetails: {
             </center>
 
             <p style="color: #6b7280; font-size: 14px; margin-top: 30px; text-align: center;">
-              Need help? Contact us at <a href="mailto:${process.env.EMAIL_USER}" class="footer-link">${process.env.EMAIL_USER}</a>
+              Need help? Contact us at <a href="mailto:${SUPPORT_EMAIL}" class="footer-link">${SUPPORT_EMAIL}</a>
             </p>
           </div>
           
@@ -1733,7 +1748,7 @@ NEXT STEPS
 
 View your bookings: ${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/user_dashboard
 
-Questions? Contact us at ${process.env.EMAIL_USER}
+Questions? Contact us at ${SUPPORT_EMAIL}
 
 © ${new Date().getFullYear()} Bloom Travel
   `.trim();
@@ -1939,7 +1954,7 @@ export async function sendWelcomeEmail(userDetails: {
 
             <p class="message" style="margin-top: 30px; text-align: center; color: #6b7280; font-size: 14px;">
               Need help getting started? Feel free to contact us at 
-              <a href="mailto:${process.env.EMAIL_USER}" class="footer-link">${process.env.EMAIL_USER}</a>
+              <a href="mailto:${SUPPORT_EMAIL}" class="footer-link">${SUPPORT_EMAIL}</a>
             </p>
           </div>
 
@@ -1992,7 +2007,7 @@ GET STARTED
 Explore Packages: ${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/packages
 Create Custom Tour: ${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/create_pkg
 
-Need help? Contact us at ${process.env.EMAIL_USER}
+Need help? Contact us at ${SUPPORT_EMAIL}
 
 © ${new Date().getFullYear()} Bloom Travel - Making Your Travel Dreams Come True
   `.trim();
@@ -2334,7 +2349,7 @@ export async function notifyAdminNewPendingBooking(details: {
   numberOfGuests: number;
   specialRequests?: string | null;
 }): Promise<boolean> {
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+  const adminEmail = process.env.ADMIN_EMAIL || SUPPORT_EMAIL;
   if (!adminEmail) {
     console.error('No admin email configured');
     return false;

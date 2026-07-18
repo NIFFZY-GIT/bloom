@@ -20,9 +20,13 @@ export async function POST(req: Request) {
 
     const userRole = role && role === 'ADMIN' ? 'ADMIN' : 'USER';
 
+    // Store email normalized (trimmed + lowercased) so it always matches at login,
+    // which looks it up case-insensitively.
+    const normalizedEmail = String(email).trim().toLowerCase();
+
     const insert = await query(
       'INSERT INTO users (username, email, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING user_id, username, email, role',
-      [username, email, password_hash, userRole]
+      [username, normalizedEmail, password_hash, userRole]
     );
 
     const user = insert.rows[0];

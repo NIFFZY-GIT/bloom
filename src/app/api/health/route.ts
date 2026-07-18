@@ -46,9 +46,9 @@ export async function GET() {
   // Check email configuration
   try {
     const emailConfigured = !!(
-      process.env.EMAIL_HOST &&
-      process.env.EMAIL_USER &&
-      process.env.EMAIL_PASSWORD
+      (process.env.SMTP_HOST || process.env.EMAIL_HOST) &&
+      (process.env.SMTP_USER || process.env.EMAIL_USER) &&
+      (process.env.SMTP_PASS || process.env.EMAIL_PASSWORD)
     );
     healthCheck.checks.email = emailConfigured;
 

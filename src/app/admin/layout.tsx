@@ -1,9 +1,7 @@
 import { ReactNode } from 'react';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import jwt from 'jsonwebtoken';
 
 import AdminSidebar from '@/components/admin/AdminSidebar';
+import { requireAdminPage } from '@/lib/admin-auth';
 import styles from './AdminLayout.module.css';
 
 interface AdminLayoutProps {
@@ -11,25 +9,9 @@ interface AdminLayoutProps {
 }
 
 export default async function AdminLayout({ children }: AdminLayoutProps) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('auth_token')?.value;
-  const requestedPath = '/admin/dashboard';
-
-  if (!token) {
-    redirect(`/login?redirect=${encodeURIComponent(requestedPath)}`);
-  }
-
-  try {
-    const secret = process.env.JWT_SECRET || 'dev-secret';
-    const payload = jwt.verify(token, secret) as { role?: string };
-
-    if (payload.role !== 'ADMIN') {
-      redirect('/');
-    }
-  } catch (error) {
-    console.error('Failed to verify auth token for admin layout:', error);
-    redirect(`/login?redirect=${encodeURIComponent(requestedPath)}`);
-  }
+  // Accepts either a NextAuth session (e.g. Google sign-in) or the legacy auth_token,
+  // and reads the current role from the DB. Gates every /admin/* page.
+  await requireAdminPage('/admin/dashboard');
 
   return (
     <div className={styles.adminLayout}>
