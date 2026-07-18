@@ -13,6 +13,23 @@ export interface AdminContext {
 }
 
 /**
+ * Next.js implements several things by *throwing* — bailing out of static rendering
+ * when a request API (cookies/headers) is used, `redirect()`, and `notFound()`. These
+ * must never be caught/swallowed, or rendering control flow breaks (and the build logs
+ * spurious "Dynamic server usage" errors). Detect them by their `digest`.
+ */
+function isNextControlFlowError(error: unknown): boolean {
+  const digest = (error as { digest?: unknown } | null | undefined)?.digest;
+  return (
+    typeof digest === 'string' &&
+    (digest === 'DYNAMIC_SERVER_USAGE' ||
+      digest.startsWith('NEXT_REDIRECT') ||
+      digest === 'NEXT_NOT_FOUND' ||
+      digest.startsWith('NEXT_HTTP_ERROR_FALLBACK'))
+  );
+}
+
+/**
  * Resolve the current user's id from EITHER auth system:
  *   1. a NextAuth session (Google or credentials), or
  *   2. the legacy `auth_token` JWT cookie.
@@ -40,6 +57,10 @@ async function resolveUserId(): Promise<number | null> {
       }
     }
   } catch (error) {
+    // Let Next.js control-flow errors (static bailout, redirect, notFound) propagate.
+    if (isNextControlFlowError(error)) {
+      throw error;
+    }
     console.error('admin-auth: NextAuth session lookup failed:', error);
   }
 

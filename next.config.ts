@@ -1,6 +1,17 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // The upload/serve routes build paths from process.cwd() at runtime, which the
+  // file tracer can't analyze statically — so it over-traces the whole project
+  // (pulling in next.config.ts). These routes need no bundled project files, so
+  // exclude them from tracing to silence the "unexpected file in NFT list" warning.
+  outputFileTracingExcludes: {
+    '/api/uploads': ['**/*'],
+    '/api/serve-uploads/[...path]': ['**/*'],
+    '/api/serve-images/[...path]': ['**/*'],
+    '/api/custom-packages/upload-quotation': ['**/*'],
+  },
+
   // 1. Configure and ENABLE the image optimizer
   images: {
     // This allows images from your own domain. It's secure.

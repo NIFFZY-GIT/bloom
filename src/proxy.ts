@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { auth } from '@/lib/auth';
 
-// Force middleware to use Node.js runtime instead of Edge
-export const runtime = 'nodejs';
+// Note: proxy always runs on the Node.js runtime, so no `runtime` export is needed
+// (and Next.js rejects one here). `auth()` below relies on Node APIs.
 
-// Simple JWT decode without verification (for middleware)
+// Simple JWT decode without verification (for the proxy)
 // Full verification should be done in API routes
 function decodeJWT(token: string): { sub: string; email: string; role: string } | null {
   try {
@@ -19,7 +19,7 @@ function decodeJWT(token: string): { sub: string; email: string; role: string } 
   }
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname, host } = request.nextUrl;
 
   const requestHost = request.headers.get('host') || '';
@@ -122,7 +122,7 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Configure which routes to run middleware on
+// Configure which routes to run the proxy on
 export const config = {
   matcher: [
     /*

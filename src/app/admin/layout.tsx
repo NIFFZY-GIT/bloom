@@ -4,6 +4,9 @@ import AdminSidebar from '@/components/admin/AdminSidebar';
 import { requireAdminPage } from '@/lib/admin-auth';
 import styles from './AdminLayout.module.css';
 
+// Admin pages are per-user and auth-gated — always render on demand, never prerender.
+export const dynamic = 'force-dynamic';
+
 interface AdminLayoutProps {
   children: ReactNode;
 }
