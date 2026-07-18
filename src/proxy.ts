@@ -20,7 +20,7 @@ function decodeJWT(token: string): { sub: string; email: string; role: string } 
 }
 
 export async function proxy(request: NextRequest) {
-  const { pathname, host } = request.nextUrl;
+  const { pathname } = request.nextUrl;
 
   const requestHost = request.headers.get('host') || '';
   if (requestHost.startsWith('www.')) {

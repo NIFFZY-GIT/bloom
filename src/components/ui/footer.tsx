@@ -11,14 +11,11 @@ import {
   FaMapMarkerAlt,
   FaPhone,
   FaEnvelope,
-  FaArrowRight,
 } from "react-icons/fa";
 
 export default function Footer() {
   // Avoid hydration mismatch issues by rendering the year dynamically after mounting
   const [currentYear, setCurrentYear] = useState(2026);
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
 
   useEffect(() => {
     setCurrentYear(new Date().getFullYear());
@@ -39,13 +36,6 @@ export default function Footer() {
     { label: "About Us", href: "/about-us" },
     { label: "Contact", href: "/contact-us" },
   ];
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) return;
-    setSubscribed(true);
-    setEmail("");
-  };
 
   return (
     <footer className="tb-footer">

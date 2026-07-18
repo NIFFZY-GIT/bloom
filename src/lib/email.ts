@@ -35,7 +35,7 @@ export interface EmailOptions {
 
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   try {
-    const fromName = process.env.EMAIL_FROM_NAME || process.env.SMTP_FROM_NAME || 'Bloom Travel';
+    const fromName = process.env.EMAIL_FROM_NAME || process.env.SMTP_FROM_NAME || 'Tropical Bloom Tourism';
     const fromEmail = SUPPORT_EMAIL;
 
     await transporter.sendMail({
@@ -123,7 +123,7 @@ export async function sendPasswordResetCode(email: string, code: string): Promis
       </head>
       <body>
         <div class="container">
-          <div class="logo">🌴 Bloom Travel</div>
+          <div class="logo">🌴 Tropical Bloom Tourism</div>
           <h1>Password Reset Request</h1>
           <p>You requested to reset your password. Use the verification code below:</p>
           
@@ -139,7 +139,7 @@ export async function sendPasswordResetCode(email: string, code: string): Promis
           </div>
           
           <div class="footer">
-            <p>© ${new Date().getFullYear()} Bloom Travel. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Tropical Bloom Tourism. All rights reserved.</p>
             <p>This is an automated email, please do not reply.</p>
           </div>
         </div>
@@ -156,7 +156,7 @@ This code will expire in 10 minutes.
 
 If you didn't request this password reset, please ignore this email.
 
-© ${new Date().getFullYear()} Bloom Travel
+© ${new Date().getFullYear()} Tropical Bloom Tourism
   `.trim();
 
   return await sendEmail({
@@ -229,7 +229,7 @@ export async function sendPasswordChangedConfirmation(email: string): Promise<bo
       </head>
       <body>
         <div class="container">
-          <div class="logo">🌴 Bloom Travel</div>
+          <div class="logo">🌴 Tropical Bloom Tourism</div>
           <div class="success-icon">✅</div>
           <h1>Password Successfully Changed</h1>
           
@@ -243,7 +243,7 @@ export async function sendPasswordChangedConfirmation(email: string): Promise<bo
           </div>
           
           <div class="footer">
-            <p>© ${new Date().getFullYear()} Bloom Travel. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Tropical Bloom Tourism. All rights reserved.</p>
             <p>This is an automated email, please do not reply.</p>
           </div>
         </div>
@@ -260,7 +260,7 @@ You can now use your new password to log in to your account.
 
 If you didn't make this change, please contact our support team immediately at ${SUPPORT_EMAIL}
 
-© ${new Date().getFullYear()} Bloom Travel
+© ${new Date().getFullYear()} Tropical Bloom Tourism
   `.trim();
 
   return await sendEmail({
@@ -480,7 +480,7 @@ export async function notifyAdminNewBooking(bookingDetails: {
       <body>
         <div class="container">
           <div class="header">
-            <div class="logo">🌴 Bloom Travel</div>
+            <div class="logo">🌴 Tropical Bloom Tourism</div>
             <div class="header-subtitle">Admin Notification</div>
           </div>
           
@@ -591,10 +591,10 @@ export async function notifyAdminNewBooking(bookingDetails: {
           
           <div class="footer">
             <p class="footer-text">
-              <strong>Bloom Travel Admin Panel</strong>
+              <strong>Tropical Bloom Tourism Admin Panel</strong>
             </p>
             <p class="footer-text">
-              © ${new Date().getFullYear()} Bloom Travel. All rights reserved.
+              © ${new Date().getFullYear()} Tropical Bloom Tourism. All rights reserved.
             </p>
           </div>
         </div>
@@ -757,7 +757,7 @@ export async function notifyAdminCustomPackage(customPackageDetails: {
       </head>
       <body>
         <div class="container">
-          <div class="logo">🌴 Bloom Travel</div>
+          <div class="logo">🌴 Tropical Bloom Tourism</div>
           <div class="badge">✨ CUSTOM PACKAGE REQUEST</div>
           <h1>${customPackageDetails.packageName}</h1>
           
@@ -804,7 +804,7 @@ export async function notifyAdminCustomPackage(customPackageDetails: {
           </p>
           
           <div class="footer">
-            <p>© ${new Date().getFullYear()} Bloom Travel. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Tropical Bloom Tourism. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -927,7 +927,7 @@ export async function notifyUserQuotationUploaded(userDetails: {
       </head>
       <body>
         <div class="container">
-          <div class="logo">🌴 Bloom Travel</div>
+          <div class="logo">🌴 Tropical Bloom Tourism</div>
           <div class="badge">✅ QUOTATION READY</div>
           <h1>Your Custom Package Quotation is Ready!</h1>
           
@@ -956,7 +956,7 @@ export async function notifyUserQuotationUploaded(userDetails: {
           
           <div class="footer">
             <p>Questions? Contact us at ${SUPPORT_EMAIL}</p>
-            <p>© ${new Date().getFullYear()} Bloom Travel. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Tropical Bloom Tourism. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -979,7 +979,7 @@ What's next?
 
 Questions? Contact us at ${SUPPORT_EMAIL}
 
-© ${new Date().getFullYear()} Bloom Travel
+© ${new Date().getFullYear()} Tropical Bloom Tourism
   `.trim();
 
   return await sendEmail({
@@ -1091,7 +1091,7 @@ export async function notifyUserBookingStatusChange(userDetails: {
       </head>
       <body>
         <div class="container">
-          <div class="logo">🌴 Bloom Travel</div>
+          <div class="logo">🌴 Tropical Bloom Tourism</div>
           <h1>Booking Status Update</h1>
           <div style="text-align: center;">
             <div class="status-badge">${status.emoji} ${userDetails.newStatus}</div>
@@ -1121,7 +1121,7 @@ export async function notifyUserBookingStatusChange(userDetails: {
           
           <div class="footer">
             <p>Questions? Contact us at ${SUPPORT_EMAIL}</p>
-            <p>© ${new Date().getFullYear()} Bloom Travel. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Tropical Bloom Tourism. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -1139,7 +1139,7 @@ View your bookings: ${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000
 
 Questions? Contact us at ${SUPPORT_EMAIL}
 
-© ${new Date().getFullYear()} Bloom Travel
+© ${new Date().getFullYear()} Tropical Bloom Tourism
   `.trim();
 
   return await sendEmail({
@@ -1255,7 +1255,7 @@ export async function notifyUserPaymentStatusChange(userDetails: {
       </head>
       <body>
         <div class="container">
-          <div class="logo">🌴 Bloom Travel</div>
+          <div class="logo">🌴 Tropical Bloom Tourism</div>
           <div class="status-icon">${status.emoji}</div>
           <h1>Payment Status Update</h1>
           
@@ -1283,7 +1283,7 @@ export async function notifyUserPaymentStatusChange(userDetails: {
           
           <div class="footer">
             <p>Questions? Contact us at ${SUPPORT_EMAIL}</p>
-            <p>© ${new Date().getFullYear()} Bloom Travel. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Tropical Bloom Tourism. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -1303,7 +1303,7 @@ View your bookings: ${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000
 
 Questions? Contact us at ${SUPPORT_EMAIL}
 
-© ${new Date().getFullYear()} Bloom Travel
+© ${new Date().getFullYear()} Tropical Bloom Tourism
   `.trim();
 
   return await sendEmail({
@@ -1559,7 +1559,7 @@ export async function sendBookingConfirmationToUser(bookingDetails: {
       <body>
         <div class="container">
           <div class="header">
-            <div class="logo">🌴 Bloom Travel</div>
+            <div class="logo">🌴 Tropical Bloom Tourism</div>
             <div class="header-subtitle">Your Adventure Awaits</div>
           </div>
           
@@ -1691,10 +1691,10 @@ export async function sendBookingConfirmationToUser(bookingDetails: {
           
           <div class="footer">
             <p class="footer-text">
-              <strong>Bloom Travel</strong> - Making Your Travel Dreams Come True
+              <strong>Tropical Bloom Tourism</strong> - Making Your Travel Dreams Come True
             </p>
             <p class="footer-text">
-              © ${new Date().getFullYear()} Bloom Travel. All rights reserved.
+              © ${new Date().getFullYear()} Tropical Bloom Tourism. All rights reserved.
             </p>
             <p class="footer-text" style="margin-top: 15px;">
               This is an automated confirmation email. Please do not reply directly to this email.
@@ -1750,7 +1750,7 @@ View your bookings: ${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000
 
 Questions? Contact us at ${SUPPORT_EMAIL}
 
-© ${new Date().getFullYear()} Bloom Travel
+© ${new Date().getFullYear()} Tropical Bloom Tourism
   `.trim();
 
   return await sendEmail({
@@ -1768,7 +1768,7 @@ export async function sendWelcomeEmail(userDetails: {
   email: string;
   username: string;
 }): Promise<boolean> {
-  const subject = '🎉 Welcome to Bloom Travel - Your Adventure Begins!';
+  const subject = '🎉 Welcome to Tropical Bloom Tourism - Your Adventure Begins!';
 
   const html = `
     <!DOCTYPE html>
@@ -1776,7 +1776,7 @@ export async function sendWelcomeEmail(userDetails: {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Welcome to Bloom Travel</title>
+        <title>Welcome to Tropical Bloom Tourism</title>
         <style>
           body {
             margin: 0;
@@ -1891,7 +1891,7 @@ export async function sendWelcomeEmail(userDetails: {
         <div class="container">
           <div class="header">
             <div class="welcome-icon">🌺</div>
-            <h1>Welcome to Bloom Travel!</h1>
+            <h1>Welcome to Tropical Bloom Tourism!</h1>
           </div>
 
           <div class="content">
@@ -1900,7 +1900,7 @@ export async function sendWelcomeEmail(userDetails: {
             </p>
 
             <p class="message">
-              Thank you for joining <strong>Bloom Travel</strong> - where every journey blooms into an unforgettable adventure!
+              Thank you for joining <strong>Tropical Bloom Tourism</strong> - where every journey blooms into an unforgettable adventure!
             </p>
 
             <p class="message">
@@ -1960,10 +1960,10 @@ export async function sendWelcomeEmail(userDetails: {
 
           <div class="footer">
             <p class="footer-text">
-              <strong>Bloom Travel</strong> - Making Your Travel Dreams Come True
+              <strong>Tropical Bloom Tourism</strong> - Making Your Travel Dreams Come True
             </p>
             <p class="footer-text">
-              © ${new Date().getFullYear()} Bloom Travel. All rights reserved.
+              © ${new Date().getFullYear()} Tropical Bloom Tourism. All rights reserved.
             </p>
             <p class="footer-text" style="margin-top: 15px;">
               You're receiving this email because you just created an account with us.
@@ -1979,7 +1979,7 @@ export async function sendWelcomeEmail(userDetails: {
 
 Hello ${userDetails.username}!
 
-Thank you for joining Bloom Travel - where every journey blooms into an unforgettable adventure!
+Thank you for joining Tropical Bloom Tourism - where every journey blooms into an unforgettable adventure!
 
 Your account has been successfully created, and you're now ready to explore amazing destinations 
 and book incredible tour packages.
@@ -2009,7 +2009,7 @@ Create Custom Tour: ${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000
 
 Need help? Contact us at ${SUPPORT_EMAIL}
 
-© ${new Date().getFullYear()} Bloom Travel - Making Your Travel Dreams Come True
+© ${new Date().getFullYear()} Tropical Bloom Tourism - Making Your Travel Dreams Come True
   `.trim();
 
   return await sendEmail({
@@ -2029,7 +2029,7 @@ export async function sendSimpleBookingAcknowledgment(details: {
   packageName: string;
   bookingId: string;
 }): Promise<boolean> {
-  const subject = '✅ Booking Request Received - Bloom Travel';
+  const subject = '✅ Booking Request Received - Tropical Bloom Tourism';
 
   const html = `
     <!DOCTYPE html>
@@ -2113,8 +2113,8 @@ export async function sendSimpleBookingAcknowledgment(details: {
           </div>
 
           <div class="footer">
-            <p><strong>Bloom Travel</strong></p>
-            <p>© ${new Date().getFullYear()} Bloom Travel. All rights reserved.</p>
+            <p><strong>Tropical Bloom Tourism</strong></p>
+            <p>© ${new Date().getFullYear()} Tropical Bloom Tourism. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -2141,7 +2141,7 @@ WHAT HAPPENS NEXT?
 
 You can track your booking status in your dashboard. We'll notify you as soon as it's confirmed!
 
-© ${new Date().getFullYear()} Bloom Travel
+© ${new Date().getFullYear()} Tropical Bloom Tourism
   `.trim();
 
   return await sendEmail({
@@ -2164,7 +2164,7 @@ export async function sendCustomPackageAcknowledgment(details: {
   guests: number;
   dateRange: string;
 }): Promise<boolean> {
-  const subject = '✅ Custom Package Request Received - Bloom Travel';
+  const subject = '✅ Custom Package Request Received - Tropical Bloom Tourism';
 
   const placesList = details.places.map(place => `<li>${place}</li>`).join('');
 
@@ -2282,9 +2282,9 @@ export async function sendCustomPackageAcknowledgment(details: {
           </div>
 
           <div class="footer">
-            <p><strong>Bloom Travel</strong></p>
+            <p><strong>Tropical Bloom Tourism</strong></p>
             <p>Creating Unforgettable Sri Lankan Adventures</p>
-            <p>© ${new Date().getFullYear()} Bloom Travel. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Tropical Bloom Tourism. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -2323,8 +2323,8 @@ WHAT HAPPENS NEXT?
 Have questions? Feel free to reply to this email or contact our support team.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Bloom Travel - Creating Unforgettable Sri Lankan Adventures
-© ${new Date().getFullYear()} Bloom Travel. All rights reserved.
+Tropical Bloom Tourism - Creating Unforgettable Sri Lankan Adventures
+© ${new Date().getFullYear()} Tropical Bloom Tourism. All rights reserved.
   `.trim();
 
   return await sendEmail({

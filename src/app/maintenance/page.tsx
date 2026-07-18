@@ -7,7 +7,7 @@ export default function Maintenance() {
         <div className={styles.icon}>🔧</div>
         <h1 className={styles.title}>We&apos;ll Be Right Back!</h1>
         <p className={styles.description}>
-          Bloom Travel is currently undergoing scheduled maintenance to improve 
+          Tropical Bloom Tourism is currently undergoing scheduled maintenance to improve 
           your experience. We&apos;ll be back online shortly.
         </p>
         

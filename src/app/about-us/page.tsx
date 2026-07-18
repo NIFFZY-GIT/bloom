@@ -36,29 +36,6 @@ export default function AboutUs() {
     }
   ];
 
-  const team = [
-    {
-      name: 'Sarah Perera',
-      role: 'Founder & Chief Executive Officer',
-      description: 'Over 15 years directing sustainable tourism strategies and cross-cultural operations.'
-    },
-    {
-      name: 'Rajiv Fernando',
-      role: 'Chief Operating Officer',
-      description: 'Specialist in high-end hospitality logistics, fleet deployment, and structural risk management.'
-    },
-    {
-      name: 'Maya Silva',
-      role: 'Director of Itinerary Design',
-      description: 'Veteran travel curator dedicated to local cultural integration and heritage preservation.'
-    },
-    {
-      name: 'David Chen',
-      role: 'Sustainability Director',
-      description: 'Environmental economist managing our carbon-neutral portfolios and regional ESG compliance.'
-    }
-  ];
-
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#1E293B] antialiased selection:bg-[#C5A880]/20 font-sans">
       
