@@ -18,16 +18,17 @@ export const verificationCodes = {
     if (!Number.isFinite(data.expiresAt) || data.expiresAt <= Date.now()) {
       throw new Error('Invalid expiration time');
     }
-    
+
+    // Replace any existing code for this email with delete + insert instead of
+    // `ON CONFLICT (email)`. ON CONFLICT requires a unique index whose columns exactly
+    // match the conflict target; a database provisioned from a schema that indexes
+    // LOWER(email) (or lacks the constraint entirely) makes `ON CONFLICT (email)` throw
+    // "there is no unique or exclusion constraint matching the ON CONFLICT specification".
+    // Delete + insert works regardless of which index the deployed database has.
+    await query('DELETE FROM password_reset_tokens WHERE LOWER(email) = $1', [normalizedEmail]);
     await query(
       `INSERT INTO password_reset_tokens (user_id, email, code, expires_at)
-       VALUES ($1, $2, $3, $4)
-       ON CONFLICT (email)
-       DO UPDATE SET 
-         code = EXCLUDED.code,
-         expires_at = EXCLUDED.expires_at,
-         user_id = EXCLUDED.user_id,
-         updated_at = NOW()`,
+       VALUES ($1, $2, $3, $4)`,
       [userId ?? null, normalizedEmail, data.code, expiresAtDate.toISOString()],
     );
   },
@@ -37,8 +38,9 @@ export const verificationCodes = {
     const result = await query(
       `SELECT code, expires_at
          FROM password_reset_tokens
-        WHERE email = $1
+        WHERE LOWER(email) = $1
           AND expires_at > NOW()
+        ORDER BY expires_at DESC
         LIMIT 1`,
       [normalizedEmail],
     );
@@ -52,7 +54,7 @@ export const verificationCodes = {
 
     // Double-check expiration in case of clock skew
     if (!Number.isFinite(expiresAtMs) || expiresAtMs <= Date.now()) {
-      await query('DELETE FROM password_reset_tokens WHERE email = $1', [normalizedEmail]);
+      await query('DELETE FROM password_reset_tokens WHERE LOWER(email) = $1', [normalizedEmail]);
       return null;
     }
 
@@ -61,7 +63,7 @@ export const verificationCodes = {
 
   async delete(email: string): Promise<void> {
     const normalizedEmail = normalizeEmail(email);
-    await query('DELETE FROM password_reset_tokens WHERE email = $1', [normalizedEmail]);
+    await query('DELETE FROM password_reset_tokens WHERE LOWER(email) = $1', [normalizedEmail]);
   },
 };
 
