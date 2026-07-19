@@ -29,17 +29,17 @@ const journeySteps = [
 const contactChannels = [
   {
     label: 'Experience Studio',
-    value: '118/7 Stratford Ave, Colombo 06',
+    value: '319/13 Boralugoda, Athurugiriya',
     sub: 'By appointment only',
     Icon: FaMapMarkerAlt,
-    link: 'https://maps.google.com'
+    link: 'https://maps.app.goo.gl/xuT5D2PpfiAgcMaV6'
   },
   {
     label: 'Concierge Hotline',
-    value: '+94 77 123 4567',
+    value: '+94 77 733 1811',
     sub: '08:00 - 22:00 Daily',
     Icon: FaPhone,
-    link: 'tel:+94771234567'
+    link: 'tel:+94777331811'
   },
   {
     label: 'Planning Team',
