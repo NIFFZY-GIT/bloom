@@ -368,7 +368,7 @@ export default function ContactRedesign() {
       <section className="relative min-h-[500px] lg:h-[500px] flex flex-col lg:flex-row items-center px-0 lg:px-16">
         <div className="absolute inset-0 w-full h-full z-10 grayscale contrast-[1.1] brightness-[0.95] opacity-85 hidden lg:block">
           <iframe 
-             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.798467112139!2d79.85275541532638!3d6.92706619500827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae259130df8cb3d%3A0xcb2d5bceae83c41!2sColombo%2C%20Sri%20Lanka!5e0!3m2!1sen!2sus!4v1633021634345!5m2!1sen!2us"
+             src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d63381.25469594124!2d79.9494996!3d6.851179!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae251c2f285f8f1%3A0x50cea54ccf9625a7!2s198%2FB%2C%20Borella%20Road%20%2Cpore%20%2CAthurugiriya!5e0!3m2!1sen!2slk!4v1784445925056!5m2!1sen!2slk" 
              loading="lazy"
              title="Colombo Studio Map Location"
              className="w-full h-full border-0"
@@ -378,7 +378,7 @@ export default function ContactRedesign() {
         {/* Mobile alternative map layout container */}
         <div className="w-full h-[350px] grayscale contrast-[1.1] brightness-[0.95] opacity-85 block lg:hidden">
           <iframe 
-             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.798467112139!2d79.85275541532638!3d6.92706619500827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae259130df8cb3d%3A0xcb2d5bceae83c41!2sColombo%2C%20Sri%20Lanka!5e0!3m2!1sen!2sus!4v1633021634345!5m2!1sen!2us"
+             src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d63381.25469594124!2d79.9494996!3d6.851179!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae251c2f285f8f1%3A0x50cea54ccf9625a7!2s198%2FB%2C%20Borella%20Road%20%2Cpore%20%2CAthurugiriya!5e0!3m2!1sen!2slk!4v1784445925056!5m2!1sen!2slk" 
              loading="lazy"
              title="Colombo Studio Map Location Mobile"
              className="w-full h-full border-0"
@@ -387,9 +387,9 @@ export default function ContactRedesign() {
 
         <div className="relative z-20 bg-white p-12 w-full lg:max-w-[380px] lg:rounded-3xl lg:shadow-3xl lg:shadow-[#091D26]/15 border-t lg:border border-[#E8E3DC]">
           <span className="text-[0.7rem] font-bold uppercase tracking-widest text-[#C99646]">Headquarters</span>
-          <h3 className="text-2xl font-extrabold mt-1 mb-3">Colombo, Sri Lanka</h3>
+          <h3 className="text-2xl font-extrabold mt-1 mb-3">Boralugoda, Athurugiriya</h3>
           <p className="text-sm text-[#334A54] leading-relaxed mb-6">Drop by the Experience Studio for a premium tea infusion tasting while we blueprint.</p>
-          <a href="https://maps.google.com" target="_blank" rel="noreferrer" className="text-[#091D26] font-bold text-sm no-underline hover:text-[#C99646] transition-colors">
+          <a href="https://maps.app.goo.gl/xuT5D2PpfiAgcMaV6" target="_blank" rel="noreferrer" className="text-[#091D26] font-bold text-sm no-underline hover:text-[#C99646] transition-colors">
             Get Navigation Data →
           </a>
         </div>
