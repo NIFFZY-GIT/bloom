@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Category, Place } from '@/Types';
+import { readJson } from '@/lib/http';
 import styles from './Places.module.css';
 
 export default function PlacesPage() {
@@ -178,16 +179,19 @@ export default function PlacesPage() {
         body: formData
       });
 
-      const data = await response.json();
+      const data = await readJson<{ success?: boolean; url?: string; message?: string }>(
+        response,
+        'Failed to upload image',
+      );
 
-      if (data.success) {
-        setFormData(prev => ({ ...prev, image: data.url }));
+      if (data.success && data.url) {
+        setFormData(prev => ({ ...prev, image: data.url as string }));
         setImagePreview(data.url);
       } else {
         setError(data.message || 'Failed to upload image');
       }
     } catch (err) {
-      setError('Error uploading image');
+      setError(err instanceof Error ? err.message : 'Error uploading image');
       console.error(err);
     } finally {
       setUploading(false);

@@ -4,9 +4,13 @@ import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
+import { readJson } from '@/lib/http';
 import styles from './PackageForm.module.css';
 
 const MAX_GALLERY_IMAGES = 10;
+
+// Keep in step with MAX_BYTES in src/app/api/uploads/route.ts.
+const MAX_UPLOAD_BYTES = 15 * 1024 * 1024;
 
 interface PackageFormInitialData {
   title: string;
@@ -123,9 +127,8 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
       throw new Error('Please select a valid image file.');
     }
 
-    const maxBytes = 4 * 1024 * 1024;
-    if (file.size > maxBytes) {
-      throw new Error('Image is too large. Maximum size is 4MB.');
+    if (file.size > MAX_UPLOAD_BYTES) {
+      throw new Error('Image is too large. Maximum size is 15MB.');
     }
 
     const formData = new FormData();
@@ -137,11 +140,13 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
       body: formData,
     });
 
-    const data = await response.json();
+    const data = await readJson<{ success?: boolean; url?: string; message?: string }>(
+      response,
+      'Failed to upload image',
+    );
 
-    if (!response.ok || !data?.success || !data?.url) {
-      const message = data?.message || 'Failed to upload image';
-      throw new Error(message);
+    if (!data?.success || !data?.url) {
+      throw new Error(data?.message || 'Failed to upload image');
     }
 
     return data.url as string;
@@ -234,9 +239,8 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
         continue;
       }
 
-      const maxBytes = 4 * 1024 * 1024;
-      if (file.size > maxBytes) {
-        setGalleryUploadError('Some images are too large. Maximum size is 4MB.');
+      if (file.size > MAX_UPLOAD_BYTES) {
+        setGalleryUploadError('Some images are too large. Maximum size is 15MB.');
         continue;
       }
 
@@ -351,10 +355,7 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.message || (isEdit ? 'Failed to update package' : 'Failed to create package'));
-      }
+      await readJson(response, isEdit ? 'Failed to update package' : 'Failed to create package');
 
       setSuccess(isEdit ? 'Package updated successfully' : 'Package created successfully');
       setTimeout(() => {

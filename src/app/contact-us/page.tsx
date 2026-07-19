@@ -43,10 +43,10 @@ const contactChannels = [
   },
   {
     label: 'Planning Team',
-    value: 'contact@tropicalbloom.lk',
+    value: 'info@tropicalbloom.lk',
     sub: 'Itineraries & Quotes',
     Icon: FaEnvelope,
-    link: 'mailto:contact@tropicalbloom.lk'
+    link: 'mailto:info@tropicalbloom.lk'
   }
 ];
 

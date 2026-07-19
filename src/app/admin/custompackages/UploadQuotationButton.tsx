@@ -3,6 +3,8 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { readJson } from '@/lib/http';
+
 interface UploadQuotationButtonProps {
   packageId: string;
   currentPdfPath: string | null;
@@ -49,10 +51,13 @@ export default function UploadQuotationButton({
         body: formData,
       });
 
-      const data = await response.json();
+      const data = await readJson<{ success?: boolean; message?: string }>(
+        response,
+        'Failed to upload quotation',
+      );
 
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || 'Failed to upload quotation');
+      if (!data?.success) {
+        throw new Error(data?.message || 'Failed to upload quotation');
       }
 
       setUploadSuccess(true);

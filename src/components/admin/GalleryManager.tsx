@@ -5,6 +5,7 @@ import type { ChangeEvent, FormEvent, MouseEvent as ReactMouseEvent } from 'reac
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
+import { readJson } from '@/lib/http';
 import styles from '@/app/admin/admingallery/AdminGallery.module.css';
 
 export interface GalleryItem {
@@ -146,15 +147,12 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
           body: formData,
         });
 
-        const uploadData = await uploadResponse.json();
-        if (!uploadResponse.ok) {
-          throw new Error(uploadData?.message || 'Failed to upload image');
-        }
+        const uploadData = await readJson<{ url?: string }>(uploadResponse, 'Failed to upload image');
 
-        imagePath = uploadData?.url;
-        if (!imagePath) {
+        if (!uploadData?.url) {
           throw new Error('Upload did not return a file path');
         }
+        imagePath = uploadData.url;
       }
 
       const response = await fetch('/api/gallery-items', {
@@ -163,10 +161,7 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
         body: JSON.stringify({ ...createState, imagePath }),
       });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.message || 'Failed to create gallery item');
-      }
+      await readJson(response, 'Failed to create gallery item');
 
       closeCreateModal();
       router.refresh();
@@ -324,15 +319,12 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
           body: formData,
         });
 
-        const uploadData = await uploadResponse.json();
-        if (!uploadResponse.ok) {
-          throw new Error(uploadData?.message || 'Failed to upload image');
-        }
+        const uploadData = await readJson<{ url?: string }>(uploadResponse, 'Failed to upload image');
 
-        imagePath = uploadData?.url;
-        if (!imagePath) {
+        if (!uploadData?.url) {
           throw new Error('Upload did not return a file path');
         }
+        imagePath = uploadData.url;
       }
 
       const response = await fetch(`/api/gallery-items/${editingId}`, {
@@ -341,10 +333,7 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
         body: JSON.stringify({ ...editState, imagePath }),
       });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.message || 'Failed to update gallery item');
-      }
+      await readJson(response, 'Failed to update gallery item');
 
       cancelEdit();
       router.refresh();

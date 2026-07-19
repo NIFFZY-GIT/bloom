@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
+import { readJson } from '@/lib/http';
 import styles from './PlaceForm.module.css';
 
 interface PlaceFormInitialData {
@@ -96,7 +97,7 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
       throw new Error('Please select a valid image file.');
     }
 
-    const maxBytes = 10 * 1024 * 1024;
+    const maxBytes = 15 * 1024 * 1024;
     if (file.size > maxBytes) {
       throw new Error('Image is too large. Maximum size is 15MB.');
     }
@@ -110,11 +111,13 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
       body: formData,
     });
 
-    const data = await response.json();
+    const data = await readJson<{ success?: boolean; url?: string; message?: string }>(
+      response,
+      'Failed to upload image',
+    );
 
-    if (!response.ok || !data?.success || !data?.url) {
-      const message = data?.message || 'Failed to upload image';
-      throw new Error(message);
+    if (!data?.success || !data?.url) {
+      throw new Error(data?.message || 'Failed to upload image');
     }
 
     return data.url as string;
@@ -292,11 +295,13 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
+      const data = await readJson<{ success?: boolean; message?: string }>(
+        response,
+        `Failed to ${isEdit ? 'update' : 'create'} place`,
+      );
 
-      if (!response.ok || !data?.success) {
-        const message = data?.message || `Failed to ${isEdit ? 'update' : 'create'} place`;
-        throw new Error(message);
+      if (!data?.success) {
+        throw new Error(data?.message || `Failed to ${isEdit ? 'update' : 'create'} place`);
       }
 
       setSuccess(data.message || `Place ${isEdit ? 'updated' : 'created'} successfully!`);

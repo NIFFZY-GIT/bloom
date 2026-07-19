@@ -101,8 +101,8 @@ export default function Footer() {
 </li>
               <li>
                 <div className="tb-contact-icon"><FaEnvelope /></div>
-                <a href="mailto:contact@tropicalbloom.lk" className="tb-contact-text tb-interactive-text">
-                  contact@tropicalbloom.lk
+                <a href="mailto:info@tropicalbloom.lk" className="tb-contact-text tb-interactive-text">
+                  info@tropicalbloom.lk
                 </a>
               </li>
             </ul>

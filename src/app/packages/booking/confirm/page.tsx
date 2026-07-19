@@ -3,6 +3,7 @@
 import { useMemo, useState, useEffect, ChangeEvent, use } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { readJson } from '@/lib/http';
 import styles from './ConfirmPage.module.css';
 
 type UploadStatus = 'idle' | 'uploading' | 'success' | 'error';
@@ -275,9 +276,9 @@ export default function BookingConfirmationPage({ searchParams }: PageProps) {
         body: formData,
       });
 
-      const data = await response.json().catch(() => ({}));
+      const data = await readJson<{ url?: string; message?: string }>(response, 'Receipt upload failed');
 
-      if (!response.ok || !data?.url) {
+      if (!data?.url) {
         throw new Error(data?.message || 'Receipt upload failed');
       }
 

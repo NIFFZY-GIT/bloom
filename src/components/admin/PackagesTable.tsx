@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { readJson } from '@/lib/http';
 import styles from '@/app/admin/packages/AdminPackages.module.css';
 
 interface PackageRow {
@@ -33,10 +34,7 @@ export default function PackagesTable({ packages }: PackagesTableProps) {
       const response = await fetch(`/api/packages/${id}`, {
         method: 'DELETE',
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.message || 'Failed to delete package');
-      }
+      await readJson(response, 'Failed to delete package');
       router.refresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to delete package';

@@ -13,6 +13,7 @@ import type { ChangeEvent, FormEvent, MouseEvent as ReactMouseEvent } from 'reac
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
+import { readJson } from '@/lib/http';
 import styles from '@/app/admin/admingallery/AdminGallery.module.css';
 
 export interface ReviewRecord {
@@ -131,10 +132,7 @@ const ReviewsManager = forwardRef<ReviewsManagerHandle, ReviewsManagerProps>(fun
         body: formData,
       });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.message || 'Failed to upload file');
-      }
+      const data = await readJson<{ url?: string }>(response, 'Failed to upload file');
 
       const uploadedUrl = data?.url;
       if (!uploadedUrl || typeof uploadedUrl !== 'string') {
