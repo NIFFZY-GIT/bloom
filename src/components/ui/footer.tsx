@@ -91,18 +91,18 @@ export default function Footer() {
              {/* Change </div> on line 149 to </li> */}
 <li>
   <div className="tb-contact-icon"><FaMapMarkerAlt /></div>
-  <span className="tb-contact-text">Colombo 03,<br />Sri Lanka</span>
+  <span className="tb-contact-text">319/13 Boralugoda,<br /> Athurugiriya</span>
 </li> {/* <-- Fixed here */}
 <li>
   <div className="tb-contact-icon"><FaPhone /></div>
   <a href="tel:+94771234567" className="tb-contact-text tb-interactive-text">
-    +94 77 123 4567
+    +94 77 733 1811
   </a>
 </li>
               <li>
                 <div className="tb-contact-icon"><FaEnvelope /></div>
-                <a href="mailto:hello@tropicalbloom.lk" className="tb-contact-text tb-interactive-text">
-                  hello@tropicalbloom.lk
+                <a href="mailto:contact@tropicalbloom.lk" className="tb-contact-text tb-interactive-text">
+                  contact@tropicalbloom.lk
                 </a>
               </li>
             </ul>
