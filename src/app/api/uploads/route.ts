@@ -3,10 +3,12 @@ import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
 
+import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL } from '@/lib/upload-limits';
+
 export const runtime = 'nodejs';
 export const maxDuration = 30; // Allow up to 30 seconds for upload
 
-const MAX_BYTES = 15 * 1024 * 1024;
+const MAX_BYTES = MAX_UPLOAD_BYTES;
 const ALLOWED_MIME_TYPES = new Set([
   'image/jpeg',
   'image/png',
@@ -21,9 +23,9 @@ export async function POST(request: Request) {
     // Check content length before processing
     const contentLength = request.headers.get('content-length');
     if (contentLength && parseInt(contentLength) > MAX_BYTES) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         success: false,
-        message: 'File too large. Maximum size is 15MB.' 
+        message: `File too large. Maximum size is ${MAX_UPLOAD_LABEL}.`
       }, { status: 413 });
     }
 
@@ -69,9 +71,9 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(bytes);
 
     if (buffer.length > MAX_BYTES) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         success: false,
-        message: `File too large (${(buffer.length / 1024 / 1024).toFixed(2)}MB). Maximum size is 15MB.` 
+        message: `File too large (${(buffer.length / 1024 / 1024).toFixed(2)}MB). Maximum size is ${MAX_UPLOAD_LABEL}.`
       }, { status: 413 });
     }
 

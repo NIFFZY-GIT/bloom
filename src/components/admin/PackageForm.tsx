@@ -6,12 +6,10 @@ import Image from 'next/image';
 
 import { readJson } from '@/lib/http';
 import { isStorableImagePath, toStorableImagePath } from '@/lib/image-path';
+import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL, tooLargeMessage } from '@/lib/upload-limits';
 import styles from './PackageForm.module.css';
 
 const MAX_GALLERY_IMAGES = 10;
-
-// Keep in step with MAX_BYTES in src/app/api/uploads/route.ts.
-const MAX_UPLOAD_BYTES = 15 * 1024 * 1024;
 
 interface PackageFormInitialData {
   title: string;
@@ -131,7 +129,7 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
     }
 
     if (file.size > MAX_UPLOAD_BYTES) {
-      throw new Error('Image is too large. Maximum size is 15MB.');
+      throw new Error(tooLargeMessage('Image'));
     }
 
     const formData = new FormData();
@@ -250,7 +248,7 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
       }
 
       if (file.size > MAX_UPLOAD_BYTES) {
-        setGalleryUploadError('Some images are too large. Maximum size is 15MB.');
+        setGalleryUploadError(`Some images are too large. Maximum size is ${MAX_UPLOAD_LABEL}.`);
         continue;
       }
 

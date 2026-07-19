@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Category, Place } from '@/Types';
 import { readJson } from '@/lib/http';
+import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL } from '@/lib/upload-limits';
 import styles from './Places.module.css';
 
 export default function PlacesPage() {
@@ -177,9 +178,8 @@ export default function PlacesPage() {
       return;
     }
 
-    // Validate file size (max 15MB)
-    if (file.size > 15 * 1024 * 1024) {
-      setError('Image size must be less than 15MB');
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setError(`Image size must be less than ${MAX_UPLOAD_LABEL}`);
       return;
     }
 

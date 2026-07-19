@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { readJson } from '@/lib/http';
+import { MAX_UPLOAD_BYTES, tooLargeMessage } from '@/lib/upload-limits';
 
 interface UploadQuotationButtonProps {
   packageId: string;
@@ -30,10 +31,8 @@ export default function UploadQuotationButton({
       return;
     }
 
-    // Validate file size (max 15MB)
-    const maxSize = 15 * 1024 * 1024;
-    if (file.size > maxSize) {
-      setUploadError('PDF file is too large. Maximum size is 15MB.');
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setUploadError(tooLargeMessage('PDF file'));
       return;
     }
 

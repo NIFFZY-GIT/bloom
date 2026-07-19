@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 import { readJson } from '@/lib/http';
+import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL } from '@/lib/upload-limits';
 import styles from '@/app/admin/admingallery/AdminGallery.module.css';
 
 export interface GalleryItem {
@@ -107,10 +108,8 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
       return;
     }
 
-    // Validate file size (max 15MB)
-    const maxSize = 15 * 1024 * 1024;
-    if (file.size > maxSize) {
-      setCreateError('File size must be less than 15MB');
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setCreateError(`File size must be less than ${MAX_UPLOAD_LABEL}`);
       return;
     }
 
@@ -275,10 +274,8 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
       return;
     }
 
-    // Validate file size (max 15MB)
-    const maxSize = 15 * 1024 * 1024;
-    if (file.size > maxSize) {
-      setUpdateError('File size must be less than 15MB');
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setUpdateError(`File size must be less than ${MAX_UPLOAD_LABEL}`);
       return;
     }
 

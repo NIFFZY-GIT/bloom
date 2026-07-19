@@ -5,6 +5,7 @@ import { existsSync } from 'fs';
 import { query } from '@/lib/db';
 import { getAdminContext } from '@/lib/admin-auth';
 import { notifyUserQuotationUploaded, notifyAdminCustomPackage } from '@/lib/email';
+import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL } from '@/lib/upload-limits';
 
 async function requireAdmin() {
   // Accepts a NextAuth session (e.g. Google admin) or the legacy auth_token, with
@@ -50,11 +51,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate file size (15MB max)
-    const maxSize = 15 * 1024 * 1024;
-    if (file.size > maxSize) {
+    // Validate file size
+    if (file.size > MAX_UPLOAD_BYTES) {
       return NextResponse.json(
-        { success: false, message: 'File size exceeds 15MB limit' },
+        { success: false, message: `File size exceeds ${MAX_UPLOAD_LABEL} limit` },
         { status: 400 }
       );
     }

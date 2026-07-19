@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect, ChangeEvent, use } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { readJson } from '@/lib/http';
+import { MAX_UPLOAD_BYTES, MAX_UPLOAD_LABEL } from '@/lib/upload-limits';
 import styles from './ConfirmPage.module.css';
 
 type UploadStatus = 'idle' | 'uploading' | 'success' | 'error';
@@ -217,10 +218,9 @@ export default function BookingConfirmationPage({ searchParams }: PageProps) {
       return;
     }
 
-    const maxBytes = 10 * 1024 * 1024;
-    if (file.size > maxBytes) {
+    if (file.size > MAX_UPLOAD_BYTES) {
       setUploadStatus('error');
-      setUploadMessage('Receipts must be 15MB or smaller.');
+      setUploadMessage(`Receipts must be ${MAX_UPLOAD_LABEL} or smaller.`);
       setReceiptFile(null);
       setReceiptPreview(null);
       return;
@@ -545,7 +545,7 @@ export default function BookingConfirmationPage({ searchParams }: PageProps) {
                 <i className="fas fa-cloud-upload-alt" style={{ fontSize: '3rem', color: '#6366f1', marginBottom: '1rem' }}></i>
                 <strong>Click here to choose your receipt file</strong>
                 <span>or drag and drop it here</span>
-                <span style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Accepted: JPG, PNG, PDF (max 15MB)</span>
+                <span style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>Accepted: JPG, PNG, PDF (max {MAX_UPLOAD_LABEL})</span>
                 <input
                   className={styles.fileInput}
                   type="file"

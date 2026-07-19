@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 import { readJson } from '@/lib/http';
+import { MAX_UPLOAD_BYTES, tooLargeMessage } from '@/lib/upload-limits';
 import styles from './PlaceForm.module.css';
 
 interface PlaceFormInitialData {
@@ -97,9 +98,8 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
       throw new Error('Please select a valid image file.');
     }
 
-    const maxBytes = 15 * 1024 * 1024;
-    if (file.size > maxBytes) {
-      throw new Error('Image is too large. Maximum size is 15MB.');
+    if (file.size > MAX_UPLOAD_BYTES) {
+      throw new Error(tooLargeMessage('Image'));
     }
 
     const formData = new FormData();
@@ -137,9 +137,8 @@ export default function PlaceForm({ mode, placeId, initialData }: PlaceFormProps
       return;
     }
 
-    const maxBytes = 15 * 1024 * 1024;
-    if (file.size > maxBytes) {
-      setError('Image is too large. Maximum size is 15MB.');
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setError(tooLargeMessage('Image'));
       return;
     }
 
