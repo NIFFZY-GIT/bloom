@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import db, { query } from '@/lib/db';
+import { isStorableImagePath, toStorableImagePath } from '@/lib/image-path';
 
 type Params = {
   params: Promise<{
@@ -42,11 +43,12 @@ const sanitizeGalleryImages = (input: unknown): string[] => {
   const seen = new Set<string>();
 
   for (const entry of input) {
-    if (typeof entry !== 'string') {
+    // Drops blob:/data: previews, which are dead the moment the tab that made them closes.
+    if (!isStorableImagePath(entry)) {
       continue;
     }
     const trimmed = entry.trim();
-    if (!trimmed || seen.has(trimmed)) {
+    if (seen.has(trimmed)) {
       continue;
     }
     seen.add(trimmed);
@@ -115,11 +117,7 @@ export async function PUT(request: Request, { params: paramsPromise }: Params) {
       galleryImages,
     } = body;
 
-    const normalizedImagePath = typeof image_path === 'string'
-      ? image_path.trim().length === 0
-        ? null
-        : image_path.trim()
-      : null;
+    const normalizedImagePath = toStorableImagePath(image_path);
 
     const normalizedHighlights = Array.isArray(highlights) ? JSON.stringify(highlights) : JSON.stringify([]);
     const normalizedIncludes = Array.isArray(includes) ? JSON.stringify(includes) : JSON.stringify([]);

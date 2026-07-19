@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 import { readJson } from '@/lib/http';
+import { isStorableImagePath, toStorableImagePath } from '@/lib/image-path';
 import styles from './PackageForm.module.css';
 
 const MAX_GALLERY_IMAGES = 10;
@@ -45,12 +46,14 @@ interface FormState {
 
 export default function PackageForm({ mode, packageId, initialData }: PackageFormProps) {
   const router = useRouter();
+  // Rows saved before blob: URLs were rejected still hold dead previews; drop them on
+  // load so the form shows the images that actually exist rather than broken tiles.
   const initialGalleryImages = (() => {
     const base = (initialData?.galleryImages ?? [])
-      .map(image => image.trim())
-      .filter(Boolean);
+      .filter(isStorableImagePath)
+      .map(image => image.trim());
     const cover = initialData?.image_path?.trim();
-    const combined = cover ? [...base, cover] : base;
+    const combined = isStorableImagePath(cover) ? [...base, cover.trim()] : base;
     return Array.from(new Set(combined));
   })();
 
@@ -63,7 +66,7 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
     description: initialData?.description ?? '',
     price: initialData ? String(initialData.price ?? '') : '',
     duration: initialData ? String(initialData.duration ?? '') : '',
-    image_path: initialData?.image_path ?? initialGalleryImages[0] ?? '',
+    image_path: toStorableImagePath(initialData?.image_path) ?? initialGalleryImages[0] ?? '',
     category: initialData?.category ?? 'Adventure',
     highlights: initialData?.highlights?.join(', ') ?? '',
     includes: initialData?.includes?.join(', ') ?? '',
@@ -156,6 +159,13 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
     const trimmed = url.trim();
     if (!trimmed) {
       setGalleryUploadError('Enter a valid image path or URL.');
+      setGalleryUploadSuccess(null);
+      return false;
+    }
+    if (!isStorableImagePath(trimmed)) {
+      setGalleryUploadError(
+        'That link is a temporary browser preview and would break once you reload. Upload the file instead.',
+      );
       setGalleryUploadSuccess(null);
       return false;
     }
@@ -269,7 +279,9 @@ export default function PackageForm({ mode, packageId, initialData }: PackageFor
         const removedUrl = prev[index];
         setFormState(prevState => {
           if (prevState.image_path.trim() === removedUrl) {
-            return { ...prevState, image_path: next[0] ?? previewUrls[0] ?? '' };
+            // Only fall back to an already-uploaded image. Pending previews are blob:
+            // URLs; promoting one to cover would persist a link that dies with the tab.
+            return { ...prevState, image_path: next[0] ?? '' };
           }
           return prevState;
         });

@@ -357,10 +357,7 @@ const GalleryManager = forwardRef<GalleryManagerHandle, GalleryManagerProps>(fun
         method: 'DELETE',
       });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.message || 'Failed to delete gallery item');
-      }
+      await readJson(response, 'Failed to delete gallery item');
 
       if (editingId === id) {
         cancelEdit();

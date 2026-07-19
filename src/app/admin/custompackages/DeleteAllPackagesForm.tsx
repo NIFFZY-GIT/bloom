@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import type { ActionResult } from "@/lib/action-result";
 import styles from "../bookings/AdminBookings.module.css";
 
 export type DeleteAllPackagesFormProps = {
-  action: () => Promise<void>;
+  action: () => Promise<ActionResult>;
   disabled: boolean;
 };
 
@@ -14,6 +15,7 @@ export default function DeleteAllPackagesForm({
 }: DeleteAllPackagesFormProps) {
   const [isPending, startTransition] = useTransition();
   const [showConfirm, setShowConfirm] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -24,17 +26,32 @@ export default function DeleteAllPackagesForm({
     }
 
     startTransition(async () => {
-      await action();
-      setShowConfirm(false);
+      setError(null);
+      try {
+        const result = await action();
+        if (!result.ok) {
+          setError(result.message);
+          return;
+        }
+        setShowConfirm(false);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to delete all requests.");
+      }
     });
   };
 
   const handleCancel = () => {
     setShowConfirm(false);
+    setError(null);
   };
 
   return (
     <form onSubmit={handleSubmit} className={styles.deleteAllForm}>
+      {error ? (
+        <p role="alert" style={{ fontSize: '0.8rem', color: '#dc2626', margin: '0 0 0.5rem' }}>
+          {error}
+        </p>
+      ) : null}
       {showConfirm ? (
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <span style={{ fontSize: '0.85rem', color: '#dc2626', fontWeight: 600 }}>

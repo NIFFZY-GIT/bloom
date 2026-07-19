@@ -44,9 +44,19 @@ export async function readJson<T = unknown>(
   }
 
   if (!response.ok) {
-    const message = (data as { message?: unknown } | null)?.message;
-    throw new Error(typeof message === 'string' && message.trim() ? message : fallbackMessage);
+    throw new Error(serverMessage(data) ?? fallbackMessage);
   }
 
   return data as T;
+}
+
+/** Route handlers report failures as `message` in most places and `error` in a few. */
+function serverMessage(data: unknown): string | null {
+  const body = data as { message?: unknown; error?: unknown } | null;
+  for (const candidate of [body?.message, body?.error]) {
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return candidate;
+    }
+  }
+  return null;
 }

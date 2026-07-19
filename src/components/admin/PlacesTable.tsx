@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
+import { readJson } from '@/lib/http';
 import styles from '@/app/admin/packages/AdminPackages.module.css';
 
 interface PlaceRow {
@@ -36,10 +37,7 @@ export default function PlacesTable({ places }: PlacesTableProps) {
       const response = await fetch(`/api/places/${id}`, {
         method: 'DELETE',
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.message || 'Failed to delete place');
-      }
+      await readJson(response, 'Failed to delete place');
       router.refresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to delete place';

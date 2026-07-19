@@ -41,6 +41,27 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '15mb',
     },
   },
+
+  // 3. Serve runtime-uploaded files.
+  //
+  // Next.js only serves files that were in public/ when the server booted, but
+  // /api/uploads writes into public/uploads while it is running — so every uploaded
+  // image 404s at /uploads/... until the next restart, even though the file is on
+  // disk. `afterFiles` runs only when the static handler found nothing, so genuinely
+  // static assets keep their fast path and runtime uploads fall through to the route
+  // that reads them from disk. This repairs existing /uploads/... rows too.
+  async rewrites() {
+    return {
+      beforeFiles: [],
+      afterFiles: [
+        {
+          source: '/uploads/:path*',
+          destination: '/api/serve-uploads/:path*',
+        },
+      ],
+      fallback: [],
+    };
+  },
 };
 
 export default nextConfig;

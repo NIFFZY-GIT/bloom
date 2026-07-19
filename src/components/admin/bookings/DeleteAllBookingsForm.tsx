@@ -1,16 +1,19 @@
 "use client";
 
-import { FormEvent } from "react";
+import { FormEvent, useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
+import type { ActionResult } from "@/lib/action-result";
 import styles from "@/app/admin/bookings/AdminBookings.module.css";
 
 type DeleteAllBookingsFormProps = {
-  action: (formData: FormData) => Promise<void>;
+  action: () => Promise<ActionResult>;
   disabled?: boolean;
 };
 
 export default function DeleteAllBookingsForm({ action, disabled = false }: DeleteAllBookingsFormProps) {
+  const [state, formAction] = useActionState<ActionResult | null>(async () => action(), null);
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     if (disabled) {
       event.preventDefault();
@@ -27,9 +30,16 @@ export default function DeleteAllBookingsForm({ action, disabled = false }: Dele
   };
 
   return (
-    <form action={action} onSubmit={handleSubmit} className={styles.deleteAllForm}>
-      <DeleteAllButton disabled={disabled} />
-    </form>
+    <>
+      <form action={formAction} onSubmit={handleSubmit} className={styles.deleteAllForm}>
+        <DeleteAllButton disabled={disabled} />
+      </form>
+      {state && !state.ok ? (
+        <p role="alert" style={{ fontSize: '0.8rem', color: '#dc2626', margin: '0.35rem 0 0' }}>
+          {state.message}
+        </p>
+      ) : null}
+    </>
   );
 }
 

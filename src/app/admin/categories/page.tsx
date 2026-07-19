@@ -33,14 +33,17 @@ export default function CategoriesPage() {
   const fetchCategories = async () => {
     try {
       const response = await fetch('/api/categories');
-      const data = await response.json();
+      const data = await readJson<{ success?: boolean; categories?: Category[]; message?: string }>(
+        response,
+        'Failed to load categories',
+      );
       if (data.success) {
-        setCategories(data.categories);
+        setCategories(data.categories ?? []);
       } else {
-        setError('Failed to load categories');
+        setError(data.message || 'Failed to load categories');
       }
     } catch (err) {
-      setError('Error loading categories');
+      setError(err instanceof Error ? err.message : 'Error loading categories');
       console.error(err);
     } finally {
       setLoading(false);
@@ -65,7 +68,10 @@ export default function CategoriesPage() {
         body: JSON.stringify(formData)
       });
 
-      const data = await response.json();
+      const data = await readJson<{ success?: boolean; message?: string }>(
+        response,
+        editingCategory ? 'Failed to update category' : 'Failed to create category',
+      );
 
       if (data.success) {
         await fetchCategories();
@@ -75,7 +81,7 @@ export default function CategoriesPage() {
         setError(data.message || 'Operation failed');
       }
     } catch (err) {
-      setError('Error saving category');
+      setError(err instanceof Error ? err.message : 'Error saving category');
       console.error(err);
     } finally {
       setSubmitting(false);
@@ -92,7 +98,10 @@ export default function CategoriesPage() {
         method: 'DELETE'
       });
 
-      const data = await response.json();
+      const data = await readJson<{ success?: boolean; message?: string }>(
+        response,
+        'Failed to delete category',
+      );
 
       if (data.success) {
         await fetchCategories();
@@ -101,7 +110,7 @@ export default function CategoriesPage() {
         alert(data.message || 'Failed to delete category');
       }
     } catch (err) {
-      alert('Error deleting category');
+      alert(err instanceof Error ? err.message : 'Error deleting category');
       console.error(err);
     }
   };

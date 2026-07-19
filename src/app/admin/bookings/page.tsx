@@ -3,7 +3,9 @@ import Image from 'next/image';
 
 import { query } from '@/lib/db';
 import { requireAdminPage } from '@/lib/admin-auth';
+import { actionError, actionOk, describeError, type ActionResult } from '@/lib/action-result';
 import { notifyUserBookingStatusChange, notifyUserPaymentStatusChange, notifyAdminNewBooking, sendBookingConfirmationToUser } from '@/lib/email';
+import ActionForm from '@/components/admin/ActionForm';
 import BookingsFilters from './BookingsFilters';
 import DeleteAllBookingsForm from '@/components/admin/bookings/DeleteAllBookingsForm';
 import DeleteBookingButton from '@/components/admin/bookings/DeleteBookingButton';
@@ -356,7 +358,7 @@ function ReceiptPreview({ url, uploadedAt }: { url: string; uploadedAt: Date | n
   );
 }
 
-async function updateBookingStatus(formData: FormData) {
+async function updateBookingStatus(_prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
   'use server';
 
   await requireAdmin();
@@ -369,12 +371,12 @@ async function updateBookingStatus(formData: FormData) {
 
   if (!Number.isInteger(bookingId) || bookingId <= 0) {
     console.warn('Invalid booking id submitted for status update:', rawId);
-    return;
+    return actionError('That booking has an invalid id, so its status could not be updated.');
   }
 
   if (!ALLOWED_STATUSES.includes(status as BookingStatus)) {
     console.warn('Invalid booking status submitted:', status);
-    return;
+    return actionError(`"${status}" is not a valid booking status.`);
   }
 
   const attemptUpdate = async (
@@ -402,24 +404,32 @@ async function updateBookingStatus(formData: FormData) {
     }
   };
 
-  let updatedRows = await attemptUpdate('booking_id', 'status');
+  let updatedRows: number;
+  try {
+    updatedRows = await attemptUpdate('booking_id', 'status');
 
-  if (updatedRows === 0) {
-    updatedRows = await attemptUpdate('booking_id', 'booking_status');
-  }
+    if (updatedRows === 0) {
+      updatedRows = await attemptUpdate('booking_id', 'booking_status');
+    }
 
-  if (updatedRows === 0) {
-    updatedRows = await attemptUpdate('id', 'status');
-  }
+    if (updatedRows === 0) {
+      updatedRows = await attemptUpdate('id', 'status');
+    }
 
-  if (updatedRows === 0) {
-    updatedRows = await attemptUpdate('id', 'booking_status');
+    if (updatedRows === 0) {
+      updatedRows = await attemptUpdate('id', 'booking_status');
+    }
+  } catch (error) {
+    console.error('Failed to update booking status:', error);
+    return actionError(describeError(error, 'Failed to update the booking status.'));
   }
 
   if (updatedRows === 0) {
     console.warn('No booking rows updated for id:', bookingId);
-    return;
+    return actionError(`Booking #${bookingId} was not found — it may have been deleted already.`);
   }
+
+  let emailWarning: string | null = null;
 
   // If status changed to CONFIRMED, send invoice emails to both admin and customer
   if (status === 'CONFIRMED') {
@@ -477,7 +487,9 @@ async function updateBookingStatus(formData: FormData) {
       }
     } catch (invoiceEmailError) {
       console.error('Failed to send invoice emails on confirmation:', invoiceEmailError);
-      // Continue - status was already updated successfully
+      // Continue - status was already updated successfully, but tell the admin so
+      // they know to follow up with the customer manually.
+      emailWarning = 'the invoice email could not be sent';
     }
   }
 
@@ -503,12 +515,16 @@ async function updateBookingStatus(formData: FormData) {
   } catch (emailError) {
     // Log email error but don't fail the request
     console.error('Failed to send booking status notification email:', emailError);
+    emailWarning = 'the customer notification email could not be sent';
   }
 
   revalidatePath('/admin/bookings');
+  return actionOk(
+    emailWarning ? `Status saved, but ${emailWarning}. Please contact the customer directly.` : undefined,
+  );
 }
 
-async function updatePaymentStatus(formData: FormData) {
+async function updatePaymentStatus(_prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
   'use server';
 
   await requireAdmin();
@@ -521,12 +537,12 @@ async function updatePaymentStatus(formData: FormData) {
 
   if (!Number.isInteger(bookingId) || bookingId <= 0) {
     console.warn('Invalid booking id submitted for payment status update:', rawId);
-    return;
+    return actionError('That booking has an invalid id, so its payment status could not be updated.');
   }
 
   if (!PAYMENT_STATUSES.includes(status as PaymentStatus)) {
     console.warn('Invalid payment status submitted:', status);
-    return;
+    return actionError(`"${status}" is not a valid payment status.`);
   }
 
   const attemptUpdate = async (
@@ -553,32 +569,40 @@ async function updatePaymentStatus(formData: FormData) {
     }
   };
 
-  let updatedRows = await attemptUpdate('booking_id', 'payment_status');
+  let updatedRows: number;
+  try {
+    updatedRows = await attemptUpdate('booking_id', 'payment_status');
 
-  if (updatedRows === 0) {
-    updatedRows = await attemptUpdate('booking_id', 'paymentstatus');
-  }
+    if (updatedRows === 0) {
+      updatedRows = await attemptUpdate('booking_id', 'paymentstatus');
+    }
 
-  if (updatedRows === 0) {
-    updatedRows = await attemptUpdate('booking_id', 'payment_state');
-  }
+    if (updatedRows === 0) {
+      updatedRows = await attemptUpdate('booking_id', 'payment_state');
+    }
 
-  if (updatedRows === 0) {
-    updatedRows = await attemptUpdate('id', 'payment_status');
-  }
+    if (updatedRows === 0) {
+      updatedRows = await attemptUpdate('id', 'payment_status');
+    }
 
-  if (updatedRows === 0) {
-    updatedRows = await attemptUpdate('id', 'paymentstatus');
-  }
+    if (updatedRows === 0) {
+      updatedRows = await attemptUpdate('id', 'paymentstatus');
+    }
 
-  if (updatedRows === 0) {
-    updatedRows = await attemptUpdate('id', 'payment_state');
+    if (updatedRows === 0) {
+      updatedRows = await attemptUpdate('id', 'payment_state');
+    }
+  } catch (error) {
+    console.error('Failed to update payment status:', error);
+    return actionError(describeError(error, 'Failed to update the payment status.'));
   }
 
   if (updatedRows === 0) {
     console.warn('No booking rows updated for payment status id:', bookingId);
-    return;
+    return actionError(`Booking #${bookingId} was not found — it may have been deleted already.`);
   }
+
+  let emailWarning: string | null = null;
 
   // Send notification email to customer
   try {
@@ -602,12 +626,16 @@ async function updatePaymentStatus(formData: FormData) {
   } catch (emailError) {
     // Log email error but don't fail the request
     console.error('Failed to send payment status notification email:', emailError);
+    emailWarning = 'the customer notification email could not be sent';
   }
 
   revalidatePath('/admin/bookings');
+  return actionOk(
+    emailWarning ? `Payment status saved, but ${emailWarning}. Please contact the customer directly.` : undefined,
+  );
 }
 
-async function deleteBooking(formData: FormData) {
+async function deleteBooking(_prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
   'use server';
 
   await requireAdmin();
@@ -617,7 +645,7 @@ async function deleteBooking(formData: FormData) {
 
   if (!Number.isInteger(bookingId) || bookingId <= 0) {
     console.warn('Invalid booking id submitted for deletion:', rawId);
-    return;
+    return actionError('That booking has an invalid id, so it could not be deleted.');
   }
 
   const receiptCleanup = async () => {
@@ -647,18 +675,21 @@ async function deleteBooking(formData: FormData) {
       if (isUndefinedColumnError(error)) {
         continue;
       }
-      throw error;
+      console.error('Failed to delete booking:', error);
+      return actionError(describeError(error, 'Failed to delete the booking.'));
     }
   }
 
   if (!deleted) {
     console.warn('No booking rows deleted for id:', bookingId);
+    return actionError(`Booking #${bookingId} was not found — it may have been deleted already.`);
   }
 
   revalidatePath('/admin/bookings');
+  return actionOk();
 }
 
-async function deleteAllBookings() {
+async function deleteAllBookings(): Promise<ActionResult> {
   'use server';
 
   await requireAdmin();
@@ -675,11 +706,13 @@ async function deleteAllBookings() {
       if (optional && (isUndefinedColumnError(error) || isMissingRelationError(error))) {
         continue;
       }
-      throw error;
+      console.error('Failed to delete all bookings:', error);
+      return actionError(describeError(error, 'Failed to delete all bookings.'));
     }
   }
 
   revalidatePath('/admin/bookings');
+  return actionOk();
 }
 
 // Unused helper functions - keeping for future use
@@ -952,7 +985,7 @@ export default async function AdminBookingsPage({
                       <label className={styles.statusLabel} htmlFor={`status-${booking.id}`}>
                         Booking Status
                       </label>
-                      <form action={updateBookingStatus} style={{ display: 'flex', gap: '0.5rem' }}>
+                      <ActionForm action={updateBookingStatus} style={{ display: 'flex', gap: '0.5rem' }}>
                         <input type="hidden" name="bookingId" value={booking.id} />
                         <select
                           id={`status-${booking.id}`}
@@ -970,14 +1003,14 @@ export default async function AdminBookingsPage({
                         <button type="submit" className={styles.statusSubmit}>
                           Save
                         </button>
-                      </form>
+                      </ActionForm>
                     </div>
 
                     <div className={styles.statusGroup}>
                       <label className={styles.statusLabel} htmlFor={`payment-${booking.id}`}>
                         Payment Status
                       </label>
-                      <form action={updatePaymentStatus} style={{ display: 'flex', gap: '0.5rem' }}>
+                      <ActionForm action={updatePaymentStatus} style={{ display: 'flex', gap: '0.5rem' }}>
                         <input type="hidden" name="bookingId" value={booking.id} />
                         <select
                           id={`payment-${booking.id}`}
@@ -995,7 +1028,7 @@ export default async function AdminBookingsPage({
                         <button type="submit" className={styles.paymentSubmit}>
                           Save
                         </button>
-                      </form>
+                      </ActionForm>
                     </div>
 
                     <DeleteBookingButton

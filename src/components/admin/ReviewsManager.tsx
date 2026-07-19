@@ -197,10 +197,7 @@ const ReviewsManager = forwardRef<ReviewsManagerHandle, ReviewsManagerProps>(fun
         body: JSON.stringify(createState),
       });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.message || 'Failed to create review');
-      }
+      await readJson(response, 'Failed to create review');
 
       closeCreateModal();
       router.refresh();
@@ -252,10 +249,7 @@ const ReviewsManager = forwardRef<ReviewsManagerHandle, ReviewsManagerProps>(fun
         body: JSON.stringify(editState),
       });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.message || 'Failed to update review');
-      }
+      await readJson(response, 'Failed to update review');
 
       cancelEdit();
       router.refresh();
@@ -279,10 +273,7 @@ const ReviewsManager = forwardRef<ReviewsManagerHandle, ReviewsManagerProps>(fun
         method: 'DELETE',
       });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.message || 'Failed to delete review');
-      }
+      await readJson(response, 'Failed to delete review');
 
       if (editingId === id) {
         cancelEdit();

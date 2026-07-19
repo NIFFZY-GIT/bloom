@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { readJson } from '@/lib/http';
 import styles from '@/app/admin/users/AdminUsers.module.css';
 
 interface UserRow {
@@ -34,10 +35,7 @@ export default function UserManagementTable({ users, currentUserId, adminCount }
         body: JSON.stringify({ role: targetRole }),
       });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.message || data?.error || 'Failed to update role');
-      }
+      await readJson(response, 'Failed to update role');
 
       router.refresh();
     } catch (error) {
@@ -61,10 +59,7 @@ export default function UserManagementTable({ users, currentUserId, adminCount }
         method: 'DELETE',
       });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.message || data?.error || 'Failed to delete user');
-      }
+      await readJson(response, 'Failed to delete user');
 
       router.refresh();
     } catch (error) {

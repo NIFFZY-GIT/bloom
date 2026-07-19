@@ -35,18 +35,29 @@ export default function PlacesPage() {
         fetch('/api/categories')
       ]);
 
-      const placesData = await placesRes.json();
-      const categoriesData = await categoriesRes.json();
+      const placesData = await readJson<{ success?: boolean; places?: Place[]; message?: string }>(
+        placesRes,
+        'Failed to load places',
+      );
+      const categoriesData = await readJson<{ success?: boolean; categories?: Category[]; message?: string }>(
+        categoriesRes,
+        'Failed to load categories',
+      );
 
       if (placesData.success) {
-        setPlaces(placesData.places);
+        setPlaces(placesData.places ?? []);
+      } else {
+        // Don't leave the admin staring at an empty table with no explanation.
+        setError(placesData.message || 'Failed to load places');
       }
 
       if (categoriesData.success) {
-        setCategories(categoriesData.categories);
+        setCategories(categoriesData.categories ?? []);
+      } else {
+        setError(categoriesData.message || 'Failed to load categories');
       }
     } catch (err) {
-      setError('Error loading data');
+      setError(err instanceof Error ? err.message : 'Error loading data');
       console.error(err);
     } finally {
       setLoading(false);
@@ -74,7 +85,10 @@ export default function PlacesPage() {
         })
       });
 
-      const data = await response.json();
+      const data = await readJson<{ success?: boolean; message?: string }>(
+        response,
+        editingPlace ? 'Failed to update place' : 'Failed to create place',
+      );
 
       if (data.success) {
         await fetchData();
@@ -84,7 +98,7 @@ export default function PlacesPage() {
         setError(data.message || 'Operation failed');
       }
     } catch (err) {
-      setError('Error saving place');
+      setError(err instanceof Error ? err.message : 'Error saving place');
       console.error(err);
     } finally {
       setSubmitting(false);
@@ -101,7 +115,10 @@ export default function PlacesPage() {
         method: 'DELETE'
       });
 
-      const data = await response.json();
+      const data = await readJson<{ success?: boolean; message?: string }>(
+        response,
+        'Failed to delete place',
+      );
 
       if (data.success) {
         await fetchData();
@@ -110,7 +127,7 @@ export default function PlacesPage() {
         alert(data.message || 'Failed to delete place');
       }
     } catch (err) {
-      alert('Error deleting place');
+      alert(err instanceof Error ? err.message : 'Error deleting place');
       console.error(err);
     }
   };

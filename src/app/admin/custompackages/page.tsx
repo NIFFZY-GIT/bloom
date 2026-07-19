@@ -1,12 +1,14 @@
 import { revalidatePath } from 'next/cache';
 import { query } from '@/lib/db';
 import { requireAdminPage } from '@/lib/admin-auth';
+import { actionError, actionOk, describeError, type ActionResult } from '@/lib/action-result';
 import Link from 'next/link';
 import styles from '../bookings/AdminBookings.module.css';
 import CustomPackagesFilters from './CustomPackagesFilters';
 import DeletePackageButton from './DeletePackageButton';
 import DeleteAllPackagesForm from './DeleteAllPackagesForm';
 import UploadQuotationButton from './UploadQuotationButton';
+import ActionForm from '@/components/admin/ActionForm';
 
 const ALLOWED_STATUSES = ['PENDING', 'APPROVED', 'REJECTED'] as const;
 type PackageStatus = typeof ALLOWED_STATUSES[number];
@@ -189,7 +191,7 @@ function formatDateRange(start: string | null, end: string | null) {
   return `${startLabel} – ${formatDate(end)}`;
 }
 
-async function updatePackageStatus(formData: FormData) {
+async function updatePackageStatus(_prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
   'use server';
 
   await requireAdmin();
@@ -202,27 +204,33 @@ async function updatePackageStatus(formData: FormData) {
 
   if (!packageId || !isValidUuid(packageId)) {
     console.warn('Invalid package id submitted for status update:', rawId);
-    return;
+    return actionError('That request has an invalid id, so its status could not be updated.');
   }
 
   if (!ALLOWED_STATUSES.includes(status as PackageStatus)) {
     console.warn('Invalid package status submitted:', status);
-    return;
+    return actionError(`"${status}" is not a valid status.`);
   }
 
   try {
-    await query(
+    const result = await query(
       `UPDATE custom_packages SET status = $1, updated_at = NOW() WHERE id = $2`,
       [status.toLowerCase(), packageId]
     );
 
+    if ((result.rowCount ?? 0) === 0) {
+      return actionError('That request no longer exists — it may have been deleted already.');
+    }
+
     revalidatePath('/admin/custompackages');
+    return actionOk();
   } catch (error) {
     console.error('Failed to update package status:', error);
+    return actionError(describeError(error, 'Failed to update the request status.'));
   }
 }
 
-async function deletePackage(formData: FormData) {
+async function deletePackage(_prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
   'use server';
 
   await requireAdmin();
@@ -232,23 +240,29 @@ async function deletePackage(formData: FormData) {
 
   if (!packageId || !isValidUuid(packageId)) {
     console.warn('Invalid package id submitted for deletion:', rawId);
-    return;
+    return actionError('That request has an invalid id, so it could not be deleted.');
   }
 
   try {
     // Delete relationships first (CASCADE should handle this, but being explicit)
     await query('DELETE FROM custom_package_places WHERE custom_package_id = $1', [packageId]);
-    
+
     // Delete the package
-    await query('DELETE FROM custom_packages WHERE id = $1', [packageId]);
+    const result = await query('DELETE FROM custom_packages WHERE id = $1', [packageId]);
+
+    if ((result.rowCount ?? 0) === 0) {
+      return actionError('That request no longer exists — it may have been deleted already.');
+    }
 
     revalidatePath('/admin/custompackages');
+    return actionOk();
   } catch (error) {
     console.error('Failed to delete package:', error);
+    return actionError(describeError(error, 'Failed to delete the request.'));
   }
 }
 
-async function deleteAllPackages() {
+async function deleteAllPackages(): Promise<ActionResult> {
   'use server';
 
   await requireAdmin();
@@ -258,8 +272,10 @@ async function deleteAllPackages() {
     await query('DELETE FROM custom_packages');
 
     revalidatePath('/admin/custompackages');
+    return actionOk();
   } catch (error) {
     console.error('Failed to delete all packages:', error);
+    return actionError(describeError(error, 'Failed to delete all requests.'));
   }
 }
 
@@ -519,7 +535,7 @@ export default async function AdminCustomPackagesPage({
                       <label className={styles.statusLabel} htmlFor={`status-${pkg.id}`}>
                         Request Status
                       </label>
-                      <form action={updatePackageStatus} style={{ display: 'flex', gap: '0.5rem' }}>
+                      <ActionForm action={updatePackageStatus} style={{ display: 'flex', gap: '0.5rem' }}>
                         <input type="hidden" name="packageId" value={pkg.id} />
                         <select
                           id={`status-${pkg.id}`}
@@ -537,7 +553,7 @@ export default async function AdminCustomPackagesPage({
                         <button type="submit" className={styles.statusSubmit}>
                           Save
                         </button>
-                      </form>
+                      </ActionForm>
                     </div>
 
                     <div style={{ marginTop: '1rem' }}>
