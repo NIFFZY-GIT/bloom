@@ -95,7 +95,7 @@ export default function Footer() {
 </li> {/* <-- Fixed here */}
 <li>
   <div className="tb-contact-icon"><FaPhone /></div>
-  <a href="tel:+94771234567" className="tb-contact-text tb-interactive-text">
+  <a href="tel:+94777331811" className="tb-contact-text tb-interactive-text">
     +94 77 733 1811
   </a>
 </li>

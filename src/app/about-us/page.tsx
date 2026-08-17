@@ -7,10 +7,10 @@ export default function AboutUs() {
   const [activeTab, setActiveTab] = useState('mission');
 
   const stats = [
-    { number: '15+', label: 'Years of Excellence' },
-    { number: '50K+', label: 'Global Travelers' },
-    { number: '200+', label: 'Curated Destinations' },
-    { number: '98%', label: 'Retention & Satisfaction' }
+    { number: '2+', label: 'Years of Excellence' },
+    { number: '20K+', label: 'Global Travelers' },
+    { number: '50+', label: 'Curated Destinations' },
+    { number: '95%', label: 'Retention & Satisfaction' }
   ];
 
   const values = [
@@ -57,7 +57,7 @@ export default function AboutUs() {
               Our Institutional Story
             </h1>
             <p className="text-lg sm:text-xl font-normal opacity-90 max-w-3xl leading-relaxed text-slate-200 font-serif italic tracking-wide animate-[fadeInUp_0.8s_ease-out_0.2s_both]">
-              Architecting bespoke luxury expeditions across the Sri Lankan subcontinent since 2010.
+              Architecting bespoke luxury expeditions across the Sri Lankan subcontinent since 2025.
             </p>
           </div>
 
@@ -82,7 +82,7 @@ export default function AboutUs() {
                 Tropical Bloom Corporate Governance
               </h2>
               <p className="text-base leading-relaxed text-slate-500">
-                Established in 2010, Tropical Bloom Tourism was conceptualized with a clear corporate mandate: 
+                Established in 2025, Tropical Bloom Tourism was conceptualized with a clear corporate mandate: 
                 to structuralize, modernize, and elevate the standard of custom destination management inside Sri Lanka. 
                 What originated as a private boutique portfolio has systematically evolved into one of the country&apos;s 
                 most authoritative assets in custom holiday engineering.

@@ -482,7 +482,7 @@ const PackagesClient = ({ initialTourPackages }: PackagesClientProps) => {
         <section className="packages-section" ref={sectionRef}>
         <div className="section-header">
             <h2>Our Tour Packages</h2>
-            <p>Choose from our selection of handcrafted Brooklyn experiences</p>
+            <p>Choose from our selection of handcrafted Blooming experiences</p>
           </div>
 
           <div className="packages-toolbar">
