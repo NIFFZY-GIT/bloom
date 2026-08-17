@@ -90,7 +90,7 @@ export default function AboutUs() {
               <p className="text-base leading-relaxed text-slate-500">
                 We assert that modern executive travel must satisfy three key pillars: absolute operational precision, 
                 environmental stewardship, and flawless experiential curation. Every asset deployment under our stewardship 
-                is guaranteed to offer exceptional luxury, from remote highland reserve access to curated historical asset encounters.
+                is guaranteed to offer Memories & Experience, from remote highland reserve access to curated historical asset encounters.
               </p>
             </div>
             
